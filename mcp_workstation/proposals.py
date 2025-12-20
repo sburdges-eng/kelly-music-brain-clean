@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from .models import (
     AIAgent,
@@ -189,14 +189,14 @@ class ProposalManager:
             if p.agent != agent and agent.value not in p.votes
         ]
 
-    def to_dict(self) -> Dict[str, any]:
+    def to_dict(self) -> Dict[str, Any]:
         return {
             "proposals": {pid: p.to_dict() for pid, p in self.proposals.items()},
             "votes": [v.to_dict() for v in self.votes],
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, any]) -> "ProposalManager":
+    def from_dict(cls, data: Dict[str, Any]) -> "ProposalManager":
         mgr = cls()
         mgr.proposals = {pid: Proposal.from_dict(pdata) for pid, pdata in data.get("proposals", {}).items()}
         mgr.votes = [ProposalVote.from_dict(v) for v in data.get("votes", [])]
