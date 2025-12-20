@@ -2,6 +2,13 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "../ml/ai_inference.h"
+<<<<<<< Current (Your changes)
+<<<<<<< Current (Your changes)
+#include "../ml/NodeMLMapper.h"
+=======
+>>>>>>> Incoming (Background Agent changes)
+=======
+>>>>>>> Incoming (Background Agent changes)
 #include "../project/ProjectManager.h"
 #include "../midi/MidiExporter.h"
 #include <atomic>
@@ -84,6 +91,183 @@ public:
      * @brief Get generation rate (how often to generate, in blocks)
      */
     int getGenerationRate() const;
+    
+    /**
+     * @brief Enable/disable ML-enhanced generation
+     */
+    void setMLEnabled(bool enabled);
+    
+    /**
+     * @brief Check if ML mode is enabled
+     */
+    bool isMLEnabled() const;
+    
+    /**
+     * @brief Get the NodeMLMapper instance
+     */
+    midikompanion::ml::NodeMLMapper& getNodeMapper() { return nodeMapper_; }
+
+    //==============================================================================
+    // Project Management
+    //==============================================================================
+    
+    /**
+     * @brief Save current project to file
+     * @param file Target file
+     * @return True if successful
+     */
+    bool saveCurrentProject(const juce::File& file);
+    
+    /**
+     * @brief Load project from file
+     * @param file Source file
+     * @return True if successful
+     */
+    bool loadProject(const juce::File& file);
+    
+    /**
+     * @brief Create new empty project
+     */
+    void createNewProject();
+    
+    /**
+     * @brief Get project manager reference
+     */
+    midikompanion::ProjectManager& getProjectManager() { return projectManager_; }
+    
+    /**
+     * @brief Get current project data
+     */
+    midikompanion::ProjectData getCurrentProjectData() const;
+    
+    /**
+     * @brief Check if project has unsaved changes
+     */
+    bool hasUnsavedChanges() const { return projectModified_; }
+    
+    /**
+     * @brief Get current project file
+     */
+    juce::File getCurrentProjectFile() const { return currentProjectFile_; }
+    
+    //==============================================================================
+    // MIDI Export
+    //==============================================================================
+    
+    /**
+     * @brief Export current session to MIDI file
+     * @param file Target file
+     * @param options Export options
+     * @return Export result
+     */
+    midikompanion::MidiExportResult exportToMidi(const juce::File& file,
+                                                 const midikompanion::MidiExportOptions& options = {});
+    
+    /**
+     * @brief Get MIDI exporter reference
+     */
+    midikompanion::MidiExporter& getMidiExporter() { return midiExporter_; }
+    
+    /**
+     * @brief Check if there is MIDI data to export
+     */
+    bool hasMidiData() const { return !generatedMidi_.isEmpty(); }
+    
+    /**
+     * @brief Add generated MIDI events to internal storage
+     */
+    void addGeneratedMidi(const std::vector<ml::MidiEvent>& events);
+    
+    /**
+     * @brief Clear generated MIDI data
+     */
+    void clearGeneratedMidi() { generatedMidi_.clear(); }
+    
+    /**
+     * @brief Get current tempo
+     */
+    double getCurrentTempo() const { return bpm_; }
+
+    //==============================================================================
+    // Project Management
+    //==============================================================================
+    
+    /**
+     * @brief Save current project to file
+     * @param file Target file
+     * @return True if successful
+     */
+    bool saveCurrentProject(const juce::File& file);
+    
+    /**
+     * @brief Load project from file
+     * @param file Source file
+     * @return True if successful
+     */
+    bool loadProject(const juce::File& file);
+    
+    /**
+     * @brief Create new empty project
+     */
+    void createNewProject();
+    
+    /**
+     * @brief Get project manager reference
+     */
+    midikompanion::ProjectManager& getProjectManager() { return projectManager_; }
+    
+    /**
+     * @brief Get current project data
+     */
+    midikompanion::ProjectData getCurrentProjectData() const;
+    
+    /**
+     * @brief Check if project has unsaved changes
+     */
+    bool hasUnsavedChanges() const { return projectModified_; }
+    
+    /**
+     * @brief Get current project file
+     */
+    juce::File getCurrentProjectFile() const { return currentProjectFile_; }
+    
+    //==============================================================================
+    // MIDI Export
+    //==============================================================================
+    
+    /**
+     * @brief Export current session to MIDI file
+     * @param file Target file
+     * @param options Export options
+     * @return Export result
+     */
+    midikompanion::MidiExportResult exportToMidi(const juce::File& file,
+                                                 const midikompanion::MidiExportOptions& options = {});
+    
+    /**
+     * @brief Get MIDI exporter reference
+     */
+    midikompanion::MidiExporter& getMidiExporter() { return midiExporter_; }
+    
+    /**
+     * @brief Check if there is MIDI data to export
+     */
+    bool hasMidiData() const { return !generatedMidi_.isEmpty(); }
+    
+    /**
+     * @brief Add generated MIDI events to internal storage
+     */
+    void addGeneratedMidi(const std::vector<ml::MidiEvent>& events);
+    
+    /**
+     * @brief Clear generated MIDI data
+     */
+    void clearGeneratedMidi() { generatedMidi_.clear(); }
+    
+    /**
+     * @brief Get current tempo
+     */
+    double getCurrentTempo() const { return bpm_; }
 
     //==============================================================================
     // Project Management
@@ -180,6 +364,15 @@ private:
     void parameterChanged(const juce::String& parameterID, float newValue) override;
 
     //==============================================================================
+    // Initialization
+    //==============================================================================
+    
+    /**
+     * @brief Initialize emotion thesaurus from JSON file
+     */
+    void initializeEmotionThesaurus();
+
+    //==============================================================================
     // Member Variables
     //==============================================================================
     
@@ -191,6 +384,10 @@ private:
 
     ml::AIInferenceEngine aiEngine_;
     ml::AIInferenceEngine cloudEngine_;
+    
+    // ML-Node mapping system
+    midikompanion::ml::NodeMLMapper nodeMapper_;
+    std::atomic<bool> mlEnabled_{false};
     
     // Cached emotion request (updated from parameters)
     mutable ml::EmotionRequest emotionRequest_{"calm", 0.1f, 0.2f, 0.4f, 120, 1};

@@ -10,6 +10,8 @@ PluginProcessor::PluginProcessor()
                          .withInput("MIDI In", juce::AudioChannelSet::disabled(), true)
                          .withOutput("MIDI Out", juce::AudioChannelSet::disabled(), true)),
       parameters_(*this, nullptr, juce::Identifier("KellyEmotionProcessor"), createParameterLayout()),
+      nodeMapper_(),
+      mlEnabled_(false),
       aiEngine_([]
       {
           ml::AIConfig cfg;
@@ -47,6 +49,59 @@ PluginProcessor::PluginProcessor()
     parameters_.addParameterListener(ParameterID::bars, this);
     parameters_.addParameterListener(ParameterID::enableCloud, this);
     parameters_.addParameterListener(ParameterID::generationRate, this);
+    
+    // Initialize emotion thesaurus
+    initializeEmotionThesaurus();
+}
+
+void PluginProcessor::initializeEmotionThesaurus() {
+    // Try to load from consolidated JSON file first
+    juce::File appDir = juce::File::getSpecialLocation(juce::File::currentExecutableFile)
+                            .getParentDirectory();
+    
+    #if JUCE_MAC
+        juce::File thesaurusFile = appDir.getParentDirectory()
+                                       .getChildFile("Resources")
+                                       .getChildFile("emotion_thesaurus")
+                                       .getChildFile("emotion_nodes.json");
+    #elif JUCE_WINDOWS
+        juce::File thesaurusFile = appDir.getChildFile("resources")
+                                       .getChildFile("emotion_thesaurus")
+                                       .getChildFile("emotion_nodes.json");
+    #else
+        juce::File thesaurusFile = appDir.getChildFile("resources")
+                                       .getChildFile("emotion_thesaurus")
+                                       .getChildFile("emotion_nodes.json");
+    #endif
+    
+    // Also try relative to source directory (for development)
+    if (!thesaurusFile.existsAsFile()) {
+        thesaurusFile = juce::File::getCurrentWorkingDirectory()
+                           .getChildFile("emotion_thesaurus")
+                           .getChildFile("emotion_nodes.json");
+    }
+    
+    // Try loading from file, fall back to default initialization
+    if (thesaurusFile.existsAsFile()) {
+        if (nodeMapper_.loadThesaurus(thesaurusFile)) {
+            juce::Logger::writeToLog("Loaded emotion thesaurus from: " + thesaurusFile.getFullPathName());
+        } else {
+            juce::Logger::writeToLog("Failed to load emotion thesaurus, using defaults");
+            nodeMapper_.initializeDefaultThesaurus();
+        }
+    } else {
+        juce::Logger::writeToLog("Emotion thesaurus file not found, using defaults: " + thesaurusFile.getFullPathName());
+        nodeMapper_.initializeDefaultThesaurus();
+    }
+}
+
+void PluginProcessor::setMLEnabled(bool enabled) {
+    mlEnabled_.store(enabled, std::memory_order_release);
+    juce::Logger::writeToLog("ML mode " + juce::String(enabled ? "enabled" : "disabled"));
+}
+
+bool PluginProcessor::isMLEnabled() const {
+    return mlEnabled_.load(std::memory_order_acquire);
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParameterLayout() {
@@ -217,6 +272,39 @@ void PluginProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiB
     if (shouldGenerate) {
         // Get current emotion request (thread-safe)
         auto request = getEmotionRequest();
+        
+        // If ML mode is enabled, use NodeMLMapper to enhance the request
+        if (isMLEnabled() && nodeMapper_.isLoaded()) {
+            // Convert VAD to emotion node
+            midikompanion::ml::VADCoordinates vad;
+            vad.valence = request.valence;
+            vad.arousal = request.arousal;
+            vad.dominance = 0.5f; // Default dominance (could be a parameter)
+            vad.intensity = request.intensity;
+            
+            int nearestNodeId = nodeMapper_.findNearestNode(vad);
+            const auto* node = nodeMapper_.getNode(nearestNodeId);
+            
+            if (node) {
+                // Enhance request with node musical attributes
+                // Adjust tempo based on node
+                request.tempo = static_cast<int>(request.tempo * node->tempoMultiplier);
+                
+                // Use node context for ML generation if available
+                auto nodeContext = nodeMapper_.getNodeContext(nearestNodeId);
+                if (!nodeContext.embedding.empty()) {
+                    // Convert 64-dim embedding to request parameters
+                    // (This is a simplified mapping - could be more sophisticated)
+                    if (nodeContext.embedding.size() >= 64) {
+                        // Use first few dimensions to adjust valence/arousal
+                        request.valence = juce::jlimit(-1.0f, 1.0f, 
+                            request.valence + nodeContext.embedding[0] * 0.2f);
+                        request.arousal = juce::jlimit(0.0f, 1.0f, 
+                            request.arousal + nodeContext.embedding[16] * 0.2f);
+                    }
+                }
+            }
+        }
         
         // Generate MIDI from AI (on-device first)
         try {
