@@ -1,2 +1,0 @@
-[console_scripts]
-music-brain = music_brain.cli:main
