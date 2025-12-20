@@ -1,0 +1,4 @@
+#
+# Lightweight requirements for the python utility package.
+# Add heavier deps to project-level pyproject as needed.
+#

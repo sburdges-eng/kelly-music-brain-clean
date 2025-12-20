@@ -57,7 +57,7 @@ include(cmake/CPM.cmake)
 CPMAddPackage(
     NAME JUCE
     GITHUB_REPOSITORY juce-framework/JUCE
-    GIT_TAG 7.0.9
+    GIT_TAG 7.0.12
     OPTIONS
         "JUCE_BUILD_EXAMPLES OFF"
         "JUCE_BUILD_EXTRAS OFF"
