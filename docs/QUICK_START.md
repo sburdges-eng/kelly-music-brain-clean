@@ -9,14 +9,19 @@ Welcome to miDiKompanion! This guide will help you get started with emotion-driv
 3. [Emotion Wheel Usage](#emotion-wheel-usage)
 4. [Creating Your First Project](#creating-your-first-project)
 5. [Exporting MIDI](#exporting-midi)
-6. [Troubleshooting](#troubleshooting)
+6. [Pricing & Tiers](#pricing--tiers)
+7. [Cloud vs Local Generation](#cloud-vs-local-generation)
+8. [Troubleshooting](#troubleshooting)
+9. [Next Steps](#next-steps)
+10. [Keyboard Shortcuts](#keyboard-shortcuts)
+11. [Getting Help](#getting-help)
 
 ## Installation
 
 ### Requirements
 
 - macOS 13.0+ (Apple Silicon native; Intel via Rosetta), Windows 11 22H2+, or iOS/iPadOS 17+ for AUv3 on mobile. Linux is experimental (CLAP/VST3 where supported).
-- DAW supporting VST3 or AUv3 (CLAP supported on Bitwig/Reaper); see `docs/daw_integration/HOST_SUPPORT_MATRIX.md` for host versions.
+- DAW supporting VST3 or AUv3 (CLAP supported on Bitwig/Reaper); see the [Host Support Matrix](daw_integration/HOST_SUPPORT_MATRIX.md) for host versions.
 - 4GB RAM minimum (8GB recommended); 2GB free disk space for models/cache.
 
 ### Plugin Installation
@@ -45,7 +50,7 @@ Welcome to miDiKompanion! This guide will help you get started with emotion-driv
 
 ### Interface Overview
 
-```
+```text
 ┌─────────────────────────────────────────────────┐
 │  miDiKompanion Emotion Workstation              │
 ├─────────────────────────────────────────────────┤
@@ -75,10 +80,10 @@ miDiKompanion uses a hierarchical emotion structure:
 1. **Click** on the emotion wheel to select a base emotion
 2. **Drag** to refine the selection to a specific node
 3. The sliders will update to show the VAD coordinates:
-   - **Valence**: Negative (-1) to Positive (+1)
-   - **Arousal**: Calm (-1) to Excited (+1)
-   - **Dominance**: Submissive (-1) to Dominant (+1)
-   - **Intensity**: Subtle (0) to Extreme (1)
+   - **Valence**: Negative (-1.0) to Positive (+1.0)
+   - **Arousal**: Calm (0.0) to Excited (1.0)
+   - **Dominance**: Submissive (0.0) to Dominant (1.0)
+   - **Intensity**: Subtle (0.0) to Extreme (1.0)
 
 ### Using the Sliders
 
@@ -160,6 +165,7 @@ Enable ML enhancement for more nuanced generation:
 ### Track Selection
 
 Choose which tracks to export:
+
 - ✓ Melody
 - ✓ Bass
 - ✓ Chords
@@ -171,6 +177,20 @@ Choose which tracks to export:
 1. Import the MIDI file into your DAW
 2. Assign instruments to each track
 3. Edit and arrange as needed
+
+## Pricing & Tiers
+
+miDiKompanion offers three tiers (see [Pricing & SKUs](PRICING_SKU.md) for full details):
+
+- **Free (Lite)**: Demo AUv3/VST3, unlimited local inference, daily cloud budget (60s), MIDI export only, single reference.
+- **One-Time Purchase**: Full plugin formats (AUv3/VST3/CLAP), unlimited local inference, stems/templates export, multi-reference blending.
+- **Premium AI ($20/mo)**: Unlimited cloud, explainability, custom ONNX upload (reviewed), cloud preset sync, priority updates.
+
+## Cloud vs Local Generation
+
+- **Local inference** (ONNX/CoreML/TFLite): Unmetered for all tiers; best for offline or low-latency use.
+- **Cloud generation**: Higher-quality models and explainability; consumes tier budgets (compute-seconds). Falls back to local/draft models when limits are reached or offline.
+- **Enable cloud**: Toggle **Enable Cloud Generation** in the plugin and set `KELLY_AI_ENDPOINT` if prompted. Keep local models configured for automatic fallback.
 
 ## Troubleshooting
 
@@ -184,6 +204,7 @@ Choose which tracks to export:
 ### No Audio Output
 
 miDiKompanion generates MIDI, not audio. To hear output:
+
 1. Route the MIDI to a virtual instrument
 2. Or use the built-in preview sounds (standalone only)
 
@@ -229,6 +250,6 @@ miDiKompanion generates MIDI, not audio. To hear output:
 
 - **Documentation**: [docs.midikompanion.com](https://docs.midikompanion.com)
 - **Issues**: [GitHub Issues](https://github.com/midikompanion/issues)
-- **Email**: support@midikompanion.com
+- **Email**: [support@midikompanion.com](mailto:support@midikompanion.com)
 
 Happy music making! 🎵

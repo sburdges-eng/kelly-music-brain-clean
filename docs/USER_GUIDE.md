@@ -3,6 +3,7 @@
 This comprehensive guide covers all features of miDiKompanion, the emotion-driven MIDI generation plugin.
 
 ## Table of Contents
+
 - [Overview](#overview)
 - [Emotion System](#emotion-system)
 - [VAD Parameters](#vad-parameters)
@@ -26,23 +27,21 @@ miDiKompanion uses a sophisticated emotion-to-music mapping system to generate M
 
 ### Base Emotions
 
-The plugin provides 9 base emotions as starting points:
+The plugin provides 6 base emotions as starting points:
 
 | Emotion | Description | Musical Characteristics |
 |---------|-------------|------------------------|
-| Calm | Peaceful, serene | Slow tempo, sustained notes, major/minor mix |
-| Excited | Energetic, enthusiastic | Fast tempo, staccato, major key |
-| Sad | Melancholic, sorrowful | Slow tempo, minor key, descending patterns |
-| Angry | Intense, aggressive | Fast tempo, dissonance, accented rhythms |
-| Happy | Joyful, cheerful | Medium-fast tempo, major key, bright tones |
-| Anxious | Nervous, tense | Irregular rhythms, chromaticism |
-| Peaceful | Tranquil, content | Very slow, consonant, open voicings |
-| Energetic | Dynamic, lively | Syncopated, driving rhythms |
-| Neutral | Balanced, even | Medium everything, balanced patterns |
+| Happy | Joyful, bright | Medium-fast tempo, major key, upward contours |
+| Sad | Melancholic, reflective | Slow tempo, minor key, descending phrases |
+| Angry | Intense, forceful | Fast tempo, dissonance, accented rhythms |
+| Fear | Anxious, tense | Uneven rhythms, sparse textures, low register |
+| Surprise | Sudden, dramatic | Dynamic shifts, tempo feints, jumps in register |
+| Disgust | Rejecting, unsettled | Chromatic tension, darker timbres, percussive emphasis |
 
 ### 216-Node Thesaurus
 
 Behind the base emotions is a 216-node emotion thesaurus with:
+
 - **6 base emotions** × **6 sub-emotions** × **6 intensity levels**
 - Each node has specific VAD coordinates and musical attributes
 - Nodes are interconnected for smooth emotional transitions
@@ -64,6 +63,7 @@ Controls the positive/negative emotional tone:
 | 1.0 | Extremely positive: major keys, bright tones |
 
 **Musical Impact**:
+
 - Key selection (major vs minor)
 - Chord quality
 - Melodic contour direction
@@ -83,10 +83,30 @@ Controls the energy level:
 | 1.0 | Very excited: fast, dense, staccato |
 
 **Musical Impact**:
+
 - Tempo adjustment
 - Note density
 - Articulation style
 - Rhythmic complexity
+
+### Dominance (Submissive ↔ Dominant)
+
+Range: 0.0 to 1.0
+
+Controls the sense of control or power:
+
+| Value | Effect |
+|-------|--------|
+| 0.0 | Submissive: supportive role, gentle dynamics |
+| 0.5 | Balanced: shared lead/support presence |
+| 1.0 | Dominant: commanding lead, forward mix placement |
+
+**Musical Impact**:
+
+- Role emphasis (lead vs accompaniment)
+- Dynamic weight and articulation strength
+- Register choice and density
+- Percussive/transient prominence
 
 ### Intensity (Subtle ↔ Extreme)
 
@@ -101,6 +121,7 @@ Controls the expressive intensity:
 | 1.0 | Extreme: strong dynamics, complex patterns |
 
 **Musical Impact**:
+
 - Velocity range
 - Dynamic contrast
 - Pattern complexity
@@ -144,6 +165,7 @@ How frequently the plugin generates new MIDI (measured in audio blocks).
 ### Project File Contents
 
 The `.mkp` file stores:
+
 - All parameter settings (including cassette/tape state)
 - Emotion state (216-node selection, VAD sliders)
 - Generated MIDI data (melody, bass, chords, drums, vocals)
@@ -208,6 +230,7 @@ When using Export > Export MIDI with Options:
 ### Export Statistics
 
 After export, the status bar shows:
+
 - Total notes exported
 - File size
 - Duration in beats
@@ -216,6 +239,7 @@ After export, the status bar shows:
 ### MIDI File Compatibility
 
 Exported MIDI files are compatible with:
+
 - All major DAWs (Ableton, Logic, Cubase, FL Studio, etc.)
 - Notation software (Sibelius, Finale, MuseScore)
 - Other MIDI applications
@@ -227,11 +251,13 @@ Exported MIDI files are compatible with:
 Toggle "Enable Cloud Generation" to use cloud-based AI inference.
 
 **When to use**:
+
 - For higher quality generation
 - When local ONNX model isn't available
 - For more complex emotional mappings
 
 **Requirements**:
+
 - Internet connection
 - Cloud API endpoint configured (via environment variable)
 
@@ -261,6 +287,7 @@ For richer arrangements:
 ### Automation
 
 Most parameters can be automated in your DAW:
+
 - Automate Valence for emotional arc
 - Automate Arousal for energy builds
 - Automate Intensity for dramatic moments
