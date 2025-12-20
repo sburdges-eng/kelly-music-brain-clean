@@ -39,6 +39,7 @@ set_source_files_properties(
 
 target_include_directories(KellyCore PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 target_link_libraries(KellyCore PUBLIC
