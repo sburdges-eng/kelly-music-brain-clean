@@ -209,8 +209,8 @@ miDiKompanion generates MIDI, not audio. To hear output:
 
 ## Next Steps
 
-- Read the [User Manual](USER_MANUAL.md) for advanced features
-- Explore [Emotion Presets](EMOTION_PRESETS.md)
+- Read the [User Guide](USER_GUIDE.md) for advanced features
+- Explore the [Emotion Wheel](EMOTION_WHEEL.md) for emotion mapping details
 - Learn about [ML Training](ML_TRAINING_GUIDE.md) to customize models
 - Join our [Community Forum](https://community.midikompanion.com) for tips and support
 

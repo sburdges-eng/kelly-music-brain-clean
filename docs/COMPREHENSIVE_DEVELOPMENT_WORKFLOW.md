@@ -352,16 +352,15 @@ feel = FeatureExtractor.extract_feel(features)
 ### 14. Reference Quick Links
 
 **Core Documentation:**
-- [README](README.md) | [Main Docs](MAIN_DOCUMENTATION.md)
-- [Install Guide](INSTALL.md) | [Build Guide](BUILD.md)
-- [Quickstart](QUICKSTART.md) | [Phase 2 Quickstart](PHASE_2_QUICKSTART.md)
+- [README](README.md) | [Build Guide](BUILD.md)
+- [Quick Start](QUICK_START.md) | [User Guide](USER_GUIDE.md)
 
 **Development:**
-- [Project Roadmap](PROJECT_ROADMAP.md) | [18-Month Plan](ROADMAP_18_MONTHS.md)
-- [TODO Analysis](TODO_ANALYSIS.md) | [Dependencies](dependencies.md)
+- [Comprehensive System Requirements](comprehensive-system-requirements.md)
+- [Dependencies](DEPENDENCIES.md) | [Architecture](ARCHITECTURE.md)
 
 **Integration:**
-- [DAW Integration](DAW_INTEGRATION.md) | [VST Plan](VST_PLUGIN_IMPLEMENTATION_PLAN.md)
+- [JUCE Plugin Architecture](JUCE_PLUGIN_ARCHITECTURE.md) | [DAW Programs](daw-programs.md)
 
 **Guides:**
 - Production workflows in `/Production_Workflows/`
