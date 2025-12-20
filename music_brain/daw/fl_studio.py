@@ -17,6 +17,8 @@ from pathlib import Path
 from enum import Enum
 import json
 
+from music_brain.utils.path_utils import safe_path
+
 try:
     import mido
     MIDO_AVAILABLE = True
@@ -248,10 +250,10 @@ class FLProject:
             # End of track
             track.append(mido.MetaMessage('end_of_track', time=0))
 
-        output_path = Path(output_path)
-        mid.save(str(output_path))
+        output_safe = safe_path(output_path)
+        mid.save(str(output_safe))
 
-        return str(output_path)
+        return str(output_safe)
 
 
 def export_to_fl_studio(
@@ -278,11 +280,11 @@ def export_to_fl_studio(
 
     target_ppq = FL_STUDIO_PPQ_HD if use_hd_ppq else FL_STUDIO_PPQ
 
-    midi_path = Path(midi_path)
-    mid = mido.MidiFile(str(midi_path))
+    midi_safe = safe_path(midi_path)
+    mid = mido.MidiFile(str(midi_safe))
 
     if output_path is None:
-        output_path = f"{midi_path.stem}_fl.mid"
+        output_path = f"{midi_safe.to_path().stem}_fl.mid"
 
     # If PPQ matches, just copy
     if mid.ticks_per_beat == target_ppq:

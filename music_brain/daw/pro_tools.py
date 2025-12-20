@@ -18,6 +18,8 @@ from pathlib import Path
 from enum import Enum
 import json
 
+from music_brain.utils.path_utils import safe_path
+
 try:
     import mido
     MIDO_AVAILABLE = True
@@ -279,10 +281,10 @@ class PTSession:
                 # End of track
                 midi_track.append(mido.MetaMessage('end_of_track', time=0))
 
-        output_path = Path(output_path)
-        mid.save(str(output_path))
+        output_safe = safe_path(output_path)
+        mid.save(str(output_safe))
 
-        return str(output_path)
+        return str(output_safe)
 
 
 def export_to_pro_tools(
@@ -305,11 +307,11 @@ def export_to_pro_tools(
     if not MIDO_AVAILABLE:
         raise ImportError("mido package required")
 
-    midi_path = Path(midi_path)
-    mid = mido.MidiFile(str(midi_path))
+    midi_safe = safe_path(midi_path)
+    mid = mido.MidiFile(str(midi_safe))
 
     if output_path is None:
-        output_path = f"{midi_path.stem}_pt.mid"
+        output_path = f"{midi_safe.to_path().stem}_pt.mid"
 
     # If PPQ matches, just copy
     if mid.ticks_per_beat == PRO_TOOLS_PPQ:
