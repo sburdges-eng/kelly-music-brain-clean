@@ -1,5 +1,6 @@
 # Pricing & SKUs
 
+<<<<<<< Current (Your changes)
 ## Overview
 
 miDiKompanion is available in three tiers to suit different production needs. For installation and host compatibility, see [Quick Start](QUICK_START.md) and [Host Support Matrix](daw_integration/HOST_SUPPORT_MATRIX.md).
@@ -27,6 +28,9 @@ miDiKompanion is available in three tiers to suit different production needs. Fo
 | Explainability | ❌ No | ❌ No | ✅ Yes |
 | Cloud Preset Sync | ❌ No | ❌ No | ✅ Yes |
 | Multi-Ref Blending | ❌ No | ✅ Yes | ✅ Yes |
+=======
+> **Related**: [Quick Start](QUICK_START.md) | [Export Workflow](EXPORT_WORKFLOW.md) | [Host Support Matrix](daw_integration/HOST_SUPPORT_MATRIX.md)
+>>>>>>> Incoming (Background Agent changes)
 
 ## Free (Lite)
 - Formats: limited (e.g., AUv3/VST3 demo), capped usage.
@@ -66,3 +70,9 @@ miDiKompanion is available in three tiers to suit different production needs. Fo
 - Opt-in data only; default no retention.
 - Latency warnings shown for cloud use.
 - User owns MIDI; fair-use/parody disclaimer in UI.
+
+## Related Documentation
+- [Quick Start Guide](QUICK_START.md) - Getting started
+- [Export Workflow](EXPORT_WORKFLOW.md) - Export options by tier
+- [Host Support Matrix](daw_integration/HOST_SUPPORT_MATRIX.md) - DAW compatibility
+- [Troubleshooting](TROUBLESHOOTING.md) - Common issues
