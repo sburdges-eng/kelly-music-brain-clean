@@ -5,10 +5,27 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "midikompanion"
 version = "0.1.0"
-description = "Music Production AI System"
+description = "Music Production AI System - Intelligent music analysis, generation, and production toolkit"
 requires-python = ">=3.11"
 readme = "README.md"
 license = { text = "MIT" }
+authors = [
+    { name = "Sean Burdges" }
+]
+keywords = ["music", "ai", "midi", "audio", "production", "music-analysis", "harmony", "groove"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Multimedia :: Sound/Audio",
+    "Topic :: Multimedia :: Sound/Audio :: Analysis",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
 dependencies = [
     # Core audio processing
     "numpy>=1.24.0",
@@ -24,14 +41,34 @@ dependencies = [
     "music21>=9.0.0",
     # Web framework & API
     "fastapi>=0.104.0",
-    "uvicorn>=0.24.0",
+    "uvicorn[standard]>=0.24.0",  # Includes websockets and standard extras
     "pydantic>=2.0.0",
     "httpx>=0.25.0",
+    "requests>=2.31.0",  # For HTTP client requests
     "python-dotenv>=1.0.0",
     "fastmcp>=0.1.0",
+    # WebSocket support (for collaboration features)
+    "websockets>=12.0",
+    # Authentication & Security
+    "python-jose[cryptography]>=3.3.0",  # JWT token handling
+    "passlib[bcrypt]>=1.7.4",  # Password hashing
+    "python-multipart>=0.0.6",  # Form data parsing
 ]
 
 [project.optional-dependencies]
+# Testing/linting development dependencies
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-asyncio>=0.21.0",  # For async test support
+    "pytest-anyio>=4.0.0",  # For anyio async testing
+    "black",
+    "ruff",
+    "mypy",
+    "isort",
+    "matplotlib>=3.5.0",
+    "tqdm>=4.65.0",
+]
 # ML/audio research dependencies
 research = [
     "speechbrain",
@@ -44,16 +81,9 @@ research = [
     "openl3>=0.5.0",
     "crepe>=0.0.13",
 ]
-# Testing/linting development dependencies
-dev = [
-    "pytest>=7.0.0",
-    "pytest-cov>=4.0.0",
-    "black",
-    "ruff",
-    "mypy",
-    "isort",
-    "matplotlib>=3.5.0",
-    "tqdm>=4.65.0",
+# All dependencies (core + dev + research)
+all = [
+    "midikompanion[dev,research]",
 ]
 
 [tool.black]
