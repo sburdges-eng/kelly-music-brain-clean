@@ -25,6 +25,16 @@ import numpy as np
 
 from data.emotional_mapping import EmotionalState
 
+# Optional import of NodeMLMapper for enhanced emotion mapping
+try:
+    from music_brain.audio.node_ml_mapper import NodeMLMapper, EmotionNode, MusicalMapping
+    NODE_ML_MAPPER_AVAILABLE = True
+except ImportError:
+    NODE_ML_MAPPER_AVAILABLE = False
+    NodeMLMapper = None
+    EmotionNode = None
+    MusicalMapping = None
+
 
 class EmotionDetector:
     """
@@ -338,6 +348,98 @@ class EmotionDetector:
                     "status": "error"
                 })
         return results
+
+    def detect_emotion_enhanced(
+        self,
+        audio_path: Union[str, Path]
+    ) -> Dict:
+        """
+        Detect emotion with enhanced 216-node thesaurus mapping.
+        
+        This extends the basic emotion detection with the full 216-node
+        emotion thesaurus, providing richer emotional context and
+        musical parameters.
+        
+        Args:
+            audio_path: Path to audio file
+            
+        Returns:
+            Dictionary with:
+            - All fields from detect_emotion()
+            - emotion_node: The matched 216-node thesaurus entry
+            - musical_params: Extracted musical parameters
+            - related_emotions: Related emotion nodes for transitions
+            
+        Raises:
+            ImportError: If NodeMLMapper is not available.
+            FileNotFoundError: If audio file doesn't exist.
+        """
+        if not NODE_ML_MAPPER_AVAILABLE:
+            raise ImportError(
+                "NodeMLMapper not available. "
+                "Make sure node_ml_mapper.py is properly installed."
+            )
+        
+        # Get basic emotion detection
+        result = self.detect_emotion(audio_path)
+        
+        # Create mapper if not cached
+        if not hasattr(self, '_node_mapper') or self._node_mapper is None:
+            self._node_mapper = NodeMLMapper()
+        
+        # Map to 216-node thesaurus
+        if self._node_mapper.node_count > 0:
+            # First try direct VAD mapping
+            node = self._node_mapper.find_nearest_node(
+                valence=result["valence"],
+                arousal=result["arousal"],
+                dominance=0.5,  # Default dominance from valence-arousal
+            )
+            
+            if node:
+                result["emotion_node"] = {
+                    "id": node.id,
+                    "name": node.name,
+                    "category": node.category,
+                    "subcategory": node.subcategory,
+                    "vad": node.vad.to_dict(),
+                    "mode": node.mode,
+                }
+                
+                # Get musical parameters
+                musical_params = self._node_mapper.get_musical_mapping(node)
+                result["musical_params"] = {
+                    "mode": musical_params.mode,
+                    "tempo_multiplier": musical_params.tempo_multiplier,
+                    "suggested_tempo_bpm": musical_params.suggested_tempo_bpm,
+                    "dynamics_scale": musical_params.dynamics_scale,
+                    "velocity_range": musical_params.velocity_range,
+                    "dissonance_level": musical_params.dissonance_level,
+                }
+                
+                # Get related emotions for smooth transitions
+                related = self._node_mapper.get_related_nodes(node.id)
+                result["related_emotions"] = [
+                    {"id": r.id, "name": r.name, "category": r.category}
+                    for r in related[:5]
+                ]
+        
+        return result
+
+    def get_node_mapper(self) -> Optional["NodeMLMapper"]:
+        """
+        Get the NodeMLMapper instance for advanced queries.
+        
+        Returns:
+            NodeMLMapper instance or None if not available.
+        """
+        if not NODE_ML_MAPPER_AVAILABLE:
+            return None
+        
+        if not hasattr(self, '_node_mapper') or self._node_mapper is None:
+            self._node_mapper = NodeMLMapper()
+        
+        return self._node_mapper
 
 
 # Convenience function for quick usage

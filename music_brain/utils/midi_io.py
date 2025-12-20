@@ -6,6 +6,8 @@ from typing import Dict, List, Optional, Tuple
 from pathlib import Path
 from dataclasses import dataclass
 
+from music_brain.utils.path_utils import safe_path
+
 try:
     import mido
     MIDO_AVAILABLE = True
@@ -41,11 +43,11 @@ def load_midi(path: str) -> "mido.MidiFile":
     if not MIDO_AVAILABLE:
         raise ImportError("mido package required. Install with: pip install mido")
     
-    path = Path(path)
-    if not path.exists():
-        raise FileNotFoundError(f"MIDI file not found: {path}")
+    path_safe = safe_path(path)
+    if not path_safe.exists():
+        raise FileNotFoundError(f"MIDI file not found: {path_safe}")
     
-    return mido.MidiFile(str(path))
+    return mido.MidiFile(str(path_safe))
 
 
 def save_midi(midi_file: "mido.MidiFile", path: str):
@@ -75,8 +77,8 @@ def get_midi_info(path: str) -> MidiInfo:
     if not MIDO_AVAILABLE:
         raise ImportError("mido package required")
     
-    path = Path(path)
-    mid = mido.MidiFile(str(path))
+    path_safe = safe_path(path)
+    mid = mido.MidiFile(str(path_safe))
     
     # Extract metadata
     ppq = mid.ticks_per_beat

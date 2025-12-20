@@ -20,6 +20,8 @@ import json
 import socket
 import struct
 
+from music_brain.utils.path_utils import safe_path
+
 try:
     import mido
     MIDO_AVAILABLE = True
@@ -270,10 +272,10 @@ class ReaperProject:
                 # End of track
                 midi_track.append(mido.MetaMessage('end_of_track', time=0))
 
-        output_path = Path(output_path)
-        mid.save(str(output_path))
+        output_safe = safe_path(output_path)
+        mid.save(str(output_safe))
 
-        return str(output_path)
+        return str(output_safe)
 
     def export_rpp(self, output_path: str) -> str:
         """
@@ -321,11 +323,11 @@ class ReaperProject:
         lines.append(">")
 
         # Write file
-        output_path = Path(output_path)
-        with open(output_path, 'w') as f:
+        output_safe = safe_path(output_path)
+        with open(str(output_safe), 'w') as f:
             f.write('\n'.join(lines))
 
-        return str(output_path)
+        return str(output_safe)
 
 
 def export_to_reaper(
@@ -345,11 +347,11 @@ def export_to_reaper(
     if not MIDO_AVAILABLE:
         raise ImportError("mido package required")
 
-    midi_path = Path(midi_path)
-    mid = mido.MidiFile(str(midi_path))
+    midi_safe = safe_path(midi_path)
+    mid = mido.MidiFile(str(midi_safe))
 
     if output_path is None:
-        output_path = f"{midi_path.stem}_reaper.mid"
+        output_path = f"{midi_safe.to_path().stem}_reaper.mid"
 
     # If PPQ matches, just copy
     if mid.ticks_per_beat == REAPER_PPQ:
@@ -389,8 +391,8 @@ def import_from_reaper(midi_path: str) -> ReaperProject:
     if not MIDO_AVAILABLE:
         raise ImportError("mido package required")
 
-    midi_path = Path(midi_path)
-    mid = mido.MidiFile(str(midi_path))
+    midi_safe = safe_path(midi_path)
+    mid = mido.MidiFile(str(midi_safe))
 
     # Detect tempo and time signature
     tempo_bpm = 120.0

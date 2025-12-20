@@ -7,18 +7,18 @@ Tests severity, context, base rules, emotion mappings, and timing pockets.
 import pytest
 from unittest.mock import patch, MagicMock
 
-from python.penta_core.rules.severity import RuleSeverity
-from python.penta_core.rules.context import (
+from penta_core.rules.severity import RuleSeverity
+from penta_core.rules.context import (
     MusicalContext,
     CONTEXT_GROUPS,
     get_context_group,
 )
-from python.penta_core.rules.base import (
+from penta_core.rules.base import (
     Rule,
     RuleViolation,
     RuleBreakSuggestion,
 )
-from python.penta_core.rules.emotion import (
+from penta_core.rules.emotion import (
     Emotion,
     EmotionalMapping,
     EMOTION_TO_TECHNIQUES,
@@ -26,7 +26,7 @@ from python.penta_core.rules.emotion import (
     get_techniques_for_emotion,
     get_emotions_for_technique,
 )
-from python.penta_core.rules.timing import (
+from penta_core.rules.timing import (
     SwingType,
     TimingPocket,
     GENRE_POCKETS,

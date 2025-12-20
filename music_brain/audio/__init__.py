@@ -61,6 +61,26 @@ except ImportError:
     detect_emotion_from_audio = None
     get_emotional_state_from_audio = None
 
+# NodeMLMapper - 216-node emotion thesaurus mapping
+try:
+    from music_brain.audio.node_ml_mapper import (
+        NodeMLMapper,
+        EmotionNode,
+        VADCoordinates,
+        MusicalMapping,
+        NodeContext,
+        create_mapper,
+    )
+    NODE_ML_MAPPER_AVAILABLE = True
+except ImportError:
+    NODE_ML_MAPPER_AVAILABLE = False
+    NodeMLMapper = None
+    EmotionNode = None
+    VADCoordinates = None
+    MusicalMapping = None
+    NodeContext = None
+    create_mapper = None
+
 __all__ = [
     "analyze_feel",
     "AudioFeatures",
@@ -93,4 +113,12 @@ __all__ = [
     "detect_emotion_from_audio",
     "get_emotional_state_from_audio",
     "EMOTION_DETECTION_AVAILABLE",
+    # NodeMLMapper - 216-node emotion thesaurus
+    "NodeMLMapper",
+    "EmotionNode",
+    "VADCoordinates",
+    "MusicalMapping",
+    "NodeContext",
+    "create_mapper",
+    "NODE_ML_MAPPER_AVAILABLE",
 ]

@@ -9,6 +9,8 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from music_brain.utils.path_utils import safe_path
+
 from fastapi import FastAPI, HTTPException, Depends, Security
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPAuthorizationCredentials
@@ -77,7 +79,7 @@ if RATE_LIMIT_ENABLED:
     )
 
 # Load emotion thesaurus
-EMOTION_THESAURUS_PATH = Path(__file__).parent.parent / "emotion_thesaurus"
+EMOTION_THESAURUS_PATH = safe_path(Path(__file__).parent.parent / "emotion_thesaurus")
 
 
 class EmotionalIntent(BaseModel):
@@ -377,14 +379,14 @@ async def get_emotions() -> Dict[str, Any]:
         try:
             emotions = {}
 
-            for emotion_file in EMOTION_THESAURUS_PATH.glob("*.json"):
+            for emotion_file in EMOTION_THESAURUS_PATH.to_path().glob("*.json"):
                 if emotion_file.stem not in ["metadata", "blends"]:
                     with open(emotion_file) as f:
                         emotions[emotion_file.stem] = json.load(f)
 
             blends_path = EMOTION_THESAURUS_PATH / "blends.json"
             if blends_path.exists():
-                with open(blends_path) as f:
+                with open(str(blends_path)) as f:
                     emotions["blends"] = json.load(f)
 
             metrics.increment("emotions_success", tags={"endpoint": "emotions"})
@@ -418,7 +420,7 @@ async def get_emotion_category(base_emotion: str) -> Dict[str, Any]:
 
     with metrics.timer("emotion_category_duration", tags={"endpoint": "emotions", "emotion": base_emotion}):
         try:
-            with open(emotion_file) as f:
+            with open(str(emotion_file)) as f:
                 data = json.load(f)
 
             metrics.increment("emotion_category_success", tags={"endpoint": "emotions", "emotion": base_emotion})

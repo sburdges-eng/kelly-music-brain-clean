@@ -12,6 +12,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional, List, Dict
 
+from music_brain.utils.path_utils import safe_path
+
 try:
     import librosa
     import numpy as np
@@ -131,14 +133,14 @@ def analyze_reference(path: Path) -> Optional[ReferenceProfile]:
         print("[REFERENCE DNA]: librosa not installed. Install with: pip install librosa")
         return None
 
-    path = Path(path)
-    if not path.exists():
-        print(f"[REFERENCE DNA]: File not found: {path}")
+    path_safe = safe_path(path)
+    if not path_safe.exists():
+        print(f"[REFERENCE DNA]: File not found: {path_safe}")
         return None
 
     try:
         # Load audio (mono, original sample rate)
-        y, sr = librosa.load(str(path), mono=True)
+        y, sr = librosa.load(str(path_safe), mono=True)
 
         # Tempo estimation
         tempo, _ = librosa.beat.beat_track(y=y, sr=sr)

@@ -18,6 +18,8 @@ import sys
 from pathlib import Path
 from typing import Optional, Callable
 
+from music_brain.utils.path_utils import safe_path, ensure_path_exists
+
 try:
     import librosa
     import soundfile as sf
@@ -37,8 +39,8 @@ try:
 except ImportError:
     HAS_AUDIO_LIBS = False
 
-INPUT_DIR = Path("./audio_vault/raw")
-OUTPUT_DIR = Path("./audio_vault/refined")
+INPUT_DIR = safe_path("./audio_vault/raw")
+OUTPUT_DIR = safe_path("./audio_vault/refined")
 SAMPLE_RATE = 44100
 
 
@@ -96,7 +98,8 @@ def process_file(file_path: str, output_path: str, pipeline) -> None:
     try:
         y, _ = librosa.load(file_path, sr=SAMPLE_RATE, mono=True)
         y_proc = pipeline(samples=y, sample_rate=SAMPLE_RATE)
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        # Ensure output directory exists using cross-platform path utilities
+        ensure_path_exists(output_path, is_file=True)
         sf.write(output_path, y_proc, SAMPLE_RATE)
         print(f"  [OK] {os.path.basename(file_path)}")
     except Exception as e:
@@ -127,12 +130,12 @@ def refine_folder(
             if not filename.lower().endswith((".wav", ".aiff", ".flac", ".mp3")):
                 continue
 
-            in_path = Path(root) / filename
-            rel_path = in_path.relative_to(input_dir)
-            out_path = output_dir / rel_path
-            out_path = out_path.with_suffix(".wav")
+            in_path = safe_path(Path(root) / filename)
+            rel_path = in_path.to_path().relative_to(input_dir.to_path())
+            out_path = output_dir / str(rel_path)
+            out_path_str = str(out_path.to_path().with_suffix(".wav"))
 
-            process_file(str(in_path), str(out_path), pipeline)
+            process_file(str(in_path), out_path_str, pipeline)
 
 
 def run_refinery(target_subfolder: Optional[str] = None) -> None:
@@ -174,12 +177,12 @@ def run_refinery(target_subfolder: Optional[str] = None) -> None:
             if not filename.lower().endswith((".wav", ".aiff", ".flac", ".mp3")):
                 continue
 
-            in_path = Path(root) / filename
-            rel_path = in_path.relative_to(INPUT_DIR)
-            out_path = OUTPUT_DIR / rel_path
-            out_path = out_path.with_suffix(".wav")
+            in_path = safe_path(Path(root) / filename)
+            rel_path = in_path.to_path().relative_to(INPUT_DIR.to_path())
+            out_path = OUTPUT_DIR / str(rel_path)
+            out_path_str = str(out_path.to_path().with_suffix(".wav"))
 
-            process_file(str(in_path), str(out_path), pipeline)
+            process_file(str(in_path), out_path_str, pipeline)
 
     print("\n✅ Refinery complete. Use 'refined' folder in your sampler.")
 

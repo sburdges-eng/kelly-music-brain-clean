@@ -35,6 +35,8 @@ import json
 from pathlib import Path
 from typing import Optional
 
+from music_brain.utils.path_utils import safe_path
+
 # Lazy imports to speed up CLI startup
 def get_groove_module():
     from music_brain.groove import extract_groove, apply_groove
@@ -123,7 +125,7 @@ def cmd_extract(args):
     """Extract groove from MIDI file."""
     extract_groove, _ = get_groove_module()
     
-    midi_path = Path(args.midi_file)
+    midi_path = safe_path(args.midi_file)
     if not midi_path.exists():
         print(f"Error: File not found: {midi_path}")
         return 1
@@ -131,7 +133,7 @@ def cmd_extract(args):
     print(f"Extracting groove from: {midi_path}")
     groove = extract_groove(str(midi_path))
     
-    output_path = midi_path.stem + "_groove.json"
+    output_path = midi_path.to_path().stem + "_groove.json"
     if args.output:
         output_path = args.output
     
@@ -149,14 +151,14 @@ def cmd_apply(args):
     """Apply groove template to MIDI file."""
     _, apply_groove = get_groove_module()
 
-    midi_path = Path(args.midi_file)
+    midi_path = safe_path(args.midi_file)
     if not midi_path.exists():
         print(f"Error: File not found: {midi_path}")
         return 1
 
     print(f"Applying {args.genre} groove to: {midi_path}")
 
-    output_path = args.output or f"{midi_path.stem}_grooved.mid"
+    output_path = args.output or f"{midi_path.to_path().stem}_grooved.mid"
     apply_groove(str(midi_path), genre=args.genre, output=output_path, intensity=args.intensity)
 
     print(f"Output saved to: {output_path}")
@@ -184,7 +186,7 @@ def cmd_humanize(args):
             print()
         return 0
 
-    midi_path = Path(args.midi_file)
+    midi_path = safe_path(args.midi_file)
     if not midi_path.exists():
         print(f"Error: File not found: {midi_path}")
         return 1
@@ -224,7 +226,7 @@ def cmd_humanize(args):
     if args.no_ghost_notes:
         settings.enable_ghost_notes = False
 
-    output_path = args.output or f"{midi_path.stem}_humanized.mid"
+    output_path = args.output or f"{midi_path.to_path().stem}_humanized.mid"
 
     result_path = humanize_midi_file(
         input_path=str(midi_path),
@@ -249,7 +251,7 @@ def cmd_analyze(args):
     """Analyze chord progression in MIDI file."""
     analyze_chords, detect_sections = get_structure_module()
     
-    midi_path = Path(args.midi_file)
+    midi_path = safe_path(args.midi_file)
     if not midi_path.exists():
         print(f"Error: File not found: {midi_path}")
         return 1
@@ -409,7 +411,7 @@ def cmd_intent(args):
             print("Error: Please specify an intent file")
             return 1
         
-        intent_path = Path(args.file)
+        intent_path = safe_path(args.file)
         if not intent_path.exists():
             print(f"Error: File not found: {intent_path}")
             return 1
@@ -528,7 +530,7 @@ def cmd_intent(args):
             print("Error: Please specify an intent file")
             return 1
         
-        intent_path = Path(args.file)
+        intent_path = safe_path(args.file)
         if not intent_path.exists():
             print(f"Error: File not found: {intent_path}")
             return 1
@@ -575,7 +577,7 @@ def cmd_audio_detect_emotion(args):
         print("Install with: pip install speechbrain torch torchaudio")
         return 1
     
-    audio_path = Path(args.audio_file)
+    audio_path = safe_path(args.audio_file)
     if not audio_path.exists():
         print(f"Error: File not found: {audio_path}")
         return 1
@@ -662,7 +664,7 @@ def cmd_audio_analyze(args):
     """Analyze audio file feel characteristics."""
     (analyze_feel, _, _, _, _, _, _, _, _, _) = get_audio_module()
     
-    audio_path = Path(args.audio_file)
+    audio_path = safe_path(args.audio_file)
     if not audio_path.exists():
         print(f"Error: File not found: {audio_path}")
         return 1
@@ -699,7 +701,7 @@ def cmd_audio_detect_chords(args):
     """Detect chords from audio file."""
     (_, ChordDetector, _, _, _, _, _, _, _, _) = get_audio_module()
     
-    audio_path = Path(args.audio_file)
+    audio_path = safe_path(args.audio_file)
     if not audio_path.exists():
         print(f"Error: File not found: {audio_path}")
         return 1
@@ -735,7 +737,7 @@ def cmd_audio_frequency(args):
     """Analyze 8-band frequency profile."""
     (_, _, analyze_frequency_bands, _, _, _, _, _, _, _) = get_audio_module()
     
-    audio_path = Path(args.audio_file)
+    audio_path = safe_path(args.audio_file)
     if not audio_path.exists():
         print(f"Error: File not found: {audio_path}")
         return 1
@@ -778,7 +780,7 @@ def cmd_audio_reference(args):
     """Analyze reference track DNA."""
     (_, _, _, analyze_reference, _, _, _, _, _, _) = get_audio_module()
     
-    audio_path = Path(args.audio_file)
+    audio_path = safe_path(args.audio_file)
     if not audio_path.exists():
         print(f"Error: File not found: {audio_path}")
         return 1

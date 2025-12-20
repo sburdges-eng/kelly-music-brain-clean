@@ -11,6 +11,8 @@ from typing import List, Dict, Optional
 from pathlib import Path
 import json
 
+from music_brain.utils.path_utils import safe_path
+
 try:
     import mido
     MIDO_AVAILABLE = True
@@ -159,10 +161,10 @@ class LogicProject:
             # End of track
             track.append(mido.MetaMessage('end_of_track', time=0))
         
-        output_path = Path(output_path)
-        mid.save(str(output_path))
+        output_safe = safe_path(output_path)
+        mid.save(str(output_safe))
         
-        return str(output_path)
+        return str(output_safe)
 
 
 def export_to_logic(
@@ -190,12 +192,12 @@ def export_to_logic(
     
     from music_brain.utils.ppq import normalize_ppq as norm_ppq
     
-    midi_path = Path(midi_path)
-    mid = mido.MidiFile(str(midi_path))
+    midi_safe = safe_path(midi_path)
+    mid = mido.MidiFile(str(midi_safe))
     
     # Determine output path
     if output_path is None:
-        output_path = f"{midi_path.stem}_logic.mid"
+        output_path = f"{midi_safe.to_path().stem}_logic.mid"
     
     # If PPQ matches, just copy
     if mid.ticks_per_beat == LOGIC_PPQ and not normalize_ppq:
@@ -240,12 +242,12 @@ def import_from_logic(midi_path: str) -> LogicProject:
     
     from music_brain.utils.midi_io import get_midi_info, extract_notes
     
-    midi_path = Path(midi_path)
-    mid = mido.MidiFile(str(midi_path))
-    info = get_midi_info(str(midi_path))
+    midi_safe = safe_path(midi_path)
+    mid = mido.MidiFile(str(midi_safe))
+    info = get_midi_info(str(midi_safe))
     
     project = LogicProject(
-        name=midi_path.stem,
+        name=midi_safe.to_path().stem,
         tempo_bpm=info.tempo_bpm,
         time_signature=info.time_signature,
         ppq=info.ppq,

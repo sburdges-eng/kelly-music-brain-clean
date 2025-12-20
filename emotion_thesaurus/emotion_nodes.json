@@ -1,0 +1,3711 @@
+{
+  "version": "1.0",
+  "total_nodes": 216,
+  "nodes": [
+    {
+      "id": 0,
+      "name": "pleased",
+      "category": "joy",
+      "subcategory": "euphoria",
+      "vad": {
+        "valence": 0.65,
+        "arousal": 0.35,
+        "dominance": 0.525,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [
+        1,
+        2,
+        3
+      ],
+      "mode": "major",
+      "tempoMultiplier": 0.94,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 1,
+      "name": "ecstatic",
+      "category": "joy",
+      "subcategory": "euphoria",
+      "vad": {
+        "valence": 0.65,
+        "arousal": 0.4,
+        "dominance": 0.525,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [
+        0,
+        2,
+        3,
+        4
+      ],
+      "mode": "major",
+      "tempoMultiplier": 0.96,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 2,
+      "name": "overjoyed",
+      "category": "joy",
+      "subcategory": "euphoria",
+      "vad": {
+        "valence": 0.65,
+        "arousal": 0.45,
+        "dominance": 0.525,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [
+        0,
+        1,
+        3,
+        4,
+        5
+      ],
+      "mode": "major",
+      "tempoMultiplier": 0.98,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 3,
+      "name": "blissful",
+      "category": "joy",
+      "subcategory": "euphoria",
+      "vad": {
+        "valence": 0.65,
+        "arousal": 0.5,
+        "dominance": 0.525,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6
+      ],
+      "mode": "major",
+      "tempoMultiplier": 1.0,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 4,
+      "name": "transcendent",
+      "category": "joy",
+      "subcategory": "euphoria",
+      "vad": {
+        "valence": 0.65,
+        "arousal": 0.55,
+        "dominance": 0.525,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [
+        1,
+        2,
+        3,
+        5,
+        6,
+        7
+      ],
+      "mode": "major",
+      "tempoMultiplier": 1.02,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 5,
+      "name": "divine ecstasy",
+      "category": "joy",
+      "subcategory": "euphoria",
+      "vad": {
+        "valence": 0.65,
+        "arousal": 0.6,
+        "dominance": 0.525,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [
+        2,
+        3,
+        4,
+        6,
+        7,
+        8
+      ],
+      "mode": "major",
+      "tempoMultiplier": 1.04,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 6,
+      "name": "calm",
+      "category": "joy",
+      "subcategory": "contentment",
+      "vad": {
+        "valence": 0.71,
+        "arousal": 0.35,
+        "dominance": 0.555,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [
+        3,
+        4,
+        5,
+        7,
+        8,
+        9
+      ],
+      "mode": "major",
+      "tempoMultiplier": 0.94,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 7,
+      "name": "serene",
+      "category": "joy",
+      "subcategory": "contentment",
+      "vad": {
+        "valence": 0.71,
+        "arousal": 0.4,
+        "dominance": 0.555,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [
+        4,
+        5,
+        6,
+        8,
+        9,
+        10
+      ],
+      "mode": "major",
+      "tempoMultiplier": 0.96,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 8,
+      "name": "deeply peaceful",
+      "category": "joy",
+      "subcategory": "contentment",
+      "vad": {
+        "valence": 0.71,
+        "arousal": 0.45,
+        "dominance": 0.555,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [
+        5,
+        6,
+        7,
+        9,
+        10,
+        11
+      ],
+      "mode": "major",
+      "tempoMultiplier": 0.98,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 9,
+      "name": "absolute serenity",
+      "category": "joy",
+      "subcategory": "contentment",
+      "vad": {
+        "valence": 0.71,
+        "arousal": 0.5,
+        "dominance": 0.555,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [
+        6,
+        7,
+        8,
+        10,
+        11,
+        12
+      ],
+      "mode": "major",
+      "tempoMultiplier": 1.0,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 10,
+      "name": "infinite calm",
+      "category": "joy",
+      "subcategory": "contentment",
+      "vad": {
+        "valence": 0.71,
+        "arousal": 0.55,
+        "dominance": 0.555,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [
+        7,
+        8,
+        9,
+        11,
+        12,
+        13
+      ],
+      "mode": "major",
+      "tempoMultiplier": 1.02,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 11,
+      "name": "transcendent stillness",
+      "category": "joy",
+      "subcategory": "contentment",
+      "vad": {
+        "valence": 0.71,
+        "arousal": 0.6,
+        "dominance": 0.555,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [
+        8,
+        9,
+        10,
+        12,
+        13,
+        14
+      ],
+      "mode": "major",
+      "tempoMultiplier": 1.04,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 12,
+      "name": "pleased",
+      "category": "joy",
+      "subcategory": "pride",
+      "vad": {
+        "valence": 0.77,
+        "arousal": 0.35,
+        "dominance": 0.585,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [
+        9,
+        10,
+        11,
+        13,
+        14,
+        15
+      ],
+      "mode": "major",
+      "tempoMultiplier": 0.94,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 13,
+      "name": "accomplished",
+      "category": "joy",
+      "subcategory": "pride",
+      "vad": {
+        "valence": 0.77,
+        "arousal": 0.4,
+        "dominance": 0.585,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [
+        10,
+        11,
+        12,
+        14,
+        15,
+        16
+      ],
+      "mode": "major",
+      "tempoMultiplier": 0.96,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 14,
+      "name": "deeply accomplished",
+      "category": "joy",
+      "subcategory": "pride",
+      "vad": {
+        "valence": 0.77,
+        "arousal": 0.45,
+        "dominance": 0.585,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [
+        11,
+        12,
+        13,
+        15,
+        16,
+        17
+      ],
+      "mode": "major",
+      "tempoMultiplier": 0.98,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 15,
+      "name": "utterly accomplished",
+      "category": "joy",
+      "subcategory": "pride",
+      "vad": {
+        "valence": 0.77,
+        "arousal": 0.5,
+        "dominance": 0.585,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [
+        12,
+        13,
+        14,
+        16,
+        17,
+        18
+      ],
+      "mode": "major",
+      "tempoMultiplier": 1.0,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 16,
+      "name": "infinite accomplishment",
+      "category": "joy",
+      "subcategory": "pride",
+      "vad": {
+        "valence": 0.77,
+        "arousal": 0.55,
+        "dominance": 0.585,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [
+        13,
+        14,
+        15,
+        17,
+        18,
+        19
+      ],
+      "mode": "major",
+      "tempoMultiplier": 1.02,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 17,
+      "name": "transcendent mastery",
+      "category": "joy",
+      "subcategory": "pride",
+      "vad": {
+        "valence": 0.77,
+        "arousal": 0.6,
+        "dominance": 0.585,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [
+        14,
+        15,
+        16,
+        18,
+        19,
+        20
+      ],
+      "mode": "major",
+      "tempoMultiplier": 1.04,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 18,
+      "name": "light",
+      "category": "joy",
+      "subcategory": "amusement",
+      "vad": {
+        "valence": 0.83,
+        "arousal": 0.35,
+        "dominance": 0.615,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [
+        15,
+        16,
+        17,
+        19,
+        20,
+        21
+      ],
+      "mode": "major",
+      "tempoMultiplier": 0.94,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 19,
+      "name": "playful",
+      "category": "joy",
+      "subcategory": "amusement",
+      "vad": {
+        "valence": 0.83,
+        "arousal": 0.4,
+        "dominance": 0.615,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [
+        16,
+        17,
+        18,
+        20,
+        21,
+        22
+      ],
+      "mode": "major",
+      "tempoMultiplier": 0.96,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 20,
+      "name": "deeply playful",
+      "category": "joy",
+      "subcategory": "amusement",
+      "vad": {
+        "valence": 0.83,
+        "arousal": 0.45,
+        "dominance": 0.615,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [
+        17,
+        18,
+        19,
+        21,
+        22,
+        23
+      ],
+      "mode": "major",
+      "tempoMultiplier": 0.98,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 21,
+      "name": "wildly playful",
+      "category": "joy",
+      "subcategory": "amusement",
+      "vad": {
+        "valence": 0.83,
+        "arousal": 0.5,
+        "dominance": 0.615,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [
+        18,
+        19,
+        20,
+        22,
+        23,
+        24
+      ],
+      "mode": "major",
+      "tempoMultiplier": 1.0,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 22,
+      "name": "infinite play",
+      "category": "joy",
+      "subcategory": "amusement",
+      "vad": {
+        "valence": 0.83,
+        "arousal": 0.55,
+        "dominance": 0.615,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [
+        19,
+        20,
+        21,
+        23,
+        24,
+        25
+      ],
+      "mode": "major",
+      "tempoMultiplier": 1.02,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 23,
+      "name": "eternal playfulness",
+      "category": "joy",
+      "subcategory": "amusement",
+      "vad": {
+        "valence": 0.83,
+        "arousal": 0.6,
+        "dominance": 0.615,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [
+        20,
+        21,
+        22,
+        24,
+        25,
+        26
+      ],
+      "mode": "major",
+      "tempoMultiplier": 1.04,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 24,
+      "name": "fond",
+      "category": "joy",
+      "subcategory": "love",
+      "vad": {
+        "valence": 0.89,
+        "arousal": 0.35,
+        "dominance": 0.645,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [
+        21,
+        22,
+        23,
+        25,
+        26,
+        27
+      ],
+      "mode": "major",
+      "tempoMultiplier": 0.94,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 25,
+      "name": "adoring",
+      "category": "joy",
+      "subcategory": "love",
+      "vad": {
+        "valence": 0.89,
+        "arousal": 0.4,
+        "dominance": 0.645,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [
+        22,
+        23,
+        24,
+        26,
+        27,
+        28
+      ],
+      "mode": "major",
+      "tempoMultiplier": 0.96,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 26,
+      "name": "deeply adoring",
+      "category": "joy",
+      "subcategory": "love",
+      "vad": {
+        "valence": 0.89,
+        "arousal": 0.45,
+        "dominance": 0.645,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [
+        23,
+        24,
+        25,
+        27,
+        28,
+        29
+      ],
+      "mode": "major",
+      "tempoMultiplier": 0.98,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 27,
+      "name": "completely adoring",
+      "category": "joy",
+      "subcategory": "love",
+      "vad": {
+        "valence": 0.89,
+        "arousal": 0.5,
+        "dominance": 0.645,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [
+        24,
+        25,
+        26,
+        28,
+        29,
+        30
+      ],
+      "mode": "major",
+      "tempoMultiplier": 1.0,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 28,
+      "name": "infinite adoration",
+      "category": "joy",
+      "subcategory": "love",
+      "vad": {
+        "valence": 0.89,
+        "arousal": 0.55,
+        "dominance": 0.645,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [
+        25,
+        26,
+        27,
+        29,
+        30,
+        31
+      ],
+      "mode": "major",
+      "tempoMultiplier": 1.02,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 29,
+      "name": "transcendent adoration",
+      "category": "joy",
+      "subcategory": "love",
+      "vad": {
+        "valence": 0.89,
+        "arousal": 0.6,
+        "dominance": 0.645,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [
+        26,
+        27,
+        28,
+        30,
+        31,
+        32
+      ],
+      "mode": "major",
+      "tempoMultiplier": 1.04,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 30,
+      "name": "lighter",
+      "category": "joy",
+      "subcategory": "relief",
+      "vad": {
+        "valence": 0.95,
+        "arousal": 0.35,
+        "dominance": 0.675,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [
+        27,
+        28,
+        29,
+        31,
+        32,
+        33
+      ],
+      "mode": "major",
+      "tempoMultiplier": 0.94,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 31,
+      "name": "unburdened",
+      "category": "joy",
+      "subcategory": "relief",
+      "vad": {
+        "valence": 0.95,
+        "arousal": 0.4,
+        "dominance": 0.675,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [
+        28,
+        29,
+        30,
+        32,
+        33,
+        34
+      ],
+      "mode": "major",
+      "tempoMultiplier": 0.96,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 32,
+      "name": "deeply unburdened",
+      "category": "joy",
+      "subcategory": "relief",
+      "vad": {
+        "valence": 0.95,
+        "arousal": 0.45,
+        "dominance": 0.675,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [
+        29,
+        30,
+        31,
+        33,
+        34,
+        35
+      ],
+      "mode": "major",
+      "tempoMultiplier": 0.98,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 33,
+      "name": "completely unburdened",
+      "category": "joy",
+      "subcategory": "relief",
+      "vad": {
+        "valence": 0.95,
+        "arousal": 0.5,
+        "dominance": 0.675,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [
+        30,
+        31,
+        32,
+        34,
+        35
+      ],
+      "mode": "major",
+      "tempoMultiplier": 1.0,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 34,
+      "name": "infinite relief",
+      "category": "joy",
+      "subcategory": "relief",
+      "vad": {
+        "valence": 0.95,
+        "arousal": 0.55,
+        "dominance": 0.675,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [
+        31,
+        32,
+        33,
+        35
+      ],
+      "mode": "major",
+      "tempoMultiplier": 1.02,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 35,
+      "name": "transcendent unburdening",
+      "category": "joy",
+      "subcategory": "relief",
+      "vad": {
+        "valence": 0.95,
+        "arousal": 0.6,
+        "dominance": 0.675,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [
+        32,
+        33,
+        34
+      ],
+      "mode": "major",
+      "tempoMultiplier": 1.04,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 36,
+      "name": "saddened",
+      "category": "sad",
+      "subcategory": "grief",
+      "vad": {
+        "valence": -0.75,
+        "arousal": 0.175,
+        "dominance": 0.225,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [
+        33,
+        34,
+        35
+      ],
+      "mode": "minor",
+      "tempoMultiplier": 0.87,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 37,
+      "name": "bereaved",
+      "category": "sad",
+      "subcategory": "grief",
+      "vad": {
+        "valence": -0.75,
+        "arousal": 0.2,
+        "dominance": 0.225,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [
+        34,
+        35
+      ],
+      "mode": "minor",
+      "tempoMultiplier": 0.88,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 38,
+      "name": "deeply grieving",
+      "category": "sad",
+      "subcategory": "grief",
+      "vad": {
+        "valence": -0.75,
+        "arousal": 0.225,
+        "dominance": 0.225,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [
+        35
+      ],
+      "mode": "minor",
+      "tempoMultiplier": 0.89,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 39,
+      "name": "devastated",
+      "category": "sad",
+      "subcategory": "grief",
+      "vad": {
+        "valence": -0.75,
+        "arousal": 0.25,
+        "dominance": 0.225,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.9,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 40,
+      "name": "utterly destroyed",
+      "category": "sad",
+      "subcategory": "grief",
+      "vad": {
+        "valence": -0.75,
+        "arousal": 0.275,
+        "dominance": 0.225,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.91,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 41,
+      "name": "consumed by grief",
+      "category": "sad",
+      "subcategory": "grief",
+      "vad": {
+        "valence": -0.75,
+        "arousal": 0.3,
+        "dominance": 0.225,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.92,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 42,
+      "name": "discouraged",
+      "category": "sad",
+      "subcategory": "despair",
+      "vad": {
+        "valence": -0.69,
+        "arousal": 0.175,
+        "dominance": 0.255,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.87,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 43,
+      "name": "hopeless",
+      "category": "sad",
+      "subcategory": "despair",
+      "vad": {
+        "valence": -0.69,
+        "arousal": 0.2,
+        "dominance": 0.255,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.88,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 44,
+      "name": "deeply hopeless",
+      "category": "sad",
+      "subcategory": "despair",
+      "vad": {
+        "valence": -0.69,
+        "arousal": 0.225,
+        "dominance": 0.255,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.89,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 45,
+      "name": "completely without hope",
+      "category": "sad",
+      "subcategory": "despair",
+      "vad": {
+        "valence": -0.69,
+        "arousal": 0.25,
+        "dominance": 0.255,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.9,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 46,
+      "name": "soul-crushing hopelessness",
+      "category": "sad",
+      "subcategory": "despair",
+      "vad": {
+        "valence": -0.69,
+        "arousal": 0.275,
+        "dominance": 0.255,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.91,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 47,
+      "name": "eternal hopelessness",
+      "category": "sad",
+      "subcategory": "despair",
+      "vad": {
+        "valence": -0.69,
+        "arousal": 0.3,
+        "dominance": 0.255,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.92,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 48,
+      "name": "apart",
+      "category": "sad",
+      "subcategory": "loneliness",
+      "vad": {
+        "valence": -0.63,
+        "arousal": 0.175,
+        "dominance": 0.285,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.87,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 49,
+      "name": "isolated",
+      "category": "sad",
+      "subcategory": "loneliness",
+      "vad": {
+        "valence": -0.63,
+        "arousal": 0.2,
+        "dominance": 0.285,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.88,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 50,
+      "name": "completely isolated",
+      "category": "sad",
+      "subcategory": "loneliness",
+      "vad": {
+        "valence": -0.63,
+        "arousal": 0.225,
+        "dominance": 0.285,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.89,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 51,
+      "name": "totally cut off",
+      "category": "sad",
+      "subcategory": "loneliness",
+      "vad": {
+        "valence": -0.63,
+        "arousal": 0.25,
+        "dominance": 0.285,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.9,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 52,
+      "name": "infinite isolation",
+      "category": "sad",
+      "subcategory": "loneliness",
+      "vad": {
+        "valence": -0.63,
+        "arousal": 0.275,
+        "dominance": 0.285,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.91,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 53,
+      "name": "eternal isolation",
+      "category": "sad",
+      "subcategory": "loneliness",
+      "vad": {
+        "valence": -0.63,
+        "arousal": 0.3,
+        "dominance": 0.285,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.92,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 54,
+      "name": "disappointed",
+      "category": "sad",
+      "subcategory": "disappointment",
+      "vad": {
+        "valence": -0.57,
+        "arousal": 0.175,
+        "dominance": 0.315,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.87,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 55,
+      "name": "betrayed expectations",
+      "category": "sad",
+      "subcategory": "disappointment",
+      "vad": {
+        "valence": -0.57,
+        "arousal": 0.2,
+        "dominance": 0.315,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.88,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 56,
+      "name": "deeply let down",
+      "category": "sad",
+      "subcategory": "disappointment",
+      "vad": {
+        "valence": -0.57,
+        "arousal": 0.225,
+        "dominance": 0.315,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.89,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 57,
+      "name": "completely betrayed",
+      "category": "sad",
+      "subcategory": "disappointment",
+      "vad": {
+        "valence": -0.57,
+        "arousal": 0.25,
+        "dominance": 0.315,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.9,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 58,
+      "name": "infinite disappointment",
+      "category": "sad",
+      "subcategory": "disappointment",
+      "vad": {
+        "valence": -0.57,
+        "arousal": 0.275,
+        "dominance": 0.315,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.91,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 59,
+      "name": "eternally let down",
+      "category": "sad",
+      "subcategory": "disappointment",
+      "vad": {
+        "valence": -0.57,
+        "arousal": 0.3,
+        "dominance": 0.315,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.92,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 60,
+      "name": "thoughtful",
+      "category": "sad",
+      "subcategory": "melancholy",
+      "vad": {
+        "valence": -0.51,
+        "arousal": 0.175,
+        "dominance": 0.345,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.87,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 61,
+      "name": "wistful",
+      "category": "sad",
+      "subcategory": "melancholy",
+      "vad": {
+        "valence": -0.51,
+        "arousal": 0.2,
+        "dominance": 0.345,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.88,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 62,
+      "name": "deeply wistful",
+      "category": "sad",
+      "subcategory": "melancholy",
+      "vad": {
+        "valence": -0.51,
+        "arousal": 0.225,
+        "dominance": 0.345,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.89,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 63,
+      "name": "utterly wistful",
+      "category": "sad",
+      "subcategory": "melancholy",
+      "vad": {
+        "valence": -0.51,
+        "arousal": 0.25,
+        "dominance": 0.345,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.9,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 64,
+      "name": "infinite wistfulness",
+      "category": "sad",
+      "subcategory": "melancholy",
+      "vad": {
+        "valence": -0.51,
+        "arousal": 0.275,
+        "dominance": 0.345,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.91,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 65,
+      "name": "eternally wistful",
+      "category": "sad",
+      "subcategory": "melancholy",
+      "vad": {
+        "valence": -0.51,
+        "arousal": 0.3,
+        "dominance": 0.345,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.92,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 66,
+      "name": "stung",
+      "category": "sad",
+      "subcategory": "hurt",
+      "vad": {
+        "valence": -0.45,
+        "arousal": 0.175,
+        "dominance": 0.375,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.87,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 67,
+      "name": "wounded",
+      "category": "sad",
+      "subcategory": "hurt",
+      "vad": {
+        "valence": -0.45,
+        "arousal": 0.2,
+        "dominance": 0.375,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.88,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 68,
+      "name": "deeply wounded",
+      "category": "sad",
+      "subcategory": "hurt",
+      "vad": {
+        "valence": -0.45,
+        "arousal": 0.225,
+        "dominance": 0.375,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.89,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 69,
+      "name": "completely wounded",
+      "category": "sad",
+      "subcategory": "hurt",
+      "vad": {
+        "valence": -0.45,
+        "arousal": 0.25,
+        "dominance": 0.375,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.9,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 70,
+      "name": "infinite pain",
+      "category": "sad",
+      "subcategory": "hurt",
+      "vad": {
+        "valence": -0.45,
+        "arousal": 0.275,
+        "dominance": 0.375,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.91,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 71,
+      "name": "eternally wounded",
+      "category": "sad",
+      "subcategory": "hurt",
+      "vad": {
+        "valence": -0.45,
+        "arousal": 0.3,
+        "dominance": 0.375,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.92,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 72,
+      "name": "annoyed",
+      "category": "anger",
+      "subcategory": "rage",
+      "vad": {
+        "valence": -0.65,
+        "arousal": 0.467,
+        "dominance": 0.725,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.99,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 73,
+      "name": "furious",
+      "category": "anger",
+      "subcategory": "rage",
+      "vad": {
+        "valence": -0.65,
+        "arousal": 0.533,
+        "dominance": 0.725,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.01,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 74,
+      "name": "livid",
+      "category": "anger",
+      "subcategory": "rage",
+      "vad": {
+        "valence": -0.65,
+        "arousal": 0.6,
+        "dominance": 0.725,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.04,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 75,
+      "name": "explosive",
+      "category": "anger",
+      "subcategory": "rage",
+      "vad": {
+        "valence": -0.65,
+        "arousal": 0.667,
+        "dominance": 0.725,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.07,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 76,
+      "name": "white-hot fury",
+      "category": "anger",
+      "subcategory": "rage",
+      "vad": {
+        "valence": -0.65,
+        "arousal": 0.733,
+        "dominance": 0.725,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.09,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 77,
+      "name": "cosmic fury",
+      "category": "anger",
+      "subcategory": "rage",
+      "vad": {
+        "valence": -0.65,
+        "arousal": 0.8,
+        "dominance": 0.725,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.12,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 78,
+      "name": "hindered",
+      "category": "anger",
+      "subcategory": "frustration",
+      "vad": {
+        "valence": -0.59,
+        "arousal": 0.467,
+        "dominance": 0.755,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.99,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 79,
+      "name": "blocked",
+      "category": "anger",
+      "subcategory": "frustration",
+      "vad": {
+        "valence": -0.59,
+        "arousal": 0.533,
+        "dominance": 0.755,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.01,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 80,
+      "name": "deeply blocked",
+      "category": "anger",
+      "subcategory": "frustration",
+      "vad": {
+        "valence": -0.59,
+        "arousal": 0.6,
+        "dominance": 0.755,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.04,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 81,
+      "name": "completely blocked",
+      "category": "anger",
+      "subcategory": "frustration",
+      "vad": {
+        "valence": -0.59,
+        "arousal": 0.667,
+        "dominance": 0.755,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.07,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 82,
+      "name": "infinite obstruction",
+      "category": "anger",
+      "subcategory": "frustration",
+      "vad": {
+        "valence": -0.59,
+        "arousal": 0.733,
+        "dominance": 0.755,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.09,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 83,
+      "name": "transcendent blockage",
+      "category": "anger",
+      "subcategory": "frustration",
+      "vad": {
+        "valence": -0.59,
+        "arousal": 0.8,
+        "dominance": 0.755,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.12,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 84,
+      "name": "bothered",
+      "category": "anger",
+      "subcategory": "irritation",
+      "vad": {
+        "valence": -0.53,
+        "arousal": 0.467,
+        "dominance": 0.785,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.99,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 85,
+      "name": "annoyed",
+      "category": "anger",
+      "subcategory": "irritation",
+      "vad": {
+        "valence": -0.53,
+        "arousal": 0.533,
+        "dominance": 0.785,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.01,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 86,
+      "name": "deeply annoyed",
+      "category": "anger",
+      "subcategory": "irritation",
+      "vad": {
+        "valence": -0.53,
+        "arousal": 0.6,
+        "dominance": 0.785,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.04,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 87,
+      "name": "thoroughly annoyed",
+      "category": "anger",
+      "subcategory": "irritation",
+      "vad": {
+        "valence": -0.53,
+        "arousal": 0.667,
+        "dominance": 0.785,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.07,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 88,
+      "name": "infinite annoyance",
+      "category": "anger",
+      "subcategory": "irritation",
+      "vad": {
+        "valence": -0.53,
+        "arousal": 0.733,
+        "dominance": 0.785,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.09,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 89,
+      "name": "transcendent annoyance",
+      "category": "anger",
+      "subcategory": "irritation",
+      "vad": {
+        "valence": -0.53,
+        "arousal": 0.8,
+        "dominance": 0.785,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.12,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 90,
+      "name": "sour",
+      "category": "anger",
+      "subcategory": "resentment",
+      "vad": {
+        "valence": -0.47,
+        "arousal": 0.467,
+        "dominance": 0.815,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.99,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 91,
+      "name": "bitter",
+      "category": "anger",
+      "subcategory": "resentment",
+      "vad": {
+        "valence": -0.47,
+        "arousal": 0.533,
+        "dominance": 0.815,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.01,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 92,
+      "name": "deeply bitter",
+      "category": "anger",
+      "subcategory": "resentment",
+      "vad": {
+        "valence": -0.47,
+        "arousal": 0.6,
+        "dominance": 0.815,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.04,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 93,
+      "name": "completely bitter",
+      "category": "anger",
+      "subcategory": "resentment",
+      "vad": {
+        "valence": -0.47,
+        "arousal": 0.667,
+        "dominance": 0.815,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.07,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 94,
+      "name": "infinite bitterness",
+      "category": "anger",
+      "subcategory": "resentment",
+      "vad": {
+        "valence": -0.47,
+        "arousal": 0.733,
+        "dominance": 0.815,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.09,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 95,
+      "name": "transcendent bitterness",
+      "category": "anger",
+      "subcategory": "resentment",
+      "vad": {
+        "valence": -0.47,
+        "arousal": 0.8,
+        "dominance": 0.815,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.12,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 96,
+      "name": "opposed",
+      "category": "anger",
+      "subcategory": "hostility",
+      "vad": {
+        "valence": -0.41,
+        "arousal": 0.467,
+        "dominance": 0.845,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.99,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 97,
+      "name": "antagonistic",
+      "category": "anger",
+      "subcategory": "hostility",
+      "vad": {
+        "valence": -0.41,
+        "arousal": 0.533,
+        "dominance": 0.845,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.01,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 98,
+      "name": "deeply antagonistic",
+      "category": "anger",
+      "subcategory": "hostility",
+      "vad": {
+        "valence": -0.41,
+        "arousal": 0.6,
+        "dominance": 0.845,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.04,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 99,
+      "name": "completely antagonistic",
+      "category": "anger",
+      "subcategory": "hostility",
+      "vad": {
+        "valence": -0.41,
+        "arousal": 0.667,
+        "dominance": 0.845,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.07,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 100,
+      "name": "infinite antagonism",
+      "category": "anger",
+      "subcategory": "hostility",
+      "vad": {
+        "valence": -0.41,
+        "arousal": 0.733,
+        "dominance": 0.845,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.09,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 101,
+      "name": "transcendent antagonism",
+      "category": "anger",
+      "subcategory": "hostility",
+      "vad": {
+        "valence": -0.41,
+        "arousal": 0.8,
+        "dominance": 0.845,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.12,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 102,
+      "name": "shocked",
+      "category": "anger",
+      "subcategory": "indignation",
+      "vad": {
+        "valence": -0.35,
+        "arousal": 0.467,
+        "dominance": 0.875,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.99,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 103,
+      "name": "outraged",
+      "category": "anger",
+      "subcategory": "indignation",
+      "vad": {
+        "valence": -0.35,
+        "arousal": 0.533,
+        "dominance": 0.875,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.01,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 104,
+      "name": "deeply outraged",
+      "category": "anger",
+      "subcategory": "indignation",
+      "vad": {
+        "valence": -0.35,
+        "arousal": 0.6,
+        "dominance": 0.875,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.04,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 105,
+      "name": "completely outraged",
+      "category": "anger",
+      "subcategory": "indignation",
+      "vad": {
+        "valence": -0.35,
+        "arousal": 0.667,
+        "dominance": 0.875,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.07,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 106,
+      "name": "infinite outrage",
+      "category": "anger",
+      "subcategory": "indignation",
+      "vad": {
+        "valence": -0.35,
+        "arousal": 0.733,
+        "dominance": 0.875,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.09,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 107,
+      "name": "transcendent outrage",
+      "category": "anger",
+      "subcategory": "indignation",
+      "vad": {
+        "valence": -0.35,
+        "arousal": 0.8,
+        "dominance": 0.875,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.12,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 108,
+      "name": "startled",
+      "category": "fear",
+      "subcategory": "terror",
+      "vad": {
+        "valence": -0.85,
+        "arousal": 0.408,
+        "dominance": 0.125,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.96,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 109,
+      "name": "horrified",
+      "category": "fear",
+      "subcategory": "terror",
+      "vad": {
+        "valence": -0.85,
+        "arousal": 0.467,
+        "dominance": 0.125,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.99,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 110,
+      "name": "deeply horrified",
+      "category": "fear",
+      "subcategory": "terror",
+      "vad": {
+        "valence": -0.85,
+        "arousal": 0.525,
+        "dominance": 0.125,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.01,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 111,
+      "name": "completely frozen",
+      "category": "fear",
+      "subcategory": "terror",
+      "vad": {
+        "valence": -0.85,
+        "arousal": 0.583,
+        "dominance": 0.125,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.03,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 112,
+      "name": "infinite horror",
+      "category": "fear",
+      "subcategory": "terror",
+      "vad": {
+        "valence": -0.85,
+        "arousal": 0.642,
+        "dominance": 0.125,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.06,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 113,
+      "name": "transcendent horror",
+      "category": "fear",
+      "subcategory": "terror",
+      "vad": {
+        "valence": -0.85,
+        "arousal": 0.7,
+        "dominance": 0.125,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.08,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 114,
+      "name": "concerned",
+      "category": "fear",
+      "subcategory": "anxiety",
+      "vad": {
+        "valence": -0.79,
+        "arousal": 0.408,
+        "dominance": 0.155,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.96,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 115,
+      "name": "worried",
+      "category": "fear",
+      "subcategory": "anxiety",
+      "vad": {
+        "valence": -0.79,
+        "arousal": 0.467,
+        "dominance": 0.155,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.99,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 116,
+      "name": "deeply worried",
+      "category": "fear",
+      "subcategory": "anxiety",
+      "vad": {
+        "valence": -0.79,
+        "arousal": 0.525,
+        "dominance": 0.155,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.01,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 117,
+      "name": "consumed by worry",
+      "category": "fear",
+      "subcategory": "anxiety",
+      "vad": {
+        "valence": -0.79,
+        "arousal": 0.583,
+        "dominance": 0.155,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.03,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 118,
+      "name": "infinite worry",
+      "category": "fear",
+      "subcategory": "anxiety",
+      "vad": {
+        "valence": -0.79,
+        "arousal": 0.642,
+        "dominance": 0.155,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.06,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 119,
+      "name": "transcendent worry",
+      "category": "fear",
+      "subcategory": "anxiety",
+      "vad": {
+        "valence": -0.79,
+        "arousal": 0.7,
+        "dominance": 0.155,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.08,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 120,
+      "name": "interested",
+      "category": "fear",
+      "subcategory": "worry",
+      "vad": {
+        "valence": -0.73,
+        "arousal": 0.408,
+        "dominance": 0.185,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.96,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 121,
+      "name": "concerned",
+      "category": "fear",
+      "subcategory": "worry",
+      "vad": {
+        "valence": -0.73,
+        "arousal": 0.467,
+        "dominance": 0.185,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.99,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 122,
+      "name": "deeply concerned",
+      "category": "fear",
+      "subcategory": "worry",
+      "vad": {
+        "valence": -0.73,
+        "arousal": 0.525,
+        "dominance": 0.185,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.01,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 123,
+      "name": "completely concerned",
+      "category": "fear",
+      "subcategory": "worry",
+      "vad": {
+        "valence": -0.73,
+        "arousal": 0.583,
+        "dominance": 0.185,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.03,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 124,
+      "name": "infinite concern",
+      "category": "fear",
+      "subcategory": "worry",
+      "vad": {
+        "valence": -0.73,
+        "arousal": 0.642,
+        "dominance": 0.185,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.06,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 125,
+      "name": "transcendent concern",
+      "category": "fear",
+      "subcategory": "worry",
+      "vad": {
+        "valence": -0.73,
+        "arousal": 0.7,
+        "dominance": 0.185,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.08,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 126,
+      "name": "sensing",
+      "category": "fear",
+      "subcategory": "dread",
+      "vad": {
+        "valence": -0.67,
+        "arousal": 0.408,
+        "dominance": 0.215,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.96,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 127,
+      "name": "foreboding",
+      "category": "fear",
+      "subcategory": "dread",
+      "vad": {
+        "valence": -0.67,
+        "arousal": 0.467,
+        "dominance": 0.215,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.99,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 128,
+      "name": "deeply foreboding",
+      "category": "fear",
+      "subcategory": "dread",
+      "vad": {
+        "valence": -0.67,
+        "arousal": 0.525,
+        "dominance": 0.215,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.01,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 129,
+      "name": "completely foreboding",
+      "category": "fear",
+      "subcategory": "dread",
+      "vad": {
+        "valence": -0.67,
+        "arousal": 0.583,
+        "dominance": 0.215,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.03,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 130,
+      "name": "infinite foreboding",
+      "category": "fear",
+      "subcategory": "dread",
+      "vad": {
+        "valence": -0.67,
+        "arousal": 0.642,
+        "dominance": 0.215,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.06,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 131,
+      "name": "transcendent foreboding",
+      "category": "fear",
+      "subcategory": "dread",
+      "vad": {
+        "valence": -0.67,
+        "arousal": 0.7,
+        "dominance": 0.215,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.08,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 132,
+      "name": "hurried",
+      "category": "fear",
+      "subcategory": "panic",
+      "vad": {
+        "valence": -0.61,
+        "arousal": 0.408,
+        "dominance": 0.245,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.96,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 133,
+      "name": "frantic",
+      "category": "fear",
+      "subcategory": "panic",
+      "vad": {
+        "valence": -0.61,
+        "arousal": 0.467,
+        "dominance": 0.245,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.99,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 134,
+      "name": "deeply frantic",
+      "category": "fear",
+      "subcategory": "panic",
+      "vad": {
+        "valence": -0.61,
+        "arousal": 0.525,
+        "dominance": 0.245,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.01,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 135,
+      "name": "completely frantic",
+      "category": "fear",
+      "subcategory": "panic",
+      "vad": {
+        "valence": -0.61,
+        "arousal": 0.583,
+        "dominance": 0.245,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.03,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 136,
+      "name": "infinite franticness",
+      "category": "fear",
+      "subcategory": "panic",
+      "vad": {
+        "valence": -0.61,
+        "arousal": 0.642,
+        "dominance": 0.245,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.06,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 137,
+      "name": "transcendent franticness",
+      "category": "fear",
+      "subcategory": "panic",
+      "vad": {
+        "valence": -0.61,
+        "arousal": 0.7,
+        "dominance": 0.245,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.08,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 138,
+      "name": "wary",
+      "category": "fear",
+      "subcategory": "paranoia",
+      "vad": {
+        "valence": -0.55,
+        "arousal": 0.408,
+        "dominance": 0.275,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.96,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 139,
+      "name": "suspicious",
+      "category": "fear",
+      "subcategory": "paranoia",
+      "vad": {
+        "valence": -0.55,
+        "arousal": 0.467,
+        "dominance": 0.275,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.99,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 140,
+      "name": "deeply suspicious",
+      "category": "fear",
+      "subcategory": "paranoia",
+      "vad": {
+        "valence": -0.55,
+        "arousal": 0.525,
+        "dominance": 0.275,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.01,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 141,
+      "name": "completely suspicious",
+      "category": "fear",
+      "subcategory": "paranoia",
+      "vad": {
+        "valence": -0.55,
+        "arousal": 0.583,
+        "dominance": 0.275,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.03,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 142,
+      "name": "infinite suspicion",
+      "category": "fear",
+      "subcategory": "paranoia",
+      "vad": {
+        "valence": -0.55,
+        "arousal": 0.642,
+        "dominance": 0.275,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.06,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 143,
+      "name": "transcendent suspicion",
+      "category": "fear",
+      "subcategory": "paranoia",
+      "vad": {
+        "valence": -0.55,
+        "arousal": 0.7,
+        "dominance": 0.275,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.08,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 144,
+      "name": "caught off guard",
+      "category": "surprise",
+      "subcategory": "shock",
+      "vad": {
+        "valence": 0.15,
+        "arousal": 0.467,
+        "dominance": 0.425,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 0.99,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 145,
+      "name": "stunned",
+      "category": "surprise",
+      "subcategory": "shock",
+      "vad": {
+        "valence": 0.15,
+        "arousal": 0.533,
+        "dominance": 0.425,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.01,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 146,
+      "name": "deeply stunned",
+      "category": "surprise",
+      "subcategory": "shock",
+      "vad": {
+        "valence": 0.15,
+        "arousal": 0.6,
+        "dominance": 0.425,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.04,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 147,
+      "name": "completely stunned",
+      "category": "surprise",
+      "subcategory": "shock",
+      "vad": {
+        "valence": 0.15,
+        "arousal": 0.667,
+        "dominance": 0.425,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.07,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 148,
+      "name": "infinite stunning",
+      "category": "surprise",
+      "subcategory": "shock",
+      "vad": {
+        "valence": 0.15,
+        "arousal": 0.733,
+        "dominance": 0.425,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.09,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 149,
+      "name": "transcendent shock",
+      "category": "surprise",
+      "subcategory": "shock",
+      "vad": {
+        "valence": 0.15,
+        "arousal": 0.8,
+        "dominance": 0.425,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.12,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 150,
+      "name": "surprised",
+      "category": "surprise",
+      "subcategory": "amazement",
+      "vad": {
+        "valence": 0.21,
+        "arousal": 0.467,
+        "dominance": 0.455,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 0.99,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 151,
+      "name": "astonished",
+      "category": "surprise",
+      "subcategory": "amazement",
+      "vad": {
+        "valence": 0.21,
+        "arousal": 0.533,
+        "dominance": 0.455,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.01,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 152,
+      "name": "deeply astonished",
+      "category": "surprise",
+      "subcategory": "amazement",
+      "vad": {
+        "valence": 0.21,
+        "arousal": 0.6,
+        "dominance": 0.455,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.04,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 153,
+      "name": "completely astonished",
+      "category": "surprise",
+      "subcategory": "amazement",
+      "vad": {
+        "valence": 0.21,
+        "arousal": 0.667,
+        "dominance": 0.455,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.07,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 154,
+      "name": "infinite astonishment",
+      "category": "surprise",
+      "subcategory": "amazement",
+      "vad": {
+        "valence": 0.21,
+        "arousal": 0.733,
+        "dominance": 0.455,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.09,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 155,
+      "name": "transcendent astonishment",
+      "category": "surprise",
+      "subcategory": "amazement",
+      "vad": {
+        "valence": 0.21,
+        "arousal": 0.8,
+        "dominance": 0.455,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.12,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 156,
+      "name": "respectful",
+      "category": "surprise",
+      "subcategory": "awe",
+      "vad": {
+        "valence": 0.27,
+        "arousal": 0.467,
+        "dominance": 0.485,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 0.99,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 157,
+      "name": "reverent",
+      "category": "surprise",
+      "subcategory": "awe",
+      "vad": {
+        "valence": 0.27,
+        "arousal": 0.533,
+        "dominance": 0.485,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.01,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 158,
+      "name": "deeply reverent",
+      "category": "surprise",
+      "subcategory": "awe",
+      "vad": {
+        "valence": 0.27,
+        "arousal": 0.6,
+        "dominance": 0.485,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.04,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 159,
+      "name": "completely reverent",
+      "category": "surprise",
+      "subcategory": "awe",
+      "vad": {
+        "valence": 0.27,
+        "arousal": 0.667,
+        "dominance": 0.485,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.07,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 160,
+      "name": "infinite reverence",
+      "category": "surprise",
+      "subcategory": "awe",
+      "vad": {
+        "valence": 0.27,
+        "arousal": 0.733,
+        "dominance": 0.485,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.09,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 161,
+      "name": "transcendent reverence",
+      "category": "surprise",
+      "subcategory": "awe",
+      "vad": {
+        "valence": 0.27,
+        "arousal": 0.8,
+        "dominance": 0.485,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.12,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 162,
+      "name": "puzzled",
+      "category": "surprise",
+      "subcategory": "confusion",
+      "vad": {
+        "valence": 0.33,
+        "arousal": 0.467,
+        "dominance": 0.515,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 0.99,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 163,
+      "name": "bewildered",
+      "category": "surprise",
+      "subcategory": "confusion",
+      "vad": {
+        "valence": 0.33,
+        "arousal": 0.533,
+        "dominance": 0.515,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.01,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 164,
+      "name": "deeply bewildered",
+      "category": "surprise",
+      "subcategory": "confusion",
+      "vad": {
+        "valence": 0.33,
+        "arousal": 0.6,
+        "dominance": 0.515,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.04,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 165,
+      "name": "completely bewildered",
+      "category": "surprise",
+      "subcategory": "confusion",
+      "vad": {
+        "valence": 0.33,
+        "arousal": 0.667,
+        "dominance": 0.515,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.07,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 166,
+      "name": "infinite bewilderment",
+      "category": "surprise",
+      "subcategory": "confusion",
+      "vad": {
+        "valence": 0.33,
+        "arousal": 0.733,
+        "dominance": 0.515,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.09,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 167,
+      "name": "transcendent bewilderment",
+      "category": "surprise",
+      "subcategory": "confusion",
+      "vad": {
+        "valence": 0.33,
+        "arousal": 0.8,
+        "dominance": 0.515,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.12,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 168,
+      "name": "interested",
+      "category": "surprise",
+      "subcategory": "wonder",
+      "vad": {
+        "valence": 0.39,
+        "arousal": 0.467,
+        "dominance": 0.545,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 0.99,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 169,
+      "name": "curious",
+      "category": "surprise",
+      "subcategory": "wonder",
+      "vad": {
+        "valence": 0.39,
+        "arousal": 0.533,
+        "dominance": 0.545,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.01,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 170,
+      "name": "deeply curious",
+      "category": "surprise",
+      "subcategory": "wonder",
+      "vad": {
+        "valence": 0.39,
+        "arousal": 0.6,
+        "dominance": 0.545,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.04,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 171,
+      "name": "burning curiosity",
+      "category": "surprise",
+      "subcategory": "wonder",
+      "vad": {
+        "valence": 0.39,
+        "arousal": 0.667,
+        "dominance": 0.545,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.07,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 172,
+      "name": "infinite curiosity",
+      "category": "surprise",
+      "subcategory": "wonder",
+      "vad": {
+        "valence": 0.39,
+        "arousal": 0.733,
+        "dominance": 0.545,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.09,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 173,
+      "name": "transcendent curiosity",
+      "category": "surprise",
+      "subcategory": "wonder",
+      "vad": {
+        "valence": 0.39,
+        "arousal": 0.8,
+        "dominance": 0.545,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.12,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 174,
+      "name": "doubting",
+      "category": "surprise",
+      "subcategory": "disbelief",
+      "vad": {
+        "valence": 0.45,
+        "arousal": 0.467,
+        "dominance": 0.575,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 0.99,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 175,
+      "name": "in denial",
+      "category": "surprise",
+      "subcategory": "disbelief",
+      "vad": {
+        "valence": 0.45,
+        "arousal": 0.533,
+        "dominance": 0.575,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.01,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 176,
+      "name": "deep denial",
+      "category": "surprise",
+      "subcategory": "disbelief",
+      "vad": {
+        "valence": 0.45,
+        "arousal": 0.6,
+        "dominance": 0.575,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.04,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 177,
+      "name": "complete denial",
+      "category": "surprise",
+      "subcategory": "disbelief",
+      "vad": {
+        "valence": 0.45,
+        "arousal": 0.667,
+        "dominance": 0.575,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.07,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 178,
+      "name": "infinite denial",
+      "category": "surprise",
+      "subcategory": "disbelief",
+      "vad": {
+        "valence": 0.45,
+        "arousal": 0.733,
+        "dominance": 0.575,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.09,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 179,
+      "name": "transcendent denial",
+      "category": "surprise",
+      "subcategory": "disbelief",
+      "vad": {
+        "valence": 0.45,
+        "arousal": 0.8,
+        "dominance": 0.575,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "major",
+      "tempoMultiplier": 1.12,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 180,
+      "name": "queasy",
+      "category": "disgust",
+      "subcategory": "revulsion",
+      "vad": {
+        "valence": -0.75,
+        "arousal": 0.292,
+        "dominance": 0.525,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.92,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 181,
+      "name": "nauseated",
+      "category": "disgust",
+      "subcategory": "revulsion",
+      "vad": {
+        "valence": -0.75,
+        "arousal": 0.333,
+        "dominance": 0.525,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.93,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 182,
+      "name": "deeply nauseated",
+      "category": "disgust",
+      "subcategory": "revulsion",
+      "vad": {
+        "valence": -0.75,
+        "arousal": 0.375,
+        "dominance": 0.525,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.95,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 183,
+      "name": "completely nauseated",
+      "category": "disgust",
+      "subcategory": "revulsion",
+      "vad": {
+        "valence": -0.75,
+        "arousal": 0.417,
+        "dominance": 0.525,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.97,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 184,
+      "name": "infinite nausea",
+      "category": "disgust",
+      "subcategory": "revulsion",
+      "vad": {
+        "valence": -0.75,
+        "arousal": 0.458,
+        "dominance": 0.525,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.98,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 185,
+      "name": "transcendent nausea",
+      "category": "disgust",
+      "subcategory": "revulsion",
+      "vad": {
+        "valence": -0.75,
+        "arousal": 0.5,
+        "dominance": 0.525,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.0,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 186,
+      "name": "unimpressed",
+      "category": "disgust",
+      "subcategory": "contempt",
+      "vad": {
+        "valence": -0.69,
+        "arousal": 0.292,
+        "dominance": 0.555,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.92,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 187,
+      "name": "disdainful",
+      "category": "disgust",
+      "subcategory": "contempt",
+      "vad": {
+        "valence": -0.69,
+        "arousal": 0.333,
+        "dominance": 0.555,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.93,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 188,
+      "name": "deeply disdainful",
+      "category": "disgust",
+      "subcategory": "contempt",
+      "vad": {
+        "valence": -0.69,
+        "arousal": 0.375,
+        "dominance": 0.555,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.95,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 189,
+      "name": "completely disdainful",
+      "category": "disgust",
+      "subcategory": "contempt",
+      "vad": {
+        "valence": -0.69,
+        "arousal": 0.417,
+        "dominance": 0.555,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.97,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 190,
+      "name": "infinite disdain",
+      "category": "disgust",
+      "subcategory": "contempt",
+      "vad": {
+        "valence": -0.69,
+        "arousal": 0.458,
+        "dominance": 0.555,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.98,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 191,
+      "name": "transcendent disdain",
+      "category": "disgust",
+      "subcategory": "contempt",
+      "vad": {
+        "valence": -0.69,
+        "arousal": 0.5,
+        "dominance": 0.555,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.0,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 192,
+      "name": "disliking",
+      "category": "disgust",
+      "subcategory": "loathing",
+      "vad": {
+        "valence": -0.63,
+        "arousal": 0.292,
+        "dominance": 0.585,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.92,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 193,
+      "name": "detesting",
+      "category": "disgust",
+      "subcategory": "loathing",
+      "vad": {
+        "valence": -0.63,
+        "arousal": 0.333,
+        "dominance": 0.585,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.93,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 194,
+      "name": "deeply detesting",
+      "category": "disgust",
+      "subcategory": "loathing",
+      "vad": {
+        "valence": -0.63,
+        "arousal": 0.375,
+        "dominance": 0.585,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.95,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 195,
+      "name": "completely detesting",
+      "category": "disgust",
+      "subcategory": "loathing",
+      "vad": {
+        "valence": -0.63,
+        "arousal": 0.417,
+        "dominance": 0.585,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.97,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 196,
+      "name": "infinite detestation",
+      "category": "disgust",
+      "subcategory": "loathing",
+      "vad": {
+        "valence": -0.63,
+        "arousal": 0.458,
+        "dominance": 0.585,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.98,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 197,
+      "name": "transcendent detestation",
+      "category": "disgust",
+      "subcategory": "loathing",
+      "vad": {
+        "valence": -0.63,
+        "arousal": 0.5,
+        "dominance": 0.585,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.0,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 198,
+      "name": "hesitant",
+      "category": "disgust",
+      "subcategory": "aversion",
+      "vad": {
+        "valence": -0.57,
+        "arousal": 0.292,
+        "dominance": 0.615,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.92,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 199,
+      "name": "avoidant",
+      "category": "disgust",
+      "subcategory": "aversion",
+      "vad": {
+        "valence": -0.57,
+        "arousal": 0.333,
+        "dominance": 0.615,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.93,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 200,
+      "name": "deeply avoidant",
+      "category": "disgust",
+      "subcategory": "aversion",
+      "vad": {
+        "valence": -0.57,
+        "arousal": 0.375,
+        "dominance": 0.615,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.95,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 201,
+      "name": "completely avoidant",
+      "category": "disgust",
+      "subcategory": "aversion",
+      "vad": {
+        "valence": -0.57,
+        "arousal": 0.417,
+        "dominance": 0.615,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.97,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 202,
+      "name": "infinite avoidance",
+      "category": "disgust",
+      "subcategory": "aversion",
+      "vad": {
+        "valence": -0.57,
+        "arousal": 0.458,
+        "dominance": 0.615,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.98,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 203,
+      "name": "transcendent avoidance",
+      "category": "disgust",
+      "subcategory": "aversion",
+      "vad": {
+        "valence": -0.57,
+        "arousal": 0.5,
+        "dominance": 0.615,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.0,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 204,
+      "name": "bothered",
+      "category": "disgust",
+      "subcategory": "repulsion",
+      "vad": {
+        "valence": -0.51,
+        "arousal": 0.292,
+        "dominance": 0.645,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.92,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 205,
+      "name": "revolted",
+      "category": "disgust",
+      "subcategory": "repulsion",
+      "vad": {
+        "valence": -0.51,
+        "arousal": 0.333,
+        "dominance": 0.645,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.93,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 206,
+      "name": "deeply revolted",
+      "category": "disgust",
+      "subcategory": "repulsion",
+      "vad": {
+        "valence": -0.51,
+        "arousal": 0.375,
+        "dominance": 0.645,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.95,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 207,
+      "name": "completely revolted",
+      "category": "disgust",
+      "subcategory": "repulsion",
+      "vad": {
+        "valence": -0.51,
+        "arousal": 0.417,
+        "dominance": 0.645,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.97,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 208,
+      "name": "infinite revolt",
+      "category": "disgust",
+      "subcategory": "repulsion",
+      "vad": {
+        "valence": -0.51,
+        "arousal": 0.458,
+        "dominance": 0.645,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.98,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 209,
+      "name": "transcendent revolt",
+      "category": "disgust",
+      "subcategory": "repulsion",
+      "vad": {
+        "valence": -0.51,
+        "arousal": 0.5,
+        "dominance": 0.645,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.0,
+      "dynamicsScale": 1.0
+    },
+    {
+      "id": 210,
+      "name": "difficult",
+      "category": "disgust",
+      "subcategory": "distaste",
+      "vad": {
+        "valence": -0.45,
+        "arousal": 0.292,
+        "dominance": 0.675,
+        "intensity": 0.167
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.92,
+      "dynamicsScale": 0.58
+    },
+    {
+      "id": 211,
+      "name": "unpalatable",
+      "category": "disgust",
+      "subcategory": "distaste",
+      "vad": {
+        "valence": -0.45,
+        "arousal": 0.333,
+        "dominance": 0.675,
+        "intensity": 0.333
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.93,
+      "dynamicsScale": 0.67
+    },
+    {
+      "id": 212,
+      "name": "deeply unpalatable",
+      "category": "disgust",
+      "subcategory": "distaste",
+      "vad": {
+        "valence": -0.45,
+        "arousal": 0.375,
+        "dominance": 0.675,
+        "intensity": 0.5
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.95,
+      "dynamicsScale": 0.75
+    },
+    {
+      "id": 213,
+      "name": "completely unpalatable",
+      "category": "disgust",
+      "subcategory": "distaste",
+      "vad": {
+        "valence": -0.45,
+        "arousal": 0.417,
+        "dominance": 0.675,
+        "intensity": 0.667
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.97,
+      "dynamicsScale": 0.83
+    },
+    {
+      "id": 214,
+      "name": "infinite unpalatability",
+      "category": "disgust",
+      "subcategory": "distaste",
+      "vad": {
+        "valence": -0.45,
+        "arousal": 0.458,
+        "dominance": 0.675,
+        "intensity": 0.833
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 0.98,
+      "dynamicsScale": 0.92
+    },
+    {
+      "id": 215,
+      "name": "transcendent unpalatability",
+      "category": "disgust",
+      "subcategory": "distaste",
+      "vad": {
+        "valence": -0.45,
+        "arousal": 0.5,
+        "dominance": 0.675,
+        "intensity": 1.0
+      },
+      "relatedEmotions": [],
+      "mode": "minor",
+      "tempoMultiplier": 1.0,
+      "dynamicsScale": 1.0
+    }
+  ]
+}

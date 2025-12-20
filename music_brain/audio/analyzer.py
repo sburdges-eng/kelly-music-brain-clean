@@ -7,7 +7,8 @@ into a single comprehensive analyzer.
 
 from dataclasses import dataclass, field
 from typing import List, Dict, Optional, Tuple, Any
-from pathlib import Path
+
+from music_brain.utils.path_utils import safe_path
 
 try:
     import numpy as np
@@ -160,7 +161,7 @@ class AudioAnalyzer:
         Returns:
             AudioAnalysis with all detected features
         """
-        audio_path = Path(audio_path)
+        audio_path = safe_path(audio_path)
         if not audio_path.exists():
             raise FileNotFoundError(f"Audio file not found: {audio_path}")
 

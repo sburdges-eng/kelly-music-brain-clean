@@ -12,6 +12,8 @@ import hashlib
 import json
 import uuid
 
+from music_brain.utils.path_utils import safe_path, ensure_path_exists
+
 
 @dataclass
 class IntentDiff:
@@ -141,8 +143,8 @@ class IntentVersionControl:
         self._head_id: Optional[str] = None
 
         if storage_path:
-            self._storage_path = Path(storage_path)
-            self._storage_path.mkdir(parents=True, exist_ok=True)
+            self._storage_path = safe_path(storage_path)
+            self._storage_path.ensure_dir()
             self._load()
         else:
             self._storage_path = None
@@ -364,7 +366,8 @@ class IntentVersionControl:
             "head_id": self._head_id,
         }
 
-        with open(self._storage_path / "versions.json", 'w') as f:
+        versions_file = self._storage_path / "versions.json"
+        with open(str(versions_file), 'w') as f:
             json.dump(data, f, indent=2)
 
     def _load(self) -> None:
@@ -373,10 +376,10 @@ class IntentVersionControl:
             return
 
         versions_file = self._storage_path / "versions.json"
-        if not versions_file.exists():
+        if not versions_file.to_path().exists():
             return
 
-        with open(versions_file) as f:
+        with open(str(versions_file)) as f:
             data = json.load(f)
 
         # Load versions

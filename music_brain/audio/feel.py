@@ -12,6 +12,8 @@ from dataclasses import dataclass, field
 from typing import List, Dict, Optional, Tuple
 from pathlib import Path
 
+from music_brain.utils.path_utils import safe_path
+
 # Optional imports for audio processing
 try:
     import librosa
@@ -100,7 +102,7 @@ def analyze_feel(
     if not NUMPY_AVAILABLE:
         raise ImportError("numpy package required")
     
-    audio_path = Path(audio_path)
+    audio_path = safe_path(audio_path)
     if not audio_path.exists():
         raise FileNotFoundError(f"Audio file not found: {audio_path}")
     
