@@ -583,3 +583,7 @@ class AIOrchestrator:
             f"AIOrchestrator(running={len(self._running_executions)}, "
             f"history={len(self._execution_history)})"
         )
+
+
+# Backwards-compatibility alias for tests
+Orchestrator = AIOrchestrator

@@ -69,28 +69,25 @@ Shutdown Methods:
 # =============================================================================
 
 from .ableton_bridge import (
+    VOWEL_FORMANTS,
     # Main classes
     AbletonBridge,
-    AbletonOSCBridge,
     AbletonMIDIBridge,
-
+    AbletonOSCBridge,
+    MIDIConfig,
     # Configuration
     OSCConfig,
-    MIDIConfig,
-
+    TrackInfo,
     # State classes
     TransportState,
-    TrackInfo,
-
     # Voice control
     VoiceCC,
-    VOWEL_FORMANTS,
-
-    # Convenience functions
-    get_bridge,
     connect_daw,
     disconnect_daw,
-
+    # Convenience functions
+    get_bridge,
+)
+from .ableton_bridge import (
     # MCP tools
     get_mcp_tools as get_bridge_mcp_tools,
 )
@@ -98,84 +95,69 @@ from .ableton_bridge import (
 # =============================================================================
 # CrewAI Music Agents - Local LLM Agents
 # =============================================================================
-
 from .crewai_music_agents import (
+    AGENT_ROLES,
+    # Agents
+    AgentRole,
+    LLMBackend,
     # LLM
     LocalLLM,
     LocalLLMConfig,
-    LLMBackend,
-
+    MusicAgent,
+    # Crew
+    MusicCrew,
     # Tools
     Tool,
     ToolManager,
-
-    # Agents
-    AgentRole,
-    MusicAgent,
-    AGENT_ROLES,
-
-    # Crew
-    MusicCrew,
-
-    # Pre-defined tasks
-    voice_production_task,
-    song_production_task,
-
     # Convenience functions
     get_crew,
     shutdown_crew,
-)
-
-# =============================================================================
-# Voice Profiles - Customizable Voice Characteristics
-# =============================================================================
-
-from .voice_profiles import (
-    # Main classes
-    VoiceProfileManager,
-    VoiceProfile,
-
-    # Enums
-    Gender,
-    AccentRegion,
-    SpeechPattern,
-
-    # Convenience functions
-    get_voice_manager,
-    apply_voice_profile,
-    learn_word,
-    list_accents,
-    list_speech_patterns,
+    song_production_task,
+    # Pre-defined tasks
+    voice_production_task,
 )
 
 # =============================================================================
 # Unified Hub - Central Orchestration
 # =============================================================================
-
 from .unified_hub import (
-    # Main class
-    UnifiedHub,
-
+    DAWState,
     # Configuration
     HubConfig,
-    SessionConfig,
-
-    # State classes
-    VoiceState,
-    DAWState,
-
     # Voice synthesis
     LocalVoiceSynth,
-
+    SessionConfig,
+    # Main class
+    UnifiedHub,
+    # State classes
+    VoiceState,
+    force_stop_hub,
     # Global functions
     get_hub,
-    start_hub,
-    stop_hub,
-    force_stop_hub,
-    shutdown_all,
-
     # MCP tools
     get_hub_mcp_tools,
+    shutdown_all,
+    start_hub,
+    stop_hub,
+)
+
+# =============================================================================
+# Voice Profiles - Customizable Voice Characteristics
+# =============================================================================
+from .voice_profiles import (
+    AccentRegion,
+    # Enums
+    Gender,
+    SpeechPattern,
+    VoiceProfile,
+    # Main classes
+    VoiceProfileManager,
+    apply_voice_profile,
+    # Convenience functions
+    get_voice_manager,
+    learn_word,
+    list_accents,
+    list_speech_patterns,
 )
 
 # =============================================================================
@@ -184,76 +166,75 @@ from .unified_hub import (
 
 # Shutdown aliases
 shutdown_tools = shutdown_crew
-get_tool_manager = lambda: get_crew().tools if get_crew() else None
+
+
+def get_tool_manager():
+    """Get the tool manager from the crew."""
+    crew = get_crew()
+    return crew.tools if crew else None
 
 # =============================================================================
 # Module Info
 # =============================================================================
 
 __all__ = [
+    "AGENT_ROLES",
+    "VOWEL_FORMANTS",
     # Ableton Bridge
     "AbletonBridge",
-    "AbletonOSCBridge",
     "AbletonMIDIBridge",
-    "OSCConfig",
-    "MIDIConfig",
-    "TransportState",
-    "TrackInfo",
-    "VoiceCC",
-    "VOWEL_FORMANTS",
-    "get_bridge",
-    "connect_daw",
-    "disconnect_daw",
-    "get_bridge_mcp_tools",
-
+    "AbletonOSCBridge",
+    "AccentRegion",
+    # Agents
+    "AgentRole",
+    "DAWState",
+    "Gender",
+    "HubConfig",
+    "LLMBackend",
     # Local LLM
     "LocalLLM",
     "LocalLLMConfig",
-    "LLMBackend",
-
+    "LocalVoiceSynth",
+    "MIDIConfig",
+    "MusicAgent",
+    "MusicCrew",
+    "OSCConfig",
+    "SessionConfig",
+    "SpeechPattern",
     # Tools
     "Tool",
     "ToolManager",
-
-    # Agents
-    "AgentRole",
-    "MusicAgent",
-    "AGENT_ROLES",
-    "MusicCrew",
-    "voice_production_task",
-    "song_production_task",
-    "get_crew",
-    "shutdown_crew",
-
+    "TrackInfo",
+    "TransportState",
+    # Unified Hub
+    "UnifiedHub",
+    "VoiceCC",
+    "VoiceProfile",
     # Voice Profiles
     "VoiceProfileManager",
-    "VoiceProfile",
-    "Gender",
-    "AccentRegion",
-    "SpeechPattern",
-    "get_voice_manager",
+    "VoiceState",
     "apply_voice_profile",
+    "connect_daw",
+    "disconnect_daw",
+    "force_stop_hub",
+    "get_bridge",
+    "get_bridge_mcp_tools",
+    "get_crew",
+    "get_hub",
+    "get_hub_mcp_tools",
+    "get_tool_manager",
+    "get_voice_manager",
     "learn_word",
     "list_accents",
     "list_speech_patterns",
-
-    # Unified Hub
-    "UnifiedHub",
-    "HubConfig",
-    "SessionConfig",
-    "VoiceState",
-    "DAWState",
-    "LocalVoiceSynth",
-    "get_hub",
-    "start_hub",
-    "stop_hub",
-    "force_stop_hub",
     "shutdown_all",
-    "get_hub_mcp_tools",
-
+    "shutdown_crew",
     # Aliases
     "shutdown_tools",
-    "get_tool_manager",
+    "song_production_task",
+    "start_hub",
+    "stop_hub",
+    "voice_production_task",
 ]
 
 __version__ = "1.0.0"

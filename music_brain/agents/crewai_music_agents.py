@@ -20,14 +20,11 @@ One-Time Setup:
 Then the system runs 100% locally.
 """
 
-import os
-import json
-import threading
 import atexit
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Optional, Dict, List, Any, Callable
 from enum import Enum
-
+from typing import Any
 
 # =============================================================================
 # Local LLM Configuration
@@ -67,7 +64,7 @@ class LocalLLM:
         response = llm.generate("Write a chord progression for grief")
     """
 
-    def __init__(self, config: Optional[LocalLLMConfig] = None):
+    def __init__(self, config: LocalLLMConfig | None = None):
         self.config = config or LocalLLMConfig()
         self._available = False
         self._check_availability()
@@ -91,9 +88,9 @@ class LocalLLM:
     def generate(
         self,
         prompt: str,
-        model: Optional[str] = None,
-        system: Optional[str] = None,
-        temperature: Optional[float] = None,
+        model: str | None = None,
+        system: str | None = None,
+        temperature: float | None = None,
         max_tokens: int = 1024
     ) -> str:
         """
@@ -145,9 +142,9 @@ class LocalLLM:
 
     def chat(
         self,
-        messages: List[Dict[str, str]],
-        model: Optional[str] = None,
-        temperature: Optional[float] = None
+        messages: list[dict[str, str]],
+        model: str | None = None,
+        temperature: float | None = None
     ) -> str:
         """
         Chat with local LLM.
@@ -225,7 +222,7 @@ class ToolManager:
     """Manages tools available to agents."""
 
     def __init__(self):
-        self._tools: Dict[str, Tool] = {}
+        self._tools: dict[str, Tool] = {}
         self._bridge = None
         self._llm = None
         atexit.register(self._shutdown)
@@ -236,11 +233,11 @@ class ToolManager:
         self._tools[name] = tool
         return tool
 
-    def get(self, name: str) -> Optional[Tool]:
+    def get(self, name: str) -> Tool | None:
         """Get a tool by name."""
         return self._tools.get(name)
 
-    def list_tools(self) -> List[str]:
+    def list_tools(self) -> list[str]:
         """List all available tools."""
         return list(self._tools.keys())
 
@@ -329,8 +326,8 @@ class AgentRole:
     name: str
     description: str
     system_prompt: str
-    tools: List[str] = field(default_factory=list)
-    model: Optional[str] = None  # Use specific model for this role
+    tools: list[str] = field(default_factory=list)
+    model: str | None = None  # Use specific model for this role
 
 
 # Define the 6 agent roles
@@ -472,7 +469,7 @@ class MusicAgent:
         self.role = role
         self.llm = llm
         self.tools = tool_manager
-        self._conversation: List[Dict[str, str]] = []
+        self._conversation: list[dict[str, str]] = []
         self._enabled = True
 
     @property
@@ -556,11 +553,11 @@ class MusicCrew:
         result = crew.produce("Create a lo-fi ballad about loss")
     """
 
-    def __init__(self, llm_config: Optional[LocalLLMConfig] = None):
+    def __init__(self, llm_config: LocalLLMConfig | None = None):
         self.llm_config = llm_config or LocalLLMConfig()
         self.llm = LocalLLM(self.llm_config)
         self.tools = ToolManager()
-        self._agents: Dict[str, MusicAgent] = {}
+        self._agents: dict[str, MusicAgent] = {}
         self._running = False
 
         atexit.register(self._shutdown)
@@ -593,7 +590,7 @@ class MusicCrew:
         self._running = True
         return True
 
-    def get_agent(self, role_id: str) -> Optional[MusicAgent]:
+    def get_agent(self, role_id: str) -> MusicAgent | None:
         """Get an agent by role ID."""
         return self._agents.get(role_id)
 
@@ -613,7 +610,7 @@ class MusicCrew:
             return agent.think(task)
         return f"Unknown agent: {role_id}"
 
-    def produce(self, brief: str) -> Dict[str, str]:
+    def produce(self, brief: str) -> dict[str, str]:
         """
         Have the Producer coordinate a production task.
 
@@ -658,7 +655,7 @@ class MusicCrew:
         return results
 
     @property
-    def agents(self) -> Dict[str, MusicAgent]:
+    def agents(self) -> dict[str, MusicAgent]:
         return self._agents.copy()
 
     @property
@@ -693,7 +690,7 @@ class MusicCrew:
 # Pre-defined Tasks
 # =============================================================================
 
-def voice_production_task(crew: MusicCrew, lyrics: str) -> Dict[str, Any]:
+def voice_production_task(crew: MusicCrew, lyrics: str) -> dict[str, Any]:
     """
     Complete voice production analysis for lyrics.
 
@@ -722,7 +719,7 @@ def song_production_task(
     crew: MusicCrew,
     emotion: str,
     genre: str = "lo-fi bedroom emo"
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Complete song production guidance.
 
@@ -736,7 +733,7 @@ def song_production_task(
 # Convenience Functions
 # =============================================================================
 
-_default_crew: Optional[MusicCrew] = None
+_default_crew: MusicCrew | None = None
 
 
 def get_crew() -> MusicCrew:

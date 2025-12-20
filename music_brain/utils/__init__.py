@@ -1,7 +1,7 @@
 """
-Utilities - MIDI I/O, instrument mappings, PPQ handling.
+Utilities - MIDI I/O, instrument mappings, PPQ handling, and cross-platform paths.
 
-Common utilities for working with MIDI data across DAWs.
+Common utilities for working with MIDI data across DAWs and cross-platform file operations.
 """
 
 from music_brain.utils.midi_io import load_midi, save_midi, get_midi_info
@@ -17,6 +17,15 @@ from music_brain.utils.ppq import (
     scale_ticks,
     ticks_to_beats,
     beats_to_ticks,
+)
+from music_brain.utils.path_utils import (
+    CrossPlatformPath,
+    safe_path,
+    safe_filename,
+    ensure_path_exists,
+    get_home_dir,
+    get_temp_dir,
+    PathError,
 )
 
 __all__ = [
@@ -35,4 +44,12 @@ __all__ = [
     "scale_ticks",
     "ticks_to_beats",
     "beats_to_ticks",
+    # Cross-platform paths (P0-004)
+    "CrossPlatformPath",
+    "safe_path",
+    "safe_filename",
+    "ensure_path_exists",
+    "get_home_dir",
+    "get_temp_dir",
+    "PathError",
 ]

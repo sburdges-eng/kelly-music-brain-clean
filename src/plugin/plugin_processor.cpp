@@ -1,6 +1,7 @@
 #include "plugin_processor.h"
 #include "plugin_editor.h"
 #include <chrono>
+#include <map>
 
 namespace kelly {
 
@@ -76,7 +77,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParam
         "Valence",
         juce::NormalisableRange<float>(-1.0f, 1.0f, 0.01f),
         0.1f,
-        juce::AudioParameterFloatAttributes().withLabel("Negative ↔ Positive")
+        juce::AudioParameterFloatAttributes().withLabel("Negative <-> Positive")
     ));
     
     // Arousal: 0.0 to 1.0
@@ -85,7 +86,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParam
         "Arousal",
         juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f),
         0.2f,
-        juce::AudioParameterFloatAttributes().withLabel("Calm ↔ Excited")
+        juce::AudioParameterFloatAttributes().withLabel("Calm <-> Excited")
     ));
     
     // Intensity: 0.0 to 1.0
@@ -94,7 +95,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParam
         "Intensity",
         juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f),
         0.4f,
-        juce::AudioParameterFloatAttributes().withLabel("Subtle ↔ Extreme")
+        juce::AudioParameterFloatAttributes().withLabel("Subtle <-> Extreme")
     ));
     
     // Bars: 1 to 8
@@ -145,6 +146,9 @@ void PluginProcessor::parameterChanged(const juce::String& parameterID, float ne
     
     // Update tempo if available
     emotionRequest_.tempo = static_cast<int>(bpm_);
+    
+    // Mark project as modified
+    projectModified_ = true;
 }
 
 ml::EmotionRequest PluginProcessor::getEmotionRequest() const {
@@ -218,6 +222,9 @@ void PluginProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiB
         try {
             auto generated = aiEngine_.generate(request);
             writeMidiToBuffer(generated, midiMessages, bpm_, sampleRate_, blockSize_);
+            
+            // Store generated events
+            addGeneratedMidi(generated);
         } catch (const std::exception& e) {
             // Log error but continue processing
             juce::Logger::writeToLog("AI generation error: " + juce::String(e.what()));
@@ -308,6 +315,260 @@ bool PluginProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const {
     const auto in = layouts.getMainInputChannelSet();
     const auto out = layouts.getMainOutputChannelSet();
     return in == juce::AudioChannelSet::disabled() && out == juce::AudioChannelSet::disabled();
+}
+
+//==============================================================================
+// Project Management
+//==============================================================================
+
+bool PluginProcessor::saveCurrentProject(const juce::File& file) {
+    midikompanion::ProjectData data = getCurrentProjectData();
+    
+    bool success = projectManager_.saveProject(file, data);
+    
+    if (success) {
+        currentProjectFile_ = file;
+        projectModified_ = false;
+        juce::Logger::writeToLog("Project saved: " + file.getFullPathName());
+    } else {
+        juce::Logger::writeToLog("Failed to save project: " + projectManager_.getLastError());
+    }
+    
+    return success;
+}
+
+bool PluginProcessor::loadProject(const juce::File& file) {
+    midikompanion::ProjectData data;
+    
+    bool success = projectManager_.loadProject(file, data);
+    
+    if (success) {
+        currentProjectData_ = data;
+        currentProjectFile_ = file;
+        projectModified_ = false;
+        
+        // Restore tempo
+        bpm_ = data.tempo;
+        
+        // Restore plugin state parameters
+        for (const auto& [paramId, value] : data.pluginState.parameters) {
+            if (auto* param = parameters_.getParameter(paramId)) {
+                param->setValueNotifyingHost(value);
+            }
+        }
+        
+        // Restore generated tracks
+        {
+            const juce::ScopedLock lock(midiStorageLock_);
+            generatedTracks_ = data.tracks;
+            
+            // Rebuild MIDI sequence from tracks
+            generatedMidi_.clear();
+            for (const auto& track : data.tracks) {
+                for (const auto& note : track.notes) {
+                    int startTicks = static_cast<int>(note.startBeat * 480.0);
+                    int endTicks = static_cast<int>((note.startBeat + note.durationBeats) * 480.0);
+                    
+                    juce::MidiMessage noteOn = juce::MidiMessage::noteOn(
+                        note.channel, note.pitch, static_cast<juce::uint8>(note.velocity));
+                    noteOn.setTimeStamp(startTicks);
+                    generatedMidi_.addEvent(noteOn);
+                    
+                    juce::MidiMessage noteOff = juce::MidiMessage::noteOff(note.channel, note.pitch);
+                    noteOff.setTimeStamp(endTicks);
+                    generatedMidi_.addEvent(noteOff);
+                }
+            }
+            generatedMidi_.sort();
+            generatedMidi_.updateMatchedPairs();
+        }
+        
+        // Update emotion request
+        {
+            const juce::ScopedLock lock(emotionRequestLock_);
+            emotionRequest_.valence = data.pluginState.emotionState.valence;
+            emotionRequest_.arousal = data.pluginState.emotionState.arousal;
+            emotionRequest_.intensity = data.pluginState.emotionState.intensity;
+            emotionRequest_.tag = data.pluginState.emotionState.emotionTag;
+            emotionRequest_.tempo = static_cast<int>(data.tempo);
+        }
+        
+        juce::Logger::writeToLog("Project loaded: " + file.getFullPathName());
+    } else {
+        juce::Logger::writeToLog("Failed to load project: " + projectManager_.getLastError());
+    }
+    
+    return success;
+}
+
+void PluginProcessor::createNewProject() {
+    currentProjectData_ = midikompanion::ProjectData();
+    currentProjectFile_ = juce::File();
+    projectModified_ = false;
+    
+    {
+        const juce::ScopedLock lock(midiStorageLock_);
+        generatedMidi_.clear();
+        generatedTracks_.clear();
+    }
+    
+    bpm_ = 120.0;
+    juce::Logger::writeToLog("New project created");
+}
+
+midikompanion::ProjectData PluginProcessor::getCurrentProjectData() const {
+    midikompanion::ProjectData data = currentProjectData_;
+    
+    data.tempo = bpm_;
+    
+    // Update plugin state from current parameters
+    data.pluginState.parameters.clear();
+    for (auto* param : getParameters()) {
+        if (auto* rangedParam = dynamic_cast<juce::RangedAudioParameter*>(param)) {
+            data.pluginState.parameters[rangedParam->getParameterID().toStdString()] = 
+                rangedParam->getValue();
+        }
+    }
+    
+    // Update emotion state
+    {
+        const juce::ScopedLock lock(emotionRequestLock_);
+        data.pluginState.emotionState.emotionTag = emotionRequest_.tag;
+        data.pluginState.emotionState.valence = emotionRequest_.valence;
+        data.pluginState.emotionState.arousal = emotionRequest_.arousal;
+        data.pluginState.emotionState.intensity = emotionRequest_.intensity;
+    }
+    
+    data.pluginState.bars = static_cast<int>(parameters_.getRawParameterValue(ParameterID::bars)->load());
+    data.pluginState.enableCloud = isCloudEnabled();
+    data.pluginState.generationRate = getGenerationRate();
+    
+    {
+        const juce::ScopedLock lock(midiStorageLock_);
+        data.tracks = generatedTracks_;
+    }
+    
+    return data;
+}
+
+//==============================================================================
+// MIDI Export
+//==============================================================================
+
+midikompanion::MidiExportResult PluginProcessor::exportToMidi(const juce::File& file,
+                                                              const midikompanion::MidiExportOptions& options) {
+    const juce::ScopedLock lock(midiStorageLock_);
+    
+    if (generatedMidi_.getNumEvents() == 0 && generatedTracks_.empty()) {
+        midikompanion::MidiExportResult result;
+        result.success = false;
+        result.errorMessage = "No MIDI data to export";
+        return result;
+    }
+    
+    midikompanion::MidiExportData exportData;
+    exportData.tempo = bpm_;
+    exportData.timeSignatureNumerator = 4;
+    exportData.timeSignatureDenominator = 4;
+    
+    // Convert generated tracks to export format
+    for (const auto& track : generatedTracks_) {
+        midikompanion::MidiExportTrack exportTrack;
+        exportTrack.name = track.name;
+        exportTrack.midiChannel = track.midiChannel;
+        
+        for (const auto& note : track.notes) {
+            midikompanion::MidiExportNote exportNote;
+            exportNote.pitch = note.pitch;
+            exportNote.velocity = note.velocity;
+            exportNote.startBeat = note.startBeat;
+            exportNote.durationBeats = note.durationBeats;
+            exportNote.channel = note.channel;
+            exportTrack.notes.push_back(exportNote);
+        }
+        
+        exportData.tracks.push_back(exportTrack);
+    }
+    
+    // If no tracks but have raw MIDI, convert it
+    if (exportData.tracks.empty() && !generatedMidi_.isEmpty()) {
+        midikompanion::MidiExportTrack defaultTrack;
+        defaultTrack.name = "Generated";
+        defaultTrack.midiChannel = 0;
+        
+        std::map<int, std::pair<double, int>> activeNotes;
+        
+        for (int i = 0; i < generatedMidi_.getNumEvents(); ++i) {
+            auto* event = generatedMidi_.getEventPointer(i);
+            auto& msg = event->message;
+            double beat = msg.getTimeStamp() / 480.0;
+            
+            if (msg.isNoteOn() && msg.getVelocity() > 0) {
+                activeNotes[msg.getNoteNumber()] = {beat, msg.getVelocity()};
+            } else if (msg.isNoteOff() || (msg.isNoteOn() && msg.getVelocity() == 0)) {
+                auto it = activeNotes.find(msg.getNoteNumber());
+                if (it != activeNotes.end()) {
+                    midikompanion::MidiExportNote exportNote;
+                    exportNote.pitch = msg.getNoteNumber();
+                    exportNote.velocity = it->second.second;
+                    exportNote.startBeat = it->second.first;
+                    exportNote.durationBeats = beat - it->second.first;
+                    exportNote.channel = msg.getChannel() - 1;
+                    defaultTrack.notes.push_back(exportNote);
+                    activeNotes.erase(it);
+                }
+            }
+        }
+        
+        if (!defaultTrack.notes.empty()) {
+            exportData.tracks.push_back(defaultTrack);
+        }
+    }
+    
+    return midiExporter_.exportToFile(file, exportData, options);
+}
+
+void PluginProcessor::addGeneratedMidi(const std::vector<ml::MidiEvent>& events) {
+    const juce::ScopedLock lock(midiStorageLock_);
+    
+    for (const auto& event : events) {
+        int startTicks = static_cast<int>(event.startBeat * 480.0);
+        int endTicks = static_cast<int>((event.startBeat + event.durationBeats) * 480.0);
+        
+        juce::MidiMessage noteOn = juce::MidiMessage::noteOn(
+            event.channel, event.note, static_cast<juce::uint8>(event.velocity));
+        noteOn.setTimeStamp(startTicks);
+        generatedMidi_.addEvent(noteOn);
+        
+        juce::MidiMessage noteOff = juce::MidiMessage::noteOff(event.channel, event.note);
+        noteOff.setTimeStamp(endTicks);
+        generatedMidi_.addEvent(noteOff);
+    }
+    
+    generatedMidi_.sort();
+    generatedMidi_.updateMatchedPairs();
+    
+    // Create default track if empty
+    if (generatedTracks_.empty()) {
+        midikompanion::TrackData melodyTrack;
+        melodyTrack.name = "Melody";
+        melodyTrack.type = "melody";
+        melodyTrack.midiChannel = 0;
+        generatedTracks_.push_back(melodyTrack);
+    }
+    
+    // Add notes to first track
+    for (const auto& event : events) {
+        midikompanion::MidiNoteData note;
+        note.pitch = event.note;
+        note.velocity = event.velocity;
+        note.startBeat = event.startBeat;
+        note.durationBeats = event.durationBeats;
+        note.channel = event.channel;
+        generatedTracks_[0].notes.push_back(note);
+    }
+    
+    projectModified_ = true;
 }
 
 } // namespace kelly

@@ -212,7 +212,7 @@ ensure_newline_before_comments = true
 skip_glob = ["*/migrations/*", "*/__pycache__/*", "*/build/*", "*/dist/*"]
 
 [tool.setuptools]
-packages = ["music_brain", "penta_core"]
+packages = ["music_brain", "penta_core", "mcp_todo", "mcp_workstation"]
 
 [tool.setuptools.package-data]
 "*" = ["*.json", "*.yaml", "*.md"]

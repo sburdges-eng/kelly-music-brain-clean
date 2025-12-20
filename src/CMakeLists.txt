@@ -26,10 +26,53 @@ set(PENTA_CORE_SOURCES
     # OSC communication
     osc/OSCServer.cpp
     osc/OSCClient.cpp
-        osc/OSCMessage.cpp
-        osc/OSCClient.cpp
-        osc/OSCHub.cpp
-        osc/RTMessageQueue.cpp
+    osc/OSCMessage.cpp
+    osc/OSCHub.cpp
+    osc/RTMessageQueue.cpp
+)
+
+# =============================================================================
+# MidiKompanion Plugin Sources (Agent 1, 3, 4 ownership)
+# =============================================================================
+
+set(MIDIKOMPANION_SOURCES
+    # Project management (Agent 1)
+    project/ProjectManager.cpp
+    
+    # MIDI export (Agent 1)
+    midi/MidiExporter.cpp
+    
+    # ML infrastructure (Agent 3)
+    ml/ONNXInference.cpp
+    ml/NodeMLMapper.cpp
+    ml/MultiModelProcessor.cpp
+    
+    # Audio analysis (Agent 4)
+    audio/AudioAnalyzer.cpp
+    
+    # Plugin (Agent 1 + Agent 5)
+    plugin/plugin_processor.cpp
+    plugin/plugin_editor.cpp
+)
+
+set(MIDIKOMPANION_HEADERS
+    # Project management
+    project/ProjectManager.h
+    
+    # MIDI export
+    midi/MidiExporter.h
+    
+    # ML infrastructure
+    ml/ONNXInference.h
+    ml/NodeMLMapper.h
+    ml/MultiModelProcessor.h
+    
+    # Audio analysis
+    audio/AudioAnalyzer.h
+    
+    # Plugin
+    plugin/plugin_processor.h
+    plugin/plugin_editor.h
 )
 
 set(PENTA_CORE_HEADERS
@@ -89,4 +132,55 @@ endif()
 # Platform-specific threading
 if(UNIX)
     target_link_libraries(penta_core PUBLIC pthread)
+endif()
+
+# =============================================================================
+# MidiKompanion Library (JUCE-based)
+# =============================================================================
+
+# Only build if JUCE is available
+if(TARGET juce::juce_audio_processors)
+    add_library(midikompanion_lib STATIC
+        ${MIDIKOMPANION_SOURCES}
+        ${MIDIKOMPANION_HEADERS}
+    )
+    
+    target_include_directories(midikompanion_lib PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${PROJECT_SOURCE_DIR}/include
+    )
+    
+    target_link_libraries(midikompanion_lib PUBLIC
+        juce::juce_audio_processors
+        juce::juce_audio_basics
+        juce::juce_core
+        juce::juce_data_structures
+        juce::juce_dsp
+        juce::juce_gui_basics
+    )
+    
+    # ONNX Runtime (optional - for ML inference)
+    # Agent 3: Add ONNX Runtime dependency when available
+    option(MIDIKOMPANION_HAS_ONNX "Enable ONNX Runtime for ML inference" OFF)
+    
+    if(MIDIKOMPANION_HAS_ONNX)
+        find_package(onnxruntime QUIET)
+        if(onnxruntime_FOUND)
+            target_link_libraries(midikompanion_lib PUBLIC onnxruntime::onnxruntime)
+            target_compile_definitions(midikompanion_lib PUBLIC MIDIKOMPANION_HAS_ONNX=1)
+            message(STATUS "ONNX Runtime enabled for MidiKompanion")
+        else()
+            message(WARNING "ONNX Runtime not found - ML features will use stub mode")
+            target_compile_definitions(midikompanion_lib PUBLIC MIDIKOMPANION_HAS_ONNX=0)
+        endif()
+    else()
+        target_compile_definitions(midikompanion_lib PUBLIC MIDIKOMPANION_HAS_ONNX=0)
+        message(STATUS "ONNX Runtime disabled - ML features will use stub mode")
+    endif()
+    
+    set_target_properties(midikompanion_lib PROPERTIES
+        CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED ON
+        POSITION_INDEPENDENT_CODE ON
+    )
 endif()

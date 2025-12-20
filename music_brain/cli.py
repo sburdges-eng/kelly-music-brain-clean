@@ -72,10 +72,14 @@ def get_intent_module():
 def get_audio_module():
     from music_brain.audio import (
         analyze_feel, ChordDetector, analyze_frequency_bands,
-        analyze_reference, compare_frequency_profiles, suggest_eq_adjustments
+        analyze_reference, compare_frequency_profiles, suggest_eq_adjustments,
+        detect_emotion_from_audio, get_emotional_state_from_audio,
+        EmotionDetector, EMOTION_DETECTION_AVAILABLE
     )
     return (analyze_feel, ChordDetector, analyze_frequency_bands,
-            analyze_reference, compare_frequency_profiles, suggest_eq_adjustments)
+            analyze_reference, compare_frequency_profiles, suggest_eq_adjustments,
+            detect_emotion_from_audio, get_emotional_state_from_audio,
+            EmotionDetector, EMOTION_DETECTION_AVAILABLE)
 
 
 def get_arrangement_module():
@@ -554,14 +558,109 @@ def cmd_audio(args):
         return cmd_audio_frequency(args)
     elif args.subcommand == 'reference':
         return cmd_audio_reference(args)
+    elif args.subcommand == 'detect-emotion':
+        return cmd_audio_detect_emotion(args)
     else:
         print("Error: Unknown audio subcommand")
         return 1
 
 
+def cmd_audio_detect_emotion(args):
+    """Detect emotion from audio file using SpeechBrain."""
+    (_, _, _, _, _, _, detect_emotion_from_audio, get_emotional_state_from_audio,
+     EmotionDetector, EMOTION_DETECTION_AVAILABLE) = get_audio_module()
+    
+    if not EMOTION_DETECTION_AVAILABLE:
+        print("Error: Emotion detection requires SpeechBrain.")
+        print("Install with: pip install speechbrain torch torchaudio")
+        return 1
+    
+    audio_path = Path(args.audio_file)
+    if not audio_path.exists():
+        print(f"Error: File not found: {audio_path}")
+        return 1
+    
+    print(f"Detecting emotion in: {audio_path}")
+    try:
+        # Use quick function for simple detection
+        if args.quick:
+            result = detect_emotion_from_audio(str(audio_path))
+            
+            print(f"\n=== Emotion Detection ===")
+            print(f"Emotion: {result['emotion']}")
+            print(f"Confidence: {result['confidence']:.1%}")
+            print(f"Valence: {result.get('valence', 'N/A'):.2f}" if result.get('valence') is not None else "Valence: N/A")
+            print(f"Arousal: {result.get('arousal', 'N/A'):.2f}" if result.get('arousal') is not None else "Arousal: N/A")
+            
+            if result.get('primary_emotion'):
+                print(f"Primary emotion: {result['primary_emotion']}")
+            
+            if args.output:
+                with open(args.output, 'w') as f:
+                    json.dump(result, f, indent=2)
+                print(f"\nResults saved to: {args.output}")
+        else:
+            # Use class-based API for more control
+            detector = EmotionDetector()
+            result = detector.detect_emotion(str(audio_path))
+            
+            print(f"\n=== Emotion Detection (Detailed) ===")
+            print(f"Detected emotion: {result['emotion']}")
+            print(f"Confidence: {result['confidence']:.1%}")
+            
+            if result.get('valence') is not None:
+                print(f"\nValence-Arousal Model:")
+                print(f"  Valence: {result['valence']:.2f} (-1=sad, +1=happy)")
+                print(f"  Arousal: {result['arousal']:.2f} (0=calm, 1=excited)")
+            
+            if result.get('primary_emotion'):
+                print(f"\nMapped to system emotion: {result['primary_emotion']}")
+            
+            # Get EmotionalState if requested
+            if args.get_state:
+                try:
+                    state = detector.get_emotional_state(str(audio_path))
+                    print(f"\n=== Emotional State (for use with intent system) ===")
+                    print(f"State: {state}")
+                    
+                    # Try to get parameters if available
+                    try:
+                        from data.emotional_mapping import get_parameters_for_state
+                        params = get_parameters_for_state(state)
+                        print(f"\nSuggested musical parameters:")
+                        print(f"  Tempo: {params.tempo_suggested} BPM")
+                        print(f"  Key: {params.key_suggested}")
+                        if hasattr(params, 'mode_suggested'):
+                            print(f"  Mode: {params.mode_suggested}")
+                    except ImportError:
+                        pass
+                except Exception as e:
+                    print(f"Warning: Could not get emotional state: {e}")
+            
+            if args.output:
+                output_data = result.copy()
+                if args.get_state:
+                    try:
+                        state = detector.get_emotional_state(str(audio_path))
+                        output_data['emotional_state'] = str(state)
+                    except:
+                        pass
+                with open(args.output, 'w') as f:
+                    json.dump(output_data, f, indent=2, default=str)
+                print(f"\nResults saved to: {args.output}")
+        
+        return 0
+    except Exception as e:
+        print(f"Error detecting emotion: {e}")
+        import traceback
+        if args.verbose:
+            traceback.print_exc()
+        return 1
+
+
 def cmd_audio_analyze(args):
     """Analyze audio file feel characteristics."""
-    (analyze_feel, _, _, _, _, _) = get_audio_module()
+    (analyze_feel, _, _, _, _, _, _, _, _, _) = get_audio_module()
     
     audio_path = Path(args.audio_file)
     if not audio_path.exists():
@@ -598,7 +697,7 @@ def cmd_audio_analyze(args):
 
 def cmd_audio_detect_chords(args):
     """Detect chords from audio file."""
-    (_, ChordDetector, _, _, _, _) = get_audio_module()
+    (_, ChordDetector, _, _, _, _, _, _, _, _) = get_audio_module()
     
     audio_path = Path(args.audio_file)
     if not audio_path.exists():
@@ -634,7 +733,7 @@ def cmd_audio_detect_chords(args):
 
 def cmd_audio_frequency(args):
     """Analyze 8-band frequency profile."""
-    (_, _, analyze_frequency_bands, _, _, _) = get_audio_module()
+    (_, _, analyze_frequency_bands, _, _, _, _, _, _, _) = get_audio_module()
     
     audio_path = Path(args.audio_file)
     if not audio_path.exists():
@@ -677,7 +776,7 @@ def cmd_audio_frequency(args):
 
 def cmd_audio_reference(args):
     """Analyze reference track DNA."""
-    (_, _, _, analyze_reference, _, _) = get_audio_module()
+    (_, _, _, analyze_reference, _, _, _, _, _, _) = get_audio_module()
     
     audio_path = Path(args.audio_file)
     if not audio_path.exists():
@@ -1122,6 +1221,18 @@ def main():
     audio_ref = audio_subparsers.add_parser('reference', help='Extract reference track DNA')
     audio_ref.add_argument('audio_file', help='Audio file')
     audio_ref.add_argument('-o', '--output', help='Save reference DNA to JSON')
+    
+    # audio detect-emotion
+    audio_emotion = audio_subparsers.add_parser('detect-emotion', 
+                                                help='Detect emotion from audio using SpeechBrain')
+    audio_emotion.add_argument('audio_file', help='Audio file (WAV, MP3, FLAC, etc.)')
+    audio_emotion.add_argument('-q', '--quick', action='store_true',
+                               help='Quick detection (simple output)')
+    audio_emotion.add_argument('-s', '--get-state', action='store_true',
+                                help='Get EmotionalState for use with intent system')
+    audio_emotion.add_argument('-o', '--output', help='Save results to JSON file')
+    audio_emotion.add_argument('-v', '--verbose', action='store_true',
+                               help='Verbose error output')
     
     # Arrangement commands
     arrange_parser = subparsers.add_parser('arrange', help='Song arrangement generation')

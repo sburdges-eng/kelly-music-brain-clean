@@ -27,45 +27,36 @@ Usage:
         response = hub.ask_agent("composer", "Write a sad progression")
 """
 
-import os
-import json
-import time
-import threading
-import queue
 import atexit
-from dataclasses import dataclass, field, asdict
+import json
+import os
+import threading
+import time
+from collections.abc import Callable
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Dict, List, Any, Callable, Tuple
-from enum import Enum
+from typing import Any
 
 from .ableton_bridge import (
     AbletonBridge,
-    AbletonOSCBridge,
     AbletonMIDIBridge,
-    OSCConfig,
     MIDIConfig,
-    TransportState,
+    OSCConfig,
     VoiceCC,
-    VOWEL_FORMANTS,
 )
 from .crewai_music_agents import (
-    MusicCrew,
-    MusicAgent,
     LocalLLM,
     LocalLLMConfig,
-    ToolManager,
-    AGENT_ROLES,
+    MusicCrew,
 )
 from .voice_profiles import (
-    VoiceProfileManager,
-    VoiceProfile,
-    Gender,
     AccentRegion,
+    Gender,
     SpeechPattern,
+    VoiceProfile,
     get_voice_manager,
 )
-
 
 # =============================================================================
 # Configuration
@@ -108,7 +99,7 @@ class SessionConfig:
     mode: str = "major"
     emotion: str = "neutral"
     voice_profile: str = "default"
-    notes: List[str] = field(default_factory=list)
+    notes: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -150,13 +141,13 @@ class LocalVoiceSynth:
     - Speech impediment simulation
     """
 
-    def __init__(self, midi_bridge: Optional[AbletonMIDIBridge] = None):
+    def __init__(self, midi_bridge: AbletonMIDIBridge | None = None):
         self.midi = midi_bridge
         self._speaking = False
         self._current_note = None
         self._platform = self._detect_platform()
         self._profile_manager = get_voice_manager()
-        self._active_profile: Optional[str] = None
+        self._active_profile: str | None = None
 
         # Initialize preset profiles
         self._profile_manager.create_preset_profiles()
@@ -175,10 +166,10 @@ class LocalVoiceSynth:
     def speak(
         self,
         text: str,
-        vowel: Optional[str] = None,
-        rate: Optional[int] = None,
-        pitch: Optional[int] = None,
-        profile: Optional[str] = None
+        vowel: str | None = None,
+        rate: int | None = None,
+        pitch: int | None = None,
+        profile: str | None = None
     ) -> bool:
         """
         Speak text using local TTS with voice profile support.
@@ -279,7 +270,7 @@ class LocalVoiceSynth:
         """Set the active voice profile."""
         self._active_profile = profile_name
 
-    def get_profile(self) -> Optional[str]:
+    def get_profile(self) -> str | None:
         """Get the active voice profile name."""
         return self._active_profile
 
@@ -287,9 +278,9 @@ class LocalVoiceSynth:
         self,
         name: str,
         gender: str = "neutral",
-        base_pitch: Optional[float] = None,
+        base_pitch: float | None = None,
         accent: str = "american_general",
-        speech_patterns: Optional[List[str]] = None,
+        speech_patterns: list[str] | None = None,
         **kwargs
     ) -> VoiceProfile:
         """
@@ -335,15 +326,15 @@ class LocalVoiceSynth:
                 self._active_profile, phrase, replacement
             )
 
-    def list_profiles(self) -> List[str]:
+    def list_profiles(self) -> list[str]:
         """List available voice profiles."""
         return self._profile_manager.list_profiles()
 
-    def list_accents(self) -> List[str]:
+    def list_accents(self) -> list[str]:
         """List available accents."""
         return [a.value for a in AccentRegion]
 
-    def list_speech_patterns(self) -> List[str]:
+    def list_speech_patterns(self) -> list[str]:
         """List available speech patterns."""
         return [p.value for p in SpeechPattern]
 
@@ -359,7 +350,7 @@ class LocalVoiceSynth:
             self.midi.send_note_on(pitch, velocity, channel)
             self._current_note = (pitch, channel)
 
-    def note_off(self, pitch: Optional[int] = None, channel: int = 0):
+    def note_off(self, pitch: int | None = None, channel: int = 0):
         """Stop a note."""
         if self.midi:
             if pitch is None and self._current_note:
@@ -432,14 +423,14 @@ class UnifiedHub:
             hub.save_session("my_session")
     """
 
-    def __init__(self, config: Optional[HubConfig] = None):
+    def __init__(self, config: HubConfig | None = None):
         self.config = config or HubConfig()
 
         # Components
-        self._bridge: Optional[AbletonBridge] = None
-        self._voice: Optional[LocalVoiceSynth] = None
-        self._crew: Optional[MusicCrew] = None
-        self._llm: Optional[LocalLLM] = None
+        self._bridge: AbletonBridge | None = None
+        self._voice: LocalVoiceSynth | None = None
+        self._crew: MusicCrew | None = None
+        self._llm: LocalLLM | None = None
 
         # State
         self._session = SessionConfig()
@@ -448,7 +439,7 @@ class UnifiedHub:
         self._running = False
 
         # Callbacks
-        self._callbacks: Dict[str, List[Callable]] = {}
+        self._callbacks: dict[str, list[Callable]] = {}
 
         # Ensure directories exist
         os.makedirs(self.config.session_dir, exist_ok=True)
@@ -584,7 +575,7 @@ class UnifiedHub:
         if self._bridge:
             self._bridge.send_note(note, velocity, duration_ms)
 
-    def send_chord(self, notes: List[int], velocity: int = 100, duration_ms: int = 500):
+    def send_chord(self, notes: list[int], velocity: int = 100, duration_ms: int = 500):
         """Send a chord to DAW."""
         if self._bridge:
             self._bridge.send_chord(notes, velocity, duration_ms)
@@ -593,12 +584,12 @@ class UnifiedHub:
     # Voice Control
     # =========================================================================
 
-    def speak(self, text: str, vowel: Optional[str] = None, rate: int = 175):
+    def speak(self, text: str, vowel: str | None = None, rate: int = 175):
         """Speak text using local TTS."""
         if self._voice:
             self._voice.speak(text, vowel, rate)
 
-    def note_on(self, pitch: int, velocity: int = 100, channel: Optional[int] = None):
+    def note_on(self, pitch: int, velocity: int = 100, channel: int | None = None):
         """Start a voice note."""
         ch = channel if channel is not None else self.config.default_voice_channel
         if self._voice:
@@ -607,28 +598,28 @@ class UnifiedHub:
             self._voice_state.velocity = velocity
             self._voice_state.active = True
 
-    def note_off(self, pitch: Optional[int] = None, channel: Optional[int] = None):
+    def note_off(self, pitch: int | None = None, channel: int | None = None):
         """Stop a voice note."""
         ch = channel if channel is not None else self.config.default_voice_channel
         if self._voice:
             self._voice.note_off(pitch, ch)
             self._voice_state.active = False
 
-    def set_vowel(self, vowel: str, channel: Optional[int] = None):
+    def set_vowel(self, vowel: str, channel: int | None = None):
         """Set voice vowel (A, E, I, O, U)."""
         ch = channel if channel is not None else self.config.default_voice_channel
         if self._voice:
             self._voice.set_vowel(vowel, ch)
             self._voice_state.vowel = vowel.upper()
 
-    def set_breathiness(self, amount: float, channel: Optional[int] = None):
+    def set_breathiness(self, amount: float, channel: int | None = None):
         """Set voice breathiness (0-1)."""
         ch = channel if channel is not None else self.config.default_voice_channel
         if self._voice:
             self._voice.set_breathiness(amount, ch)
             self._voice_state.breathiness = amount
 
-    def set_vibrato(self, rate: float, depth: float, channel: Optional[int] = None):
+    def set_vibrato(self, rate: float, depth: float, channel: int | None = None):
         """Set voice vibrato."""
         ch = channel if channel is not None else self.config.default_voice_channel
         if self._voice:
@@ -638,10 +629,10 @@ class UnifiedHub:
 
     def sing_vowel_sequence(
         self,
-        vowels: List[str],
+        vowels: list[str],
         pitch: int = 60,
         duration_ms: int = 300,
-        channel: Optional[int] = None
+        channel: int | None = None
     ):
         """Sing a sequence of vowels on a single pitch."""
         ch = channel if channel is not None else self.config.default_voice_channel
@@ -675,7 +666,7 @@ class UnifiedHub:
             return self._crew.ask(role_id, task)
         return "AI agents not initialized"
 
-    def produce(self, brief: str) -> Dict[str, str]:
+    def produce(self, brief: str) -> dict[str, str]:
         """
         Have the Producer coordinate a production task.
 
@@ -689,7 +680,7 @@ class UnifiedHub:
             return self._crew.produce(brief)
         return {"error": "AI agents not initialized"}
 
-    def analyze_lyrics(self, lyrics: str) -> Dict[str, str]:
+    def analyze_lyrics(self, lyrics: str) -> dict[str, str]:
         """
         Analyze lyrics for vocal production.
 
@@ -746,7 +737,7 @@ class UnifiedHub:
         self._voice_state = VoiceState()
         self._trigger_callback("session_new", name)
 
-    def save_session(self, name: Optional[str] = None) -> str:
+    def save_session(self, name: str | None = None) -> str:
         """
         Save current session to file.
 
@@ -783,7 +774,7 @@ class UnifiedHub:
             True if loaded successfully
         """
         try:
-            with open(filepath, 'r') as f:
+            with open(filepath) as f:
                 data = json.load(f)
 
             # Restore session
@@ -813,7 +804,7 @@ class UnifiedHub:
             print(f"Error loading session: {e}")
             return False
 
-    def list_sessions(self) -> List[str]:
+    def list_sessions(self) -> list[str]:
         """List available session files."""
         session_dir = Path(self.config.session_dir)
         return [f.name for f in session_dir.glob("*.json")]
@@ -828,7 +819,7 @@ class UnifiedHub:
             self._callbacks[event] = []
         self._callbacks[event].append(callback)
 
-    def off(self, event: str, callback: Optional[Callable] = None):
+    def off(self, event: str, callback: Callable | None = None):
         """Remove callback(s)."""
         if callback:
             self._callbacks.get(event, []).remove(callback)
@@ -881,7 +872,7 @@ class UnifiedHub:
 # Global Instance Management
 # =============================================================================
 
-_default_hub: Optional[UnifiedHub] = None
+_default_hub: UnifiedHub | None = None
 
 
 def get_hub() -> UnifiedHub:
@@ -923,7 +914,7 @@ def shutdown_all():
 # MCP Tools (for AI access)
 # =============================================================================
 
-def get_hub_mcp_tools() -> List[Dict[str, Any]]:
+def get_hub_mcp_tools() -> list[dict[str, Any]]:
     """Return MCP tool definitions for the hub."""
     return [
         {

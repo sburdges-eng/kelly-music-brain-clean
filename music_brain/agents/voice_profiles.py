@@ -43,17 +43,16 @@ Usage:
     modified_text, params = manager.apply_profile("Hello world", "my_voice")
 """
 
-import os
-import json
-import re
-import random
-from dataclasses import dataclass, field, asdict
-from datetime import datetime
-from pathlib import Path
-from typing import Optional, Dict, List, Any, Tuple
-from enum import Enum
 import copy
-
+import json
+import os
+import random
+import re
+from dataclasses import asdict, dataclass, field
+from datetime import datetime
+from enum import Enum
+from pathlib import Path
+from typing import Any
 
 # =============================================================================
 # Enums and Constants
@@ -457,7 +456,7 @@ class VoiceProfile:
     accent_strength: float = 1.0       # 0.0 = none, 1.0 = full
 
     # Speech patterns
-    speech_patterns: List[SpeechPattern] = field(default_factory=list)
+    speech_patterns: list[SpeechPattern] = field(default_factory=list)
 
     # Voice quality
     breathiness: float = 0.0           # 0.0 - 1.0
@@ -470,14 +469,14 @@ class VoiceProfile:
     formant_scale: float = 1.0         # 0.8 - 1.2
 
     # Learned preferences (updated by learning system)
-    learned_words: Dict[str, str] = field(default_factory=dict)  # Custom pronunciations
-    learned_phrases: Dict[str, str] = field(default_factory=dict)
+    learned_words: dict[str, str] = field(default_factory=dict)  # Custom pronunciations
+    learned_phrases: dict[str, str] = field(default_factory=dict)
 
     # Metadata
     notes: str = ""
-    tags: List[str] = field(default_factory=list)
+    tags: list[str] = field(default_factory=list)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         data = asdict(self)
         data["gender"] = self.gender.value
@@ -486,7 +485,7 @@ class VoiceProfile:
         return data
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "VoiceProfile":
+    def from_dict(cls, data: dict[str, Any]) -> "VoiceProfile":
         """Create from dictionary."""
         data = copy.deepcopy(data)
 
@@ -516,14 +515,14 @@ class VoiceProfileManager:
     LOCAL SYSTEM - All data stored in ~/.daiw/voice_profiles/
     """
 
-    def __init__(self, storage_dir: Optional[str] = None):
+    def __init__(self, storage_dir: str | None = None):
         self.storage_dir = Path(
             storage_dir or os.path.expanduser("~/.daiw/voice_profiles")
         )
         self.storage_dir.mkdir(parents=True, exist_ok=True)
 
-        self._profiles: Dict[str, VoiceProfile] = {}
-        self._active_profile: Optional[str] = None
+        self._profiles: dict[str, VoiceProfile] = {}
+        self._active_profile: str | None = None
         self._pattern_processor = SpeechPatternProcessor()
 
         # Load existing profiles
@@ -533,7 +532,7 @@ class VoiceProfileManager:
         """Load all profiles from storage."""
         for filepath in self.storage_dir.glob("*.json"):
             try:
-                with open(filepath, 'r') as f:
+                with open(filepath) as f:
                     data = json.load(f)
                     profile = VoiceProfile.from_dict(data)
                     self._profiles[profile.name] = profile
@@ -554,9 +553,9 @@ class VoiceProfileManager:
         self,
         name: str,
         gender: Gender = Gender.NEUTRAL,
-        base_pitch: Optional[float] = None,
+        base_pitch: float | None = None,
         accent: AccentRegion = AccentRegion.AMERICAN_GENERAL,
-        speech_patterns: Optional[List[SpeechPattern]] = None,
+        speech_patterns: list[SpeechPattern] | None = None,
         **kwargs
     ) -> VoiceProfile:
         """
@@ -591,11 +590,11 @@ class VoiceProfileManager:
 
         return profile
 
-    def get_profile(self, name: str) -> Optional[VoiceProfile]:
+    def get_profile(self, name: str) -> VoiceProfile | None:
         """Get a profile by name."""
         return self._profiles.get(name)
 
-    def list_profiles(self) -> List[str]:
+    def list_profiles(self) -> list[str]:
         """List all profile names."""
         return list(self._profiles.keys())
 
@@ -617,7 +616,7 @@ class VoiceProfileManager:
         return False
 
     @property
-    def active_profile(self) -> Optional[VoiceProfile]:
+    def active_profile(self) -> VoiceProfile | None:
         """Get the active profile."""
         if self._active_profile:
             return self._profiles.get(self._active_profile)
@@ -630,8 +629,8 @@ class VoiceProfileManager:
     def apply_profile(
         self,
         text: str,
-        profile_name: Optional[str] = None
-    ) -> Tuple[str, Dict[str, Any]]:
+        profile_name: str | None = None
+    ) -> tuple[str, dict[str, Any]]:
         """
         Apply a voice profile to text.
 
@@ -844,7 +843,7 @@ class VoiceProfileManager:
 # Convenience Functions
 # =============================================================================
 
-_default_manager: Optional[VoiceProfileManager] = None
+_default_manager: VoiceProfileManager | None = None
 
 
 def get_voice_manager() -> VoiceProfileManager:
@@ -856,7 +855,7 @@ def get_voice_manager() -> VoiceProfileManager:
     return _default_manager
 
 
-def apply_voice_profile(text: str, profile: str = None) -> Tuple[str, Dict]:
+def apply_voice_profile(text: str, profile: str | None = None) -> tuple[str, dict]:
     """Apply a voice profile to text."""
     return get_voice_manager().apply_profile(text, profile)
 
@@ -866,12 +865,12 @@ def learn_word(profile: str, word: str, pronunciation: str):
     get_voice_manager().learn_pronunciation(profile, word, pronunciation)
 
 
-def list_accents() -> List[str]:
+def list_accents() -> list[str]:
     """List all available accents."""
     return [a.value for a in AccentRegion]
 
 
-def list_speech_patterns() -> List[str]:
+def list_speech_patterns() -> list[str]:
     """List all available speech patterns."""
     return [p.value for p in SpeechPattern]
 
@@ -911,5 +910,5 @@ if __name__ == "__main__":
     # Test learning
     manager.learn_pronunciation("test_voice", "hello", "howdy")
     modified2, _ = manager.apply_profile(test_text, "test_voice")
-    print(f"\nAfter learning 'hello' → 'howdy':")
+    print("\nAfter learning 'hello' → 'howdy':")
     print(f"Modified: {modified2}")

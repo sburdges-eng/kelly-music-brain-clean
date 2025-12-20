@@ -20,6 +20,11 @@ from penta_core.rules.timing import (
     get_genre_pocket,
     apply_pocket_to_midi,
 )
+from penta_core.rules.voice_leading import VoiceLeadingRules
+from penta_core.rules.harmony_rules import HarmonyRules
+from penta_core.rules.counterpoint_rules import CounterpointRules
+from penta_core.rules.rhythm_rules import RhythmRules
+from penta_core.rules.species import Species
 
 __all__ = [
     "RuleSeverity",
@@ -40,4 +45,9 @@ __all__ = [
     "GENRE_POCKETS",
     "get_genre_pocket",
     "apply_pocket_to_midi",
+    "VoiceLeadingRules",
+    "HarmonyRules",
+    "CounterpointRules",
+    "RhythmRules",
+    "Species",
 ]

@@ -2,6 +2,8 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "../ml/ai_inference.h"
+#include "../project/ProjectManager.h"
+#include "../midi/MidiExporter.h"
 #include <atomic>
 #include <future>
 
@@ -83,6 +85,87 @@ public:
      */
     int getGenerationRate() const;
 
+    //==============================================================================
+    // Project Management
+    //==============================================================================
+    
+    /**
+     * @brief Save current project to file
+     * @param file Target file
+     * @return True if successful
+     */
+    bool saveCurrentProject(const juce::File& file);
+    
+    /**
+     * @brief Load project from file
+     * @param file Source file
+     * @return True if successful
+     */
+    bool loadProject(const juce::File& file);
+    
+    /**
+     * @brief Create new empty project
+     */
+    void createNewProject();
+    
+    /**
+     * @brief Get project manager reference
+     */
+    midikompanion::ProjectManager& getProjectManager() { return projectManager_; }
+    
+    /**
+     * @brief Get current project data
+     */
+    midikompanion::ProjectData getCurrentProjectData() const;
+    
+    /**
+     * @brief Check if project has unsaved changes
+     */
+    bool hasUnsavedChanges() const { return projectModified_; }
+    
+    /**
+     * @brief Get current project file
+     */
+    juce::File getCurrentProjectFile() const { return currentProjectFile_; }
+    
+    //==============================================================================
+    // MIDI Export
+    //==============================================================================
+    
+    /**
+     * @brief Export current session to MIDI file
+     * @param file Target file
+     * @param options Export options
+     * @return Export result
+     */
+    midikompanion::MidiExportResult exportToMidi(const juce::File& file,
+                                                 const midikompanion::MidiExportOptions& options = {});
+    
+    /**
+     * @brief Get MIDI exporter reference
+     */
+    midikompanion::MidiExporter& getMidiExporter() { return midiExporter_; }
+    
+    /**
+     * @brief Check if there is MIDI data to export
+     */
+    bool hasMidiData() const { return !generatedMidi_.isEmpty(); }
+    
+    /**
+     * @brief Add generated MIDI events to internal storage
+     */
+    void addGeneratedMidi(const std::vector<ml::MidiEvent>& events);
+    
+    /**
+     * @brief Clear generated MIDI data
+     */
+    void clearGeneratedMidi() { generatedMidi_.clear(); }
+    
+    /**
+     * @brief Get current tempo
+     */
+    double getCurrentTempo() const { return bpm_; }
+
 private:
     //==============================================================================
     // Parameter Tree Setup
@@ -119,6 +202,18 @@ private:
     std::atomic<int> generationCounter_{0};
     juce::MidiBuffer cloudMidi_;
     juce::CriticalSection cloudLock_;
+
+    // Project management
+    midikompanion::ProjectManager projectManager_;
+    midikompanion::MidiExporter midiExporter_;
+    midikompanion::ProjectData currentProjectData_;
+    juce::File currentProjectFile_;
+    bool projectModified_{false};
+    
+    // Generated MIDI storage
+    juce::MidiMessageSequence generatedMidi_;
+    std::vector<midikompanion::TrackData> generatedTracks_;
+    mutable juce::CriticalSection midiStorageLock_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginProcessor)
 };

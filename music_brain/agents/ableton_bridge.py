@@ -20,15 +20,14 @@ Usage:
         bridge.send_note(60, 100, 500)
 """
 
-import threading
-import queue
-import time
-import json
 import atexit
-from dataclasses import dataclass, field
-from typing import Optional, Callable, Dict, List, Any, Tuple
+import queue
+import threading
+import time
+from collections.abc import Callable
+from dataclasses import dataclass
 from enum import Enum
-
+from typing import Any
 
 # =============================================================================
 # Voice Control CC Mappings (for formant synthesis)
@@ -84,7 +83,7 @@ class TransportState:
     playing: bool = False
     recording: bool = False
     tempo: float = 120.0
-    time_signature: Tuple[int, int] = (4, 4)
+    time_signature: tuple[int, int] = (4, 4)
     position_bars: float = 0.0
     position_beats: float = 0.0
 
@@ -113,16 +112,16 @@ class AbletonOSCBridge:
     All communication is LOCAL - no cloud APIs.
     """
 
-    def __init__(self, config: Optional[OSCConfig] = None):
+    def __init__(self, config: OSCConfig | None = None):
         self.config = config or OSCConfig()
         self._server = None
         self._client = None
         self._server_thread = None
         self._running = False
-        self._callbacks: Dict[str, List[Callable]] = {}
+        self._callbacks: dict[str, list[Callable]] = {}
         self._message_queue = queue.Queue()
         self._transport = TransportState()
-        self._tracks: Dict[int, TrackInfo] = {}
+        self._tracks: dict[int, TrackInfo] = {}
 
         # Register cleanup
         atexit.register(self._shutdown)
@@ -130,7 +129,7 @@ class AbletonOSCBridge:
     def connect(self) -> bool:
         """Connect to Ableton via OSC."""
         try:
-            from pythonosc import udp_client, dispatcher, osc_server
+            from pythonosc import dispatcher, osc_server, udp_client
 
             # Create client (send to Ableton)
             self._client = udp_client.SimpleUDPClient(
@@ -232,7 +231,7 @@ class AbletonOSCBridge:
             self._callbacks[event] = []
         self._callbacks[event].append(callback)
 
-    def off(self, event: str, callback: Optional[Callable] = None):
+    def off(self, event: str, callback: Callable | None = None):
         """Remove callback(s) for an event."""
         if callback:
             self._callbacks.get(event, []).remove(callback)
@@ -322,7 +321,7 @@ class AbletonOSCBridge:
         return self._transport
 
     @property
-    def tracks(self) -> Dict[int, TrackInfo]:
+    def tracks(self) -> dict[int, TrackInfo]:
         return self._tracks.copy()
 
     def disconnect(self):
@@ -376,14 +375,14 @@ class AbletonMIDIBridge:
     All communication is LOCAL - no cloud APIs.
     """
 
-    def __init__(self, config: Optional[MIDIConfig] = None):
+    def __init__(self, config: MIDIConfig | None = None):
         self.config = config or MIDIConfig()
         self._output = None
         self._input = None
         self._running = False
         self._input_thread = None
-        self._callbacks: Dict[str, List[Callable]] = {}
-        self._active_notes: Dict[Tuple[int, int], int] = {}  # (channel, note) -> velocity
+        self._callbacks: dict[str, list[Callable]] = {}
+        self._active_notes: dict[tuple[int, int], int] = {}  # (channel, note) -> velocity
 
         atexit.register(self._shutdown)
 
@@ -444,7 +443,7 @@ class AbletonMIDIBridge:
 
         threading.Thread(target=note_off_later, daemon=True).start()
 
-    def send_chord(self, notes: List[int], velocity: int = 100,
+    def send_chord(self, notes: list[int], velocity: int = 100,
                    duration_ms: int = 500, channel: int = 0):
         """Send multiple notes as a chord."""
         for note in notes:
@@ -493,7 +492,7 @@ class AbletonMIDIBridge:
         self.send_cc(VoiceCC.VIBRATO_RATE.value, int(rate * 127), channel)
         self.send_cc(VoiceCC.VIBRATO_DEPTH.value, int(depth * 127), channel)
 
-    def all_notes_off(self, channel: Optional[int] = None):
+    def all_notes_off(self, channel: int | None = None):
         """Send all notes off message."""
         if self._output:
             import mido
@@ -509,7 +508,7 @@ class AbletonMIDIBridge:
         return self._running and self._output is not None
 
     @property
-    def active_notes(self) -> Dict[Tuple[int, int], int]:
+    def active_notes(self) -> dict[tuple[int, int], int]:
         return self._active_notes.copy()
 
     def disconnect(self):
@@ -571,8 +570,8 @@ class AbletonBridge:
 
     def __init__(
         self,
-        osc_config: Optional[OSCConfig] = None,
-        midi_config: Optional[MIDIConfig] = None
+        osc_config: OSCConfig | None = None,
+        midi_config: MIDIConfig | None = None
     ):
         self.osc = AbletonOSCBridge(osc_config)
         self.midi = AbletonMIDIBridge(midi_config)
@@ -604,7 +603,7 @@ class AbletonBridge:
     def send_note(self, note: int, velocity: int, duration_ms: int, channel: int = 0):
         self.midi.send_note(note, velocity, duration_ms, channel)
 
-    def send_chord(self, notes: List[int], velocity: int = 100,
+    def send_chord(self, notes: list[int], velocity: int = 100,
                    duration_ms: int = 500, channel: int = 0):
         self.midi.send_chord(notes, velocity, duration_ms, channel)
 
@@ -652,7 +651,7 @@ class AbletonBridge:
 # MCP Tool Definitions (for AI access)
 # =============================================================================
 
-def get_mcp_tools() -> List[Dict[str, Any]]:
+def get_mcp_tools() -> list[dict[str, Any]]:
     """Return MCP tool definitions for the Ableton bridge."""
     return [
         {
@@ -749,7 +748,7 @@ def get_mcp_tools() -> List[Dict[str, Any]]:
 # Convenience Functions
 # =============================================================================
 
-_default_bridge: Optional[AbletonBridge] = None
+_default_bridge: AbletonBridge | None = None
 
 
 def get_bridge() -> AbletonBridge:

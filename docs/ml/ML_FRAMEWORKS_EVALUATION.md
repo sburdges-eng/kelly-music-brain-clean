@@ -199,6 +199,15 @@ public:
 
 ---
 
+## Model Handling & Governance
+- Execution policy: ONNX Runtime default on all platforms; CoreML execution provider auto-enabled on Apple when available; TensorRT/DirectML may be enabled for offline/bounce mode only.
+- Versioning: every model ships with `model_manifest.json` containing `model_id`, semantic version, git commit hash, dataset/provenance URL, quantization level, and known compatible engine flags. Manifest is stored alongside the model and embedded in export metadata.
+- Pinning: projects pin to a specific `model_id@version`; the UI shows current/pinned/available versions with a rollback action. Cloud inference respects the pinned version unless the user opts into "fast track" (latest minor).
+- Provenance surfacing: UI displays model name + version + provenance badge (local, cloud-validated, user-uploaded) next to generation actions; logs include execution provider used (CPU/CoreML/GPU/NNAPI).
+- Custom ONNX intake: upload requires a manifest, ONNX checker pass, opset ≤17, static-shape fast-path, quantization report, and license declaration. Approved uploads are codesigned; non-compliant uploads run only in sandboxed local mode.
+- CoreML delegate usage: convert approved ONNX models via `onnx_coreml`; compile with compute units set to "all" (prefer Neural Engine). Store compiled `.mlmodelc` per architecture; fall back to ONNX Runtime CPU if compilation fails.
+- Safety rails: max model size 200MB for realtime paths; larger models allowed only for offline bounce with explicit confirmation. Cloud calls pause when provenance is unknown or signature check fails.
+
 ## Recommended Architecture
 
 ```

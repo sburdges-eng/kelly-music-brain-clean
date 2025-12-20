@@ -9,8 +9,7 @@ are features, not bugs.
 """
 
 import random
-from typing import List, Dict, Any, Optional
-
+from typing import Any
 
 # =================================================================
 # CONSTANTS
@@ -29,18 +28,21 @@ MAX_DROPOUT_PROB = 0.2
 VELOCITY_RANGE_LOW = 0.7   # Multiplier for soft dynamics
 VELOCITY_RANGE_HIGH = 1.15  # Multiplier for loud dynamics
 
+# Vulnerability threshold (midpoint for velocity adjustment)
+VULNERABILITY_MIDPOINT = 0.5
+
 
 # =================================================================
 # CORE GROOVE FUNCTION
 # =================================================================
 
 def apply_groove(
-    events: List[Dict[str, Any]],
+    events: list[dict[str, Any]],
     complexity: float = 0.5,
     vulnerability: float = 0.5,
     ppq: int = 480,
-    seed: Optional[int] = None,
-) -> List[Dict[str, Any]]:
+    seed: int | None = None,
+) -> list[dict[str, Any]]:
     """
     Apply humanizing groove to a list of note events.
 
@@ -89,11 +91,8 @@ def apply_groove(
 
         # Timing humanization
         if "start_tick" in new_event:
-            if complexity > 0:
-                # Random drift within bounds
-                drift = random.randint(-max_drift, max_drift)
-            else:
-                drift = 0
+            # Random drift within bounds
+            drift = random.randint(-max_drift, max_drift) if complexity > 0 else 0
 
             # Add consistent human latency bias
             new_tick = new_event["start_tick"] + drift + latency_bias
@@ -106,12 +105,12 @@ def apply_groove(
             original_vel = new_event["velocity"]
 
             # Base velocity adjustment from vulnerability
-            if vulnerability > 0.5:
+            if vulnerability > VULNERABILITY_MIDPOINT:
                 # Higher vulnerability = softer, more exposed
-                vel_factor = 1.0 - ((vulnerability - 0.5) * 0.4)
+                vel_factor = 1.0 - ((vulnerability - VULNERABILITY_MIDPOINT) * 0.4)
             else:
                 # Lower vulnerability = more confident
-                vel_factor = 1.0 + ((0.5 - vulnerability) * 0.2)
+                vel_factor = 1.0 + ((VULNERABILITY_MIDPOINT - vulnerability) * 0.2)
 
             # Add random variation based on complexity
             if complexity > 0:
@@ -132,10 +131,10 @@ def apply_groove(
 
 
 def apply_swing(
-    events: List[Dict[str, Any]],
+    events: list[dict[str, Any]],
     swing_amount: float = 0.3,
     ppq: int = 480,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """
     Apply swing feel to note events.
 
@@ -174,10 +173,10 @@ def apply_swing(
 
 
 def apply_pocket(
-    events: List[Dict[str, Any]],
+    events: list[dict[str, Any]],
     pocket_depth: float = 0.5,
     ppq: int = 480,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """
     Apply "in the pocket" feel - consistent slight push or pull.
 
@@ -216,11 +215,11 @@ def apply_pocket(
 
 
 def humanize_velocities(
-    events: List[Dict[str, Any]],
+    events: list[dict[str, Any]],
     variation: float = 0.2,
-    accent_pattern: Optional[List[float]] = None,
+    accent_pattern: list[float] | None = None,
     ppq: int = 480,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """
     Apply human-like velocity variations.
 
