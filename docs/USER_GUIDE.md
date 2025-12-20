@@ -2,6 +2,8 @@
 
 This comprehensive guide covers all features of miDiKompanion, the emotion-driven MIDI generation plugin.
 
+**Related docs**: [Quick Start](QUICK_START.md) · [Pricing & SKUs](PRICING_SKU.md) · [Host Support Matrix](daw_integration/HOST_SUPPORT_MATRIX.md)
+
 ## Table of Contents
 
 - [Overview](#overview)
@@ -16,6 +18,15 @@ This comprehensive guide covers all features of miDiKompanion, the emotion-drive
 ## Overview
 
 miDiKompanion uses a sophisticated emotion-to-music mapping system to generate MIDI patterns that reflect specific emotional states. The system is based on the 216-node Emotion Thesaurus, which maps emotions to musical attributes.
+
+### System Requirements
+
+- macOS 13.0 (Ventura) or newer (Apple Silicon native; Intel via Rosetta)
+- Windows 11 22H2 or newer
+- iOS/iPadOS 17 or newer for AUv3 on mobile
+- Linux (experimental: CLAP/VST3 where supported)
+- DAW with VST3 or AUv3 support (CLAP on Bitwig/Reaper); see [Host Support Matrix](daw_integration/HOST_SUPPORT_MATRIX.md) for versions.
+- 4GB RAM minimum (8GB recommended); 2GB free disk space for models/cache.
 
 ### Key Concepts
 
@@ -270,6 +281,16 @@ export KELLY_ONNX_MODEL=/path/to/model.onnx
 # Set cloud endpoint (for cloud inference)
 export KELLY_AI_ENDPOINT=https://api.example.com/generate
 ```
+
+### Premium Features (summary)
+
+See [Pricing & SKUs](PRICING_SKU.md) for full details.
+
+- Explainability: request “why” chord/groove decisions.
+- Custom ONNX uploads (reviewed) with pin/rollback.
+- Cloud preset sync and higher-quality cloud models.
+- Unlimited cloud budget (fair-use) with priority updates.
+- Classifiers/QA gates for safer generations.
 
 ## Advanced Usage
 

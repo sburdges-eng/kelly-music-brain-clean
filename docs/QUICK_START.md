@@ -20,9 +20,20 @@ Welcome to miDiKompanion! This guide will help you get started with emotion-driv
 
 ### Requirements
 
-- macOS 13.0+ (Apple Silicon native; Intel via Rosetta), Windows 11 22H2+, or iOS/iPadOS 17+ for AUv3 on mobile. Linux is experimental (CLAP/VST3 where supported).
-- DAW supporting VST3 or AUv3 (CLAP supported on Bitwig/Reaper); see the [Host Support Matrix](daw_integration/HOST_SUPPORT_MATRIX.md) for host versions.
+- macOS 13.0 (Ventura) or newer (Apple Silicon native; Intel via Rosetta)
+- Windows 11 22H2 or newer
+- iOS/iPadOS 17 or newer for AUv3 on mobile
+- Linux (experimental: CLAP/VST3 where supported)
+- DAW with VST3 or AUv3 support (CLAP on Bitwig/Reaper); see the [Host Support Matrix](daw_integration/HOST_SUPPORT_MATRIX.md) for host versions.
 - 4GB RAM minimum (8GB recommended); 2GB free disk space for models/cache.
+
+**Common DAW versions (see matrix for full list):**
+
+- Logic Pro 10.7.9
+- Ableton Live 11.3+
+- FL Studio 21.2+
+- Reaper 6.80+
+- Bitwig 5.1+
 
 ### Plugin Installation
 
