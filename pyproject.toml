@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "midikompanion"
 version = "0.1.0"
@@ -176,4 +180,10 @@ force_grid_wrap = 0
 use_parentheses = true
 ensure_newline_before_comments = true
 skip_glob = ["*/migrations/*", "*/__pycache__/*", "*/build/*", "*/dist/*"]
+
+[tool.setuptools]
+packages = ["music_brain", "penta_core"]
+
+[tool.setuptools.package-data]
+"*" = ["*.json", "*.yaml", "*.md"]
 

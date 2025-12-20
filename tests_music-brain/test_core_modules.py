@@ -14,7 +14,7 @@ from music_brain.session.intent_schema import (
 )
 from music_brain.structure.chord import Chord, ChordProgression
 from music_brain.structure.progression import diagnose_progression, generate_reharmonizations
-from music_brain.groove.templates import get_genre_template, list_genre_templates
+from music_brain.groove.templates import get_genre_template, list_genres
 
 
 class TestChordModule:
@@ -182,7 +182,7 @@ class TestGrooveTemplates:
     """Test groove template system."""
     
     def test_list_available_genres(self):
-        genres = list_genre_templates()
+        genres = list_genres()
         assert len(genres) > 0
         assert 'funk' in genres
         assert 'boom-bap' in genres or 'boom_bap' in genres
