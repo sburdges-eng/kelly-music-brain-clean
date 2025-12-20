@@ -107,8 +107,8 @@ def process_file(file_path: str, output_path: str, pipeline) -> None:
 
 
 def refine_folder(
-    input_dir: Path,
-    output_dir: Path,
+    input_dir,  # Path or CrossPlatformPath
+    output_dir,  # Path or CrossPlatformPath
     pipeline = None,
 ) -> None:
     """
@@ -121,19 +121,23 @@ def refine_folder(
     if pipeline is None:
         pipeline = pipe_clean
 
-    if not input_dir.exists():
-        print(f"❌ Input directory not found: {input_dir}")
+    # Convert to Path for compatibility
+    input_path = Path(str(input_dir))
+    output_path = Path(str(output_dir))
+
+    if not input_path.exists():
+        print(f"❌ Input directory not found: {input_path}")
         return
 
-    for root, _, files in os.walk(input_dir):
+    for root, _, files in os.walk(input_path):
         for filename in files:
             if not filename.lower().endswith((".wav", ".aiff", ".flac", ".mp3")):
                 continue
 
             in_path = safe_path(Path(root) / filename)
-            rel_path = in_path.to_path().relative_to(input_dir.to_path())
-            out_path = output_dir / str(rel_path)
-            out_path_str = str(out_path.to_path().with_suffix(".wav"))
+            rel_path = Path(str(in_path)).relative_to(input_path)
+            out_path_final = output_path / rel_path
+            out_path_str = str(out_path_final.with_suffix(".wav"))
 
             process_file(str(in_path), out_path_str, pipeline)
 
@@ -164,8 +168,11 @@ def run_refinery(target_subfolder: Optional[str] = None) -> None:
         print("✅ Done.")
         return
 
-    # Full walk
-    for root, _, files in os.walk(INPUT_DIR):
+    # Full walk - convert to Path for os.walk compatibility
+    input_path = Path(str(INPUT_DIR))
+    output_path = Path(str(OUTPUT_DIR))
+
+    for root, _, files in os.walk(input_path):
         if not files:
             continue
 
@@ -178,9 +185,9 @@ def run_refinery(target_subfolder: Optional[str] = None) -> None:
                 continue
 
             in_path = safe_path(Path(root) / filename)
-            rel_path = in_path.to_path().relative_to(INPUT_DIR.to_path())
-            out_path = OUTPUT_DIR / str(rel_path)
-            out_path_str = str(out_path.to_path().with_suffix(".wav"))
+            rel_path = Path(str(in_path)).relative_to(input_path)
+            out_path_final = output_path / rel_path
+            out_path_str = str(out_path_final.with_suffix(".wav"))
 
             process_file(str(in_path), out_path_str, pipeline)
 

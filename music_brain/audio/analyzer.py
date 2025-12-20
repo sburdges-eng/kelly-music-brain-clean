@@ -161,16 +161,16 @@ class AudioAnalyzer:
         Returns:
             AudioAnalysis with all detected features
         """
-        audio_path = safe_path(audio_path)
-        if not audio_path.exists():
-            raise FileNotFoundError(f"Audio file not found: {audio_path}")
+        audio_safe = safe_path(audio_path)
+        if not audio_safe.exists():
+            raise FileNotFoundError(f"Audio file not found: {audio_safe}")
 
         # Get basic feel analysis
-        feel = analyze_feel(str(audio_path), hop_length=self.hop_length)
+        feel = analyze_feel(str(audio_safe), hop_length=self.hop_length)
 
         # Initialize analysis with feel data
         analysis = AudioAnalysis(
-            filename=str(audio_path),
+            filename=str(audio_safe),
             duration_seconds=feel.duration_seconds,
             sample_rate=feel.sample_rate,
             tempo_bpm=feel.tempo_bpm,
@@ -185,7 +185,7 @@ class AudioAnalyzer:
 
         # Detect chords and key
         if include_chords:
-            chord_prog = self._chord_detector.detect_progression(str(audio_path))
+            chord_prog = self._chord_detector.detect_progression(str(audio_safe))
             analysis.chord_progression = chord_prog
             analysis.chord_sequence = chord_prog.chord_sequence
 
@@ -196,7 +196,7 @@ class AudioAnalyzer:
 
         # Frequency band analysis
         if include_frequency_bands:
-            freq_profile = analyze_frequency_bands(str(audio_path))
+            freq_profile = analyze_frequency_bands(str(audio_safe))
             analysis.frequency_profile = freq_profile
             analysis.brightness = freq_profile.brightness
             analysis.warmth = freq_profile.warmth
