@@ -1,0 +1,35 @@
+# Dockerfile for Data Processing Environment
+# Agent 2: ML Training Specialist (Week 3-6)
+# Data processing environment (CPU-only, lighter weight)
+
+FROM python:3.10-slim
+
+# Set working directory
+WORKDIR /workspace
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    wget \
+    curl \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies for data processing
+RUN pip install --no-cache-dir \
+    numpy==1.24.3 \
+    pandas==2.0.3 \
+    librosa==0.10.1 \
+    mido==1.3.0 \
+    scikit-learn==1.3.2 \
+    tqdm==4.66.1 \
+    matplotlib==3.7.1
+
+# Copy data processing scripts
+COPY prepare_datasets.py ./
+
+# Create data directories
+RUN mkdir -p /workspace/data/raw /workspace/data/processed
+
+# Default command: prepare datasets
+CMD ["python", "prepare_datasets.py", "--input-dir", "/workspace/data/raw", "--output-dir", "/workspace/data/processed"]

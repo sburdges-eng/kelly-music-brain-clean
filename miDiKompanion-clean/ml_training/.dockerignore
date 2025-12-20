@@ -1,0 +1,64 @@
+# miDiKompanion ML Training - .dockerignore
+
+# Ignore Python cache, bytecode, and build artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pytorch
+*.so
+*.egg-info/
+build/
+dist/
+.eggs/
+pip-wheel-metadata/
+*.log
+
+# Ignore local datasets and model outputs (don't bake into image!)
+datasets/
+data/
+processed_data/
+raw_data/
+outputs/
+logs/
+runs/  # e.g. TensorBoard logs
+
+# Ignore local models and checkpoints (mounted at runtime instead)
+models/
+trained_models/
+checkpoints/
+*.pth
+*.pt
+*.ckpt
+
+# Ignore environment, config, and dev files
+.env
+.env.*
+config_local.json
+config_dev.json
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.bak
+
+# Ignore test output
+htmlcov/
+.coverage
+coverage.xml
+*.prof
+
+# Ignore system and temp files
+*.tmp
+*.temp
+*.orig
+
+# Don't ignore Dockerfiles, scripts, configs, or core ML code!
+!Dockerfile
+!Dockerfile.data
+!requirements.txt
+!docker-compose.yml
+!docker-run.sh
+!README.md
+!*.py
+

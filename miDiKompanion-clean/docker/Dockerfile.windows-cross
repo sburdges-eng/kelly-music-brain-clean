@@ -1,0 +1,13 @@
+# Dockerfile.windows-cross
+# Windows cross-compilation environment
+
+FROM base-builder as windows-builder
+
+RUN apt-get update && apt-get install -y \
+    mingw-w64 \
+    wine64 \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV WINEPREFIX=/root/.wine
+
+WORKDIR /build

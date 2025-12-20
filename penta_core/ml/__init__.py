@@ -1,0 +1,78 @@
+"""
+ML Model Integration - Machine Learning inference for iDAW.
+
+Provides unified interfaces for:
+- ONNX Runtime (cross-platform)
+- TensorFlow Lite (mobile/edge)
+- CoreML (macOS/iOS)
+- PyTorch (training and inference)
+
+Supports:
+- Chord prediction models
+- Style transfer for groove
+- Emotion classification
+- Audio feature extraction
+"""
+
+from python.penta_core.ml.model_registry import (
+    ModelRegistry,
+    ModelInfo,
+    ModelBackend,
+    register_model,
+    get_model,
+    list_models,
+)
+
+from python.penta_core.ml.inference import (
+    InferenceEngine,
+    InferenceResult,
+    create_engine,
+)
+
+from python.penta_core.ml.chord_predictor import (
+    ChordPredictor,
+    ChordPrediction,
+    predict_next_chord,
+    predict_progression,
+)
+
+from python.penta_core.ml.style_transfer import (
+    GrooveStyleTransfer,
+    StyleTransferResult,
+    transfer_groove_style,
+)
+
+from python.penta_core.ml.gpu_utils import (
+    get_available_devices,
+    select_best_device,
+    GPUDevice,
+    DeviceType,
+)
+
+__all__ = [
+    # Registry
+    "ModelRegistry",
+    "ModelInfo",
+    "ModelBackend",
+    "register_model",
+    "get_model",
+    "list_models",
+    # Inference
+    "InferenceEngine",
+    "InferenceResult",
+    "create_engine",
+    # Chord Prediction
+    "ChordPredictor",
+    "ChordPrediction",
+    "predict_next_chord",
+    "predict_progression",
+    # Style Transfer
+    "GrooveStyleTransfer",
+    "StyleTransferResult",
+    "transfer_groove_style",
+    # GPU
+    "get_available_devices",
+    "select_best_device",
+    "GPUDevice",
+    "DeviceType",
+]

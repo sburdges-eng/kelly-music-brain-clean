@@ -1,0 +1,58 @@
+# Docker Compose for ML Training Orchestration
+# Agent 2: ML Training Specialist (Week 3-6)
+
+version: '3.8'
+
+services:
+  # Data processing service (CPU-only)
+  data-processing:
+    build:
+      context: .
+      dockerfile: Dockerfile.data
+    volumes:
+      - ./data:/workspace/data
+      - ./prepare_datasets.py:/workspace/prepare_datasets.py
+    command: python prepare_datasets.py --input-dir /workspace/data/raw --output-dir /workspace/data/processed
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  # ML training service (GPU-enabled)
+  training:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./data:/workspace/data
+      - ./models:/workspace/models
+      - ./train_all_models.py:/workspace/train_all_models.py
+      - ./node_aware_training.py:/workspace/node_aware_training.py
+      - ./export_to_onnx.py:/workspace/export_to_onnx.py
+      - ./training_utils.py:/workspace/training_utils.py
+      - ./dataset_loaders.py:/workspace/dataset_loaders.py
+    command: python train_all_models.py --epochs 100 --output-dir /workspace/models
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CUDA_VISIBLE_DEVICES=0
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    depends_on:
+      - data-processing
+
+  # Model export service (CPU-only)
+  export:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./models:/workspace/models
+      - ./export_to_onnx.py:/workspace/export_to_onnx.py
+    command: python export_to_onnx.py --input-dir /workspace/models/pytorch --output-dir /workspace/models/onnx
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - training

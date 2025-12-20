@@ -1,0 +1,7 @@
+# Patterns Directory
+
+Extract reusable code patterns here.
+
+Format: `[pattern-name].md` or `[pattern-name].py`
+
+Example: `librosa-caching.py`, `opensmile-pipeline.md`

@@ -1,0 +1,7 @@
+# Benchmarks Directory
+
+Save performance comparisons and benchmarks here.
+
+Format: `[library]-[date].md` or `comparison-[date].json`
+
+Example: `speechbrain-benchmark-2024-12-20.md`

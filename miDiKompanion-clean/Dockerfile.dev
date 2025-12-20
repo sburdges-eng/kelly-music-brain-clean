@@ -1,0 +1,41 @@
+# DAiW Music-Brain - Development Dockerfile
+# ==========================================
+# For development with hot-reload and debugging
+
+FROM python:3.11-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    git \
+    vim \
+    curl \
+    libasound2-dev \
+    portaudio19-dev \
+    libsndfile1-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Install Python development tools
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir \
+    pytest \
+    pytest-cov \
+    pytest-mock \
+    black \
+    flake8 \
+    mypy \
+    ipython \
+    ipdb
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Expose ports for Streamlit and debugging
+EXPOSE 8501 5678
+
+# Default command
+CMD ["bash"]

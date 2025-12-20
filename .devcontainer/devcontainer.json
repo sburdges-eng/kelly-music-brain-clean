@@ -1,0 +1,61 @@
+{
+  "name": "Kelly Music Brain - GPU Workspace",
+  "image": "nvidia/cuda:12.2.0-devel-ubuntu22.04",
+  
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    },
+    "ghcr.io/devcontainers/features/nvidia-cuda:1": {
+      "installCudnn": true
+    },
+    "ghcr.io/devcontainers/features/git:1": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {
+      "version": "latest"
+    }
+  },
+  
+  "hostRequirements": {
+    "gpu": "optional"
+  },
+  
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "github.copilot",
+        "github.copilot-chat",
+        "ms-python.python",
+        "ms-toolsai.jupyter",
+        "ms-vscode.cpptools",
+        "ms-vscode.cmake-tools",
+        "rust-lang.rust-analyzer",
+        "tauri-apps.tauri-vscode"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.linting.enabled": true,
+        "python.linting.pylintEnabled": false,
+        "python.linting.ruffEnabled": true,
+        "python.formatting.provider": "black",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.organizeImports": true
+        }
+      }
+    }
+  },
+  
+  "postCreateCommand": "bash .devcontainer/setup-gpu.sh",
+  "forwardPorts": [8888, 6006, 8000, 1420],
+  "remoteUser": "vscode",
+  "mounts": [
+    "source=${localWorkspaceFolder}/data,target=/workspace/data,type=bind,consistency=cached",
+    "source=${localWorkspaceFolder}/music_brain,target=/workspace/music_brain,type=bind,consistency=cached"
+  ]
+}
+

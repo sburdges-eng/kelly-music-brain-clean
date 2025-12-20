@@ -1,0 +1,483 @@
+{
+  "id": "V",
+  "name": "SURPRISE",
+  "description": "Neutral to positive emotional states characterized by unexpected events and high arousal",
+  "valence": "neutral",
+  "arousal_range": [0.6, 1.0],
+  "sub_emotions": {
+    "SHOCK": {
+      "id": "Va",
+      "description": "Sudden overwhelming surprise",
+      "arousal_bias": 0.95,
+      "sub_sub_emotions": {
+        "stunned": {
+          "id": "Vaa",
+          "description": "Frozen by surprise",
+          "intensity_tiers": {
+            "1_subtle": ["caught off guard", "taken aback", "startled"],
+            "2_mild": ["stunned", "dazed", "stupefied"],
+            "3_moderate": ["deeply stunned", "profoundly dazed", "utterly stupefied"],
+            "4_strong": ["completely stunned", "absolutely dazed", "totally floored"],
+            "5_intense": ["infinite stunning", "cosmic daze", "boundless stupefaction"],
+            "6_overwhelming": ["transcendent shock", "eternal daze", "complete mental arrest"]
+          }
+        },
+        "thunderstruck": {
+          "id": "Vab",
+          "description": "Hit like lightning",
+          "intensity_tiers": {
+            "1_subtle": ["struck", "hit", "impacted"],
+            "2_mild": ["thunderstruck", "electrified", "jolted"],
+            "3_moderate": ["deeply thunderstruck", "profoundly electrified", "utterly jolted"],
+            "4_strong": ["completely thunderstruck", "absolutely electrified", "totally shocked"],
+            "5_intense": ["infinite thunderstrike", "cosmic electricity", "boundless jolt"],
+            "6_overwhelming": ["transcendent thunderstrike", "eternal electricity", "divine lightning"]
+          }
+        },
+        "blindsided": {
+          "id": "Vac",
+          "description": "Hit from unexpected angle",
+          "intensity_tiers": {
+            "1_subtle": ["caught off guard", "unprepared", "unready"],
+            "2_mild": ["blindsided", "ambushed", "bushwhacked"],
+            "3_moderate": ["deeply blindsided", "profoundly ambushed", "utterly unprepared"],
+            "4_strong": ["completely blindsided", "absolutely ambushed", "totally caught off guard"],
+            "5_intense": ["infinite blindside", "cosmic ambush", "boundless surprise attack"],
+            "6_overwhelming": ["transcendent blindside", "eternal ambush", "complete sneak attack"]
+          }
+        },
+        "reeling": {
+          "id": "Vad",
+          "description": "Staggering from impact",
+          "intensity_tiers": {
+            "1_subtle": ["wobbling", "swaying", "unsteady"],
+            "2_mild": ["reeling", "staggering", "tottering"],
+            "3_moderate": ["deeply reeling", "profoundly staggering", "utterly destabilized"],
+            "4_strong": ["completely reeling", "absolutely staggering", "totally knocked off balance"],
+            "5_intense": ["infinite reeling", "cosmic staggering", "boundless destabilization"],
+            "6_overwhelming": ["transcendent reeling", "eternal staggering", "complete loss of equilibrium"]
+          }
+        },
+        "jarred": {
+          "id": "Vae",
+          "description": "Shaken abruptly",
+          "intensity_tiers": {
+            "1_subtle": ["shaken", "jolted", "bumped"],
+            "2_mild": ["jarred", "rattled", "disturbed"],
+            "3_moderate": ["deeply jarred", "profoundly rattled", "utterly disturbed"],
+            "4_strong": ["completely jarred", "absolutely rattled", "totally shaken"],
+            "5_intense": ["infinite jarring", "cosmic rattling", "boundless disturbance"],
+            "6_overwhelming": ["transcendent jarring", "eternal rattling", "complete psychic earthquake"]
+          }
+        },
+        "floored": {
+          "id": "Vaf",
+          "description": "Knocked down by surprise",
+          "intensity_tiers": {
+            "1_subtle": ["surprised", "amazed", "impressed"],
+            "2_mild": ["floored", "knocked down", "bowled over"],
+            "3_moderate": ["deeply floored", "profoundly knocked down", "utterly bowled over"],
+            "4_strong": ["completely floored", "absolutely knocked flat", "totally leveled"],
+            "5_intense": ["infinite flooring", "cosmic knockdown", "boundless leveling"],
+            "6_overwhelming": ["transcendent flooring", "eternal knockdown", "complete obliteration"]
+          }
+        }
+      }
+    },
+    "AMAZEMENT": {
+      "id": "Vb",
+      "description": "Wonder-filled surprise",
+      "arousal_bias": 0.8,
+      "sub_sub_emotions": {
+        "astonished": {
+          "id": "Vba",
+          "description": "Greatly surprised",
+          "intensity_tiers": {
+            "1_subtle": ["surprised", "impressed", "struck"],
+            "2_mild": ["astonished", "astounded", "amazed"],
+            "3_moderate": ["deeply astonished", "profoundly astounded", "utterly amazed"],
+            "4_strong": ["completely astonished", "absolutely astounded", "totally blown away"],
+            "5_intense": ["infinite astonishment", "cosmic amazement", "boundless wonder"],
+            "6_overwhelming": ["transcendent astonishment", "eternal amazement", "absolute wonder"]
+          }
+        },
+        "dazzled": {
+          "id": "Vbb",
+          "description": "Impressed by brilliance",
+          "intensity_tiers": {
+            "1_subtle": ["impressed", "charmed", "captivated"],
+            "2_mild": ["dazzled", "bedazzled", "entranced"],
+            "3_moderate": ["deeply dazzled", "profoundly bedazzled", "utterly entranced"],
+            "4_strong": ["completely dazzled", "absolutely bedazzled", "totally spellbound"],
+            "5_intense": ["infinite dazzle", "cosmic brilliance", "boundless enchantment"],
+            "6_overwhelming": ["transcendent dazzle", "eternal brilliance", "absolute enchantment"]
+          }
+        },
+        "marveling": {
+          "id": "Vbc",
+          "description": "Wonder at something",
+          "intensity_tiers": {
+            "1_subtle": ["appreciating", "admiring", "noticing"],
+            "2_mild": ["marveling", "wondering", "appreciating deeply"],
+            "3_moderate": ["deeply marveling", "profoundly wondering", "utterly appreciating"],
+            "4_strong": ["completely marveling", "absolutely wondering", "totally in awe"],
+            "5_intense": ["infinite marvel", "cosmic wonder", "boundless appreciation"],
+            "6_overwhelming": ["transcendent marvel", "eternal wonder", "absolute awe"]
+          }
+        },
+        "incredulous": {
+          "id": "Vbd",
+          "description": "Unable to believe",
+          "intensity_tiers": {
+            "1_subtle": ["doubting", "questioning", "skeptical"],
+            "2_mild": ["incredulous", "disbelieving", "dubious"],
+            "3_moderate": ["deeply incredulous", "profoundly disbelieving", "utterly dubious"],
+            "4_strong": ["completely incredulous", "absolutely disbelieving", "totally unable to accept"],
+            "5_intense": ["infinite incredulity", "cosmic disbelief", "boundless doubt"],
+            "6_overwhelming": ["transcendent incredulity", "eternal disbelief", "complete reality denial"]
+          }
+        },
+        "spellbound": {
+          "id": "Vbe",
+          "description": "Held captive by wonder",
+          "intensity_tiers": {
+            "1_subtle": ["captivated", "absorbed", "engaged"],
+            "2_mild": ["spellbound", "entranced", "mesmerized"],
+            "3_moderate": ["deeply spellbound", "profoundly entranced", "utterly mesmerized"],
+            "4_strong": ["completely spellbound", "absolutely entranced", "totally under a spell"],
+            "5_intense": ["infinite spell", "cosmic trance", "boundless mesmerism"],
+            "6_overwhelming": ["transcendent spell", "eternal trance", "complete enchantment"]
+          }
+        },
+        "breathless": {
+          "id": "Vbf",
+          "description": "Wonder taking breath away",
+          "intensity_tiers": {
+            "1_subtle": ["impressed", "moved", "touched"],
+            "2_mild": ["breathless", "gasping", "speechless"],
+            "3_moderate": ["deeply breathless", "profoundly speechless", "utterly moved"],
+            "4_strong": ["completely breathless", "absolutely speechless", "totally overcome"],
+            "5_intense": ["infinite breathlessness", "cosmic speechlessness", "boundless being overcome"],
+            "6_overwhelming": ["transcendent breathlessness", "eternal speechlessness", "complete overwhelm"]
+          }
+        }
+      }
+    },
+    "AWE": {
+      "id": "Vc",
+      "description": "Reverent wonder",
+      "arousal_bias": 0.7,
+      "sub_sub_emotions": {
+        "reverent": {
+          "id": "Vca",
+          "description": "Deep respectful wonder",
+          "intensity_tiers": {
+            "1_subtle": ["respectful", "admiring", "appreciative"],
+            "2_mild": ["reverent", "venerable", "worshipful"],
+            "3_moderate": ["deeply reverent", "profoundly worshipful", "utterly respectful"],
+            "4_strong": ["completely reverent", "absolutely worshipful", "totally devoted"],
+            "5_intense": ["infinite reverence", "cosmic worship", "boundless respect"],
+            "6_overwhelming": ["transcendent reverence", "eternal worship", "absolute devotion"]
+          }
+        },
+        "humbled": {
+          "id": "Vcb",
+          "description": "Made small by greatness",
+          "intensity_tiers": {
+            "1_subtle": ["modest", "unassuming", "small"],
+            "2_mild": ["humbled", "chastened", "lowered"],
+            "3_moderate": ["deeply humbled", "profoundly chastened", "utterly lowered"],
+            "4_strong": ["completely humbled", "absolutely diminished", "totally insignificant"],
+            "5_intense": ["infinite humility", "cosmic insignificance", "boundless smallness"],
+            "6_overwhelming": ["transcendent humility", "eternal insignificance", "complete self-dissolution"]
+          }
+        },
+        "sublime": {
+          "id": "Vcc",
+          "description": "Touched by the transcendent",
+          "intensity_tiers": {
+            "1_subtle": ["elevated", "lifted", "raised"],
+            "2_mild": ["sublime", "transcendent", "elevated"],
+            "3_moderate": ["deeply sublime", "profoundly transcendent", "utterly elevated"],
+            "4_strong": ["completely sublime", "absolutely transcendent", "totally elevated"],
+            "5_intense": ["infinite sublimity", "cosmic transcendence", "boundless elevation"],
+            "6_overwhelming": ["pure sublimity", "eternal transcendence", "absolute elevation"]
+          }
+        },
+        "numinous": {
+          "id": "Vcd",
+          "description": "Feeling divine presence",
+          "intensity_tiers": {
+            "1_subtle": ["sensing", "feeling", "perceiving"],
+            "2_mild": ["numinous", "sacred", "holy"],
+            "3_moderate": ["deeply numinous", "profoundly sacred", "utterly holy"],
+            "4_strong": ["completely numinous", "absolutely sacred", "totally divine"],
+            "5_intense": ["infinite numinosity", "cosmic sacredness", "boundless holiness"],
+            "6_overwhelming": ["transcendent numinosity", "eternal sacredness", "absolute divinity"]
+          }
+        },
+        "overwhelmed_beauty": {
+          "id": "Vce",
+          "description": "Overcome by beauty",
+          "intensity_tiers": {
+            "1_subtle": ["moved", "touched", "affected"],
+            "2_mild": ["overwhelmed", "overcome", "swept away"],
+            "3_moderate": ["deeply overwhelmed", "profoundly overcome", "utterly swept away"],
+            "4_strong": ["completely overwhelmed", "absolutely overcome", "totally dissolved"],
+            "5_intense": ["infinite overwhelm", "cosmic beauty", "boundless being overcome"],
+            "6_overwhelming": ["transcendent overwhelm", "eternal beauty", "complete dissolution in beauty"]
+          }
+        },
+        "mystified": {
+          "id": "Vcf",
+          "description": "Touched by mystery",
+          "intensity_tiers": {
+            "1_subtle": ["curious", "wondering", "puzzled"],
+            "2_mild": ["mystified", "enchanted", "bewildered"],
+            "3_moderate": ["deeply mystified", "profoundly enchanted", "utterly bewildered"],
+            "4_strong": ["completely mystified", "absolutely enchanted", "totally lost in mystery"],
+            "5_intense": ["infinite mystery", "cosmic enchantment", "boundless bewilderment"],
+            "6_overwhelming": ["transcendent mystery", "eternal enchantment", "complete immersion in unknown"]
+          }
+        }
+      }
+    },
+    "CONFUSION": {
+      "id": "Vd",
+      "description": "Disorienting surprise",
+      "arousal_bias": 0.6,
+      "sub_sub_emotions": {
+        "bewildered": {
+          "id": "Vda",
+          "description": "Lost and confused",
+          "intensity_tiers": {
+            "1_subtle": ["puzzled", "perplexed", "baffled"],
+            "2_mild": ["bewildered", "confounded", "flummoxed"],
+            "3_moderate": ["deeply bewildered", "profoundly confounded", "utterly flummoxed"],
+            "4_strong": ["completely bewildered", "absolutely confounded", "totally lost"],
+            "5_intense": ["infinite bewilderment", "cosmic confusion", "boundless lostness"],
+            "6_overwhelming": ["transcendent bewilderment", "eternal confusion", "complete disorientation"]
+          }
+        },
+        "disoriented": {
+          "id": "Vdb",
+          "description": "Lost sense of direction",
+          "intensity_tiers": {
+            "1_subtle": ["off-balance", "uncertain", "unsure"],
+            "2_mild": ["disoriented", "lost", "turned around"],
+            "3_moderate": ["deeply disoriented", "profoundly lost", "utterly turned around"],
+            "4_strong": ["completely disoriented", "absolutely lost", "totally without bearings"],
+            "5_intense": ["infinite disorientation", "cosmic lostness", "boundless confusion"],
+            "6_overwhelming": ["transcendent disorientation", "eternal lostness", "complete loss of self"]
+          }
+        },
+        "perplexed": {
+          "id": "Vdc",
+          "description": "Unable to understand",
+          "intensity_tiers": {
+            "1_subtle": ["puzzled", "questioning", "wondering"],
+            "2_mild": ["perplexed", "stumped", "baffled"],
+            "3_moderate": ["deeply perplexed", "profoundly stumped", "utterly baffled"],
+            "4_strong": ["completely perplexed", "absolutely stumped", "totally unable to grasp"],
+            "5_intense": ["infinite perplexity", "cosmic bafflement", "boundless confusion"],
+            "6_overwhelming": ["transcendent perplexity", "eternal bafflement", "complete incomprehension"]
+          }
+        },
+        "dazed": {
+          "id": "Vdd",
+          "description": "Mentally foggy",
+          "intensity_tiers": {
+            "1_subtle": ["foggy", "hazy", "unclear"],
+            "2_mild": ["dazed", "muddled", "befuddled"],
+            "3_moderate": ["deeply dazed", "profoundly muddled", "utterly befuddled"],
+            "4_strong": ["completely dazed", "absolutely muddled", "totally in a fog"],
+            "5_intense": ["infinite daze", "cosmic fog", "boundless befuddlement"],
+            "6_overwhelming": ["transcendent daze", "eternal fog", "complete mental blankness"]
+          }
+        },
+        "scattered": {
+          "id": "Vde",
+          "description": "Thoughts all over",
+          "intensity_tiers": {
+            "1_subtle": ["distracted", "unfocused", "dispersed"],
+            "2_mild": ["scattered", "fragmented", "disjointed"],
+            "3_moderate": ["deeply scattered", "profoundly fragmented", "utterly disjointed"],
+            "4_strong": ["completely scattered", "absolutely fragmented", "totally incoherent"],
+            "5_intense": ["infinite scattering", "cosmic fragmentation", "boundless incoherence"],
+            "6_overwhelming": ["transcendent scattering", "eternal fragmentation", "complete dissolution"]
+          }
+        },
+        "overwhelmed_info": {
+          "id": "Vdf",
+          "description": "Too much to process",
+          "intensity_tiers": {
+            "1_subtle": ["full", "loaded", "saturated"],
+            "2_mild": ["overwhelmed", "flooded", "overloaded"],
+            "3_moderate": ["deeply overwhelmed", "profoundly flooded", "utterly overloaded"],
+            "4_strong": ["completely overwhelmed", "absolutely flooded", "totally crashed"],
+            "5_intense": ["infinite overwhelm", "cosmic flooding", "boundless overload"],
+            "6_overwhelming": ["transcendent overwhelm", "eternal flooding", "complete system crash"]
+          }
+        }
+      }
+    },
+    "WONDER": {
+      "id": "Ve",
+      "description": "Curious, delighted surprise",
+      "arousal_bias": 0.65,
+      "sub_sub_emotions": {
+        "curious": {
+          "id": "Vea",
+          "description": "Eager to know more",
+          "intensity_tiers": {
+            "1_subtle": ["interested", "intrigued", "engaged"],
+            "2_mild": ["curious", "inquisitive", "questioning"],
+            "3_moderate": ["deeply curious", "profoundly inquisitive", "utterly questioning"],
+            "4_strong": ["burning curiosity", "absolute inquisitiveness", "total fascination"],
+            "5_intense": ["infinite curiosity", "cosmic inquisitiveness", "boundless questioning"],
+            "6_overwhelming": ["transcendent curiosity", "eternal inquisitiveness", "complete absorption in mystery"]
+          }
+        },
+        "fascinated": {
+          "id": "Veb",
+          "description": "Captivated by interest",
+          "intensity_tiers": {
+            "1_subtle": ["interested", "engaged", "drawn in"],
+            "2_mild": ["fascinated", "captivated", "enthralled"],
+            "3_moderate": ["deeply fascinated", "profoundly captivated", "utterly enthralled"],
+            "4_strong": ["completely fascinated", "absolutely captivated", "totally obsessed"],
+            "5_intense": ["infinite fascination", "cosmic captivation", "boundless enthrallment"],
+            "6_overwhelming": ["transcendent fascination", "eternal captivation", "complete obsession"]
+          }
+        },
+        "enchanted": {
+          "id": "Vec",
+          "description": "Magically delighted",
+          "intensity_tiers": {
+            "1_subtle": ["charmed", "pleased", "delighted"],
+            "2_mild": ["enchanted", "bewitched", "spellbound"],
+            "3_moderate": ["deeply enchanted", "profoundly bewitched", "utterly spellbound"],
+            "4_strong": ["completely enchanted", "absolutely bewitched", "totally under a spell"],
+            "5_intense": ["infinite enchantment", "cosmic bewitchment", "boundless spell"],
+            "6_overwhelming": ["transcendent enchantment", "eternal bewitchment", "complete magical capture"]
+          }
+        },
+        "intrigued": {
+          "id": "Ved",
+          "description": "Mystery drawing you in",
+          "intensity_tiers": {
+            "1_subtle": ["interested", "curious", "drawn"],
+            "2_mild": ["intrigued", "tantalized", "piqued"],
+            "3_moderate": ["deeply intrigued", "profoundly tantalized", "utterly piqued"],
+            "4_strong": ["completely intrigued", "absolutely tantalized", "totally hooked"],
+            "5_intense": ["infinite intrigue", "cosmic tantalization", "boundless fascination"],
+            "6_overwhelming": ["transcendent intrigue", "eternal tantalization", "complete absorption"]
+          }
+        },
+        "delighted_surprise": {
+          "id": "Vee",
+          "description": "Pleasant unexpected joy",
+          "intensity_tiers": {
+            "1_subtle": ["pleased", "happy", "glad"],
+            "2_mild": ["delighted", "thrilled", "overjoyed"],
+            "3_moderate": ["deeply delighted", "profoundly thrilled", "utterly overjoyed"],
+            "4_strong": ["completely delighted", "absolutely thrilled", "totally ecstatic"],
+            "5_intense": ["infinite delight", "cosmic thrill", "boundless joy"],
+            "6_overwhelming": ["transcendent delight", "eternal thrill", "absolute bliss"]
+          }
+        },
+        "childlike_wonder": {
+          "id": "Vef",
+          "description": "Pure innocent amazement",
+          "intensity_tiers": {
+            "1_subtle": ["open", "fresh", "innocent"],
+            "2_mild": ["wondering", "marveling", "amazed"],
+            "3_moderate": ["deeply wondering", "profoundly marveling", "utterly amazed"],
+            "4_strong": ["pure wonder", "absolute marvel", "total amazement"],
+            "5_intense": ["infinite wonder", "cosmic marvel", "boundless amazement"],
+            "6_overwhelming": ["transcendent wonder", "eternal marvel", "complete return to innocence"]
+          }
+        }
+      }
+    },
+    "DISBELIEF": {
+      "id": "Vf",
+      "description": "Refusing to accept reality",
+      "arousal_bias": 0.7,
+      "sub_sub_emotions": {
+        "denial": {
+          "id": "Vfa",
+          "description": "Refusing to accept",
+          "intensity_tiers": {
+            "1_subtle": ["doubting", "questioning", "hesitant"],
+            "2_mild": ["in denial", "refusing", "rejecting"],
+            "3_moderate": ["deep denial", "profound refusal", "utter rejection"],
+            "4_strong": ["complete denial", "absolute refusal", "total rejection"],
+            "5_intense": ["infinite denial", "cosmic refusal", "boundless rejection"],
+            "6_overwhelming": ["transcendent denial", "eternal refusal", "complete disconnection from reality"]
+          }
+        },
+        "skeptical": {
+          "id": "Vfb",
+          "description": "Doubting truth",
+          "intensity_tiers": {
+            "1_subtle": ["questioning", "uncertain", "unsure"],
+            "2_mild": ["skeptical", "dubious", "unconvinced"],
+            "3_moderate": ["deeply skeptical", "profoundly dubious", "utterly unconvinced"],
+            "4_strong": ["completely skeptical", "absolutely dubious", "totally disbelieving"],
+            "5_intense": ["infinite skepticism", "cosmic doubt", "boundless disbelief"],
+            "6_overwhelming": ["transcendent skepticism", "eternal doubt", "complete epistemic crisis"]
+          }
+        },
+        "cant_believe": {
+          "id": "Vfc",
+          "description": "Beyond belief",
+          "intensity_tiers": {
+            "1_subtle": ["surprised", "taken aback", "startled"],
+            "2_mild": ["can't believe", "shocked", "stunned"],
+            "3_moderate": ["really can't believe", "deeply shocked", "utterly stunned"],
+            "4_strong": ["completely unable to believe", "absolutely shocked", "totally stunned"],
+            "5_intense": ["infinite disbelief", "cosmic shock", "boundless stunning"],
+            "6_overwhelming": ["transcendent disbelief", "eternal shock", "complete reality collapse"]
+          }
+        },
+        "questioning_reality": {
+          "id": "Vfd",
+          "description": "Doubting what's real",
+          "intensity_tiers": {
+            "1_subtle": ["uncertain", "unsure", "confused"],
+            "2_mild": ["questioning reality", "doubting senses", "uncertain of truth"],
+            "3_moderate": ["deeply questioning", "profoundly doubting", "utterly uncertain"],
+            "4_strong": ["completely questioning reality", "absolutely doubting everything", "total uncertainty"],
+            "5_intense": ["infinite questioning", "cosmic doubt", "boundless uncertainty"],
+            "6_overwhelming": ["transcendent questioning", "eternal doubt", "complete dissolution of reality"]
+          }
+        },
+        "surreal": {
+          "id": "Vfe",
+          "description": "Dreamlike unreality",
+          "intensity_tiers": {
+            "1_subtle": ["odd", "strange", "unusual"],
+            "2_mild": ["surreal", "dreamlike", "unreal"],
+            "3_moderate": ["deeply surreal", "profoundly dreamlike", "utterly unreal"],
+            "4_strong": ["completely surreal", "absolutely dreamlike", "totally otherworldly"],
+            "5_intense": ["infinite surreality", "cosmic dreamscape", "boundless unreality"],
+            "6_overwhelming": ["transcendent surreality", "eternal dreamscape", "complete departure from reality"]
+          }
+        },
+        "impossible": {
+          "id": "Vff",
+          "description": "Defying possibility",
+          "intensity_tiers": {
+            "1_subtle": ["unlikely", "improbable", "hard to believe"],
+            "2_mild": ["impossible", "unbelievable", "inconceivable"],
+            "3_moderate": ["deeply impossible", "profoundly unbelievable", "utterly inconceivable"],
+            "4_strong": ["completely impossible", "absolutely unbelievable", "totally beyond comprehension"],
+            "5_intense": ["infinite impossibility", "cosmic unbelievability", "boundless inconceivability"],
+            "6_overwhelming": ["transcendent impossibility", "eternal unbelievability", "complete logic breakdown"]
+          }
+        }
+      }
+    }
+  }
+}
