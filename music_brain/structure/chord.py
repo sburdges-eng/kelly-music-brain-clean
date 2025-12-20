@@ -129,6 +129,86 @@ class Chord:
     
     def __str__(self) -> str:
         return self.name
+    
+    @classmethod
+    def from_string(cls, chord_str: str, key: Optional[str] = None) -> 'Chord':
+        """
+        Create a Chord object from a string representation.
+        
+        Args:
+            chord_str: Chord string (e.g., "C", "Am", "F#dim", "G7")
+            key: Optional key context (currently unused but kept for API compatibility)
+        
+        Returns:
+            Chord object
+        """
+        # Import here to avoid circular dependency
+        from music_brain.structure.progression import parse_chord
+        
+        parsed = parse_chord(chord_str)
+        if parsed is None:
+            raise ValueError(f"Could not parse chord: {chord_str}")
+        
+        # Convert extensions list to list of strings
+        extensions = parsed.extensions.copy() if parsed.extensions else []
+        
+        # Handle bass note if present
+        bass = None
+        if parsed.bass:
+            try:
+                bass = NOTE_NAMES.index(parsed.bass.capitalize())
+            except ValueError:
+                pass
+        
+        return cls(
+            root=parsed.root_num,
+            quality=parsed.quality,
+            extensions=extensions,
+            bass=bass,
+        )
+    
+    def get_voicing(self, octave: int = 4, voicing_type: str = 'close') -> List[int]:
+        """
+        Get MIDI note numbers for a chord voicing.
+        
+        Args:
+            octave: Starting octave (0-10)
+            voicing_type: 'close' or 'open'
+        
+        Returns:
+            List of MIDI note numbers
+        """
+        base_note = octave * 12
+        
+        # Get intervals for this chord quality
+        intervals = CHORD_QUALITIES.get(self.quality, (0, 4, 7))
+        
+        # Add extensions
+        for ext in self.extensions:
+            if ext.isdigit():
+                ext_num = int(ext)
+                if ext_num == 9:
+                    intervals = intervals + (14,)  # 9th = octave + 2nd
+                elif ext_num == 11:
+                    intervals = intervals + (17,)  # 11th = octave + 4th
+                elif ext_num == 13:
+                    intervals = intervals + (21,)  # 13th = octave + 6th
+        
+        # Build voicing
+        notes = []
+        root_midi = base_note + self.root
+        
+        if voicing_type == 'close':
+            # Close voicing: stack intervals
+            for interval in intervals:
+                notes.append(root_midi + interval)
+        else:
+            # Open voicing: spread across octaves
+            for i, interval in enumerate(intervals):
+                octave_offset = (i // 3) * 12  # Every 3rd note up an octave
+                notes.append(root_midi + interval + octave_offset)
+        
+        return sorted(notes)
 
 
 @dataclass
