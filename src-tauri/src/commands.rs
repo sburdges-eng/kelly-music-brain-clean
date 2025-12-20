@@ -46,7 +46,7 @@ pub struct InterrogateRequest {
 pub async fn generate_music(request: GenerateRequest) -> Result<serde_json::Value, String> {
     crate::bridge::musicbrain::generate(request)
         .await
-        .map_err(|e| e.to_string())
+        .map_err(|e| format!("Music generation failed: {}", e))
 }
 
 /// Conversational music creation endpoint.
@@ -61,7 +61,7 @@ pub async fn generate_music(request: GenerateRequest) -> Result<serde_json::Valu
 pub async fn interrogate(request: InterrogateRequest) -> Result<serde_json::Value, String> {
     crate::bridge::musicbrain::interrogate(request)
         .await
-        .map_err(|e| e.to_string())
+        .map_err(|e| format!("Interrogation failed: {}", e))
 }
 
 /// Get the full emotion thesaurus.
@@ -73,5 +73,26 @@ pub async fn interrogate(request: InterrogateRequest) -> Result<serde_json::Valu
 pub async fn get_emotions() -> Result<serde_json::Value, String> {
     crate::bridge::musicbrain::get_emotions()
         .await
-        .map_err(|e| e.to_string())
+        .map_err(|e| format!("Failed to load emotions: {}", e))
+}
+
+/// Check if the Music Brain API server is available.
+///
+/// # Returns
+/// * `Ok(Value)` - Health check response
+/// * `Err(String)` - Error message if health check fails
+#[command]
+pub async fn health_check() -> Result<serde_json::Value, String> {
+    crate::bridge::musicbrain::health_check()
+        .await
+        .map_err(|e| format!("Health check failed: {}", e))
+}
+
+/// Check if the Music Brain API server is available (boolean).
+///
+/// # Returns
+/// * `Ok(bool)` - `true` if available, `false` otherwise
+#[command]
+pub async fn is_api_available() -> bool {
+    crate::bridge::musicbrain::is_available().await
 }

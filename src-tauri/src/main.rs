@@ -4,12 +4,12 @@
 mod commands;
 mod bridge;
 
-use commands::{generate_music, interrogate, get_emotions};
+use commands::{generate_music, interrogate, get_emotions, health_check, is_api_available};
 
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
-            generate_music, interrogate, get_emotions,
+            generate_music, interrogate, get_emotions, health_check, is_api_available,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
