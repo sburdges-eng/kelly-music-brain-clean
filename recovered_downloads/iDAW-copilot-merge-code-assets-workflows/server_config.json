@@ -1,0 +1,11 @@
+{
+  "port": 8000,
+  "host": "0.0.0.0",
+  "ws_port": 8001,
+  "enable_cors": true,
+  "sample_rate": 48000.0,
+  "log_requests": true,
+  "max_connections": 100,
+  "osc_server_port": 9000,
+  "osc_client_port": 9001
+}

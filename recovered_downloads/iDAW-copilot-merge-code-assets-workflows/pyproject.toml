@@ -1,0 +1,174 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel", "pybind11>=2.10.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "idaw"
+version = "1.0.0"
+description = "iDAW - Integrated Digital Audio Workstation combining penta-core (C++/Python real-time analysis) and DAiW-Music-Brain (intent-based composition)"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+authors = [
+    {name = "Sean Burdges", email = "seanblariat@gmail.com"},
+    {name = "Penta Core Team"}
+]
+keywords = [
+    "midi", "music", "analysis", "groove", "chord", "songwriting", 
+    "daw", "production", "real-time", "audio", "harmony", "rhythm", 
+    "emotion", "intent", "c++", "python"
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "Topic :: Multimedia :: Sound/Audio :: Analysis",
+    "Topic :: Multimedia :: Sound/Audio :: MIDI",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: C++",
+]
+
+# Core dependencies (minimal for basic functionality)
+dependencies = [
+    "mido>=1.2.10",      # MIDI file I/O
+    "numpy>=1.21.0",     # Numerical operations
+]
+
+[project.optional-dependencies]
+# Audio analysis features
+audio = [
+    "librosa>=0.9.0",
+    "soundfile>=0.10.0",
+]
+
+# Advanced music theory
+theory = [
+    "music21>=7.0.0",
+]
+
+# Desktop UI
+ui = [
+    "streamlit>=1.28.0",
+]
+
+# Native desktop app
+desktop = [
+    "streamlit>=1.28.0",
+    "pywebview>=4.0.0",
+]
+
+# Build tools for standalone executables
+build = [
+    "streamlit>=1.28.0",
+    "pywebview>=4.0.0",
+    "pyinstaller>=6.0.0",
+]
+
+# MCP server dependencies
+mcp = [
+    "fastmcp>=2.0.0",
+    "python-dotenv>=1.0.0",
+    "openai>=1.0.0",
+    "anthropic>=0.30.0",
+    "google-generativeai>=0.5.0",
+    "httpx>=0.25.0",
+]
+
+# Development tools
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=22.0.0",
+    "flake8>=4.0.0",
+    "mypy>=1.0",
+]
+
+# Install everything
+all = [
+    "librosa>=0.9.0",
+    "soundfile>=0.10.0",
+    "music21>=7.0.0",
+    "streamlit>=1.28.0",
+    "pywebview>=4.0.0",
+    "fastmcp>=2.0.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.scripts]
+# DAiW-Music-Brain CLI
+daiw = "music_brain.cli:main"
+
+# MCP servers
+mcp-todo = "mcp_todo.cli:main"
+mcp-todo-server = "mcp_todo.server:main"
+mcp-todo-http = "mcp_todo.http_server:main"
+mcp-workstation = "mcp_workstation.cli:main"
+mcp-workstation-server = "mcp_workstation.server:run_server"
+
+# Penta-core server (if Python bindings built)
+# penta-core-server = "penta_core.server:main"
+
+[project.gui-scripts]
+daiw-desktop = "launcher:main"
+
+[project.urls]
+Homepage = "https://github.com/sburdges-eng/iDAW"
+"Bug Tracker" = "https://github.com/sburdges-eng/iDAW/issues"
+Documentation = "https://github.com/sburdges-eng/iDAW#readme"
+"penta-core" = "https://github.com/sburdges-eng/penta-core"
+"DAiW-Music-Brain" = "https://github.com/sburdges-eng/DAiW-Music-Brain"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["music_brain*", "mcp_todo*", "mcp_workstation*"]
+exclude = ["tests*", "examples*", "vault*", "docs*"]
+
+[tool.setuptools.package-data]
+music_brain = ["data/*.json", "data/*.yaml"]
+mcp_todo = ["configs/*.json", "configs/*.yaml", "configs/*.md"]
+mcp_workstation = ["configs/*.json"]
+
+[tool.black]
+line-length = 100
+target-version = ["py39", "py310", "py311", "py312"]
+exclude = '''
+/(
+    \.git
+    | \.venv
+    | venv
+    | build
+    | dist
+    | \.eggs
+    | external
+    | DAiW-Music-Brain
+    | iDAW_Core
+)/
+'''
+
+[tool.pytest.ini_options]
+testpaths = ["tests_music-brain", "tests_penta-core"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+asyncio_mode = "auto"
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+exclude = [
+    "^external/",
+    "^DAiW-Music-Brain/",
+    "^DAiW-Music-Brain 2/",
+    "^iDAW_Core/",
+]
+
+# Note: For penta-core C++ bindings, you need to:
+# 1. Build the C++ library with CMake
+# 2. The Python package will be available in python/penta_core
+# 3. See README_penta-core.md for build instructions
