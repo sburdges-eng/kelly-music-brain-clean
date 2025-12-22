@@ -1,8 +1,6 @@
 #include "bridge/OSCBridge.h"
 #include <juce_osc/juce_osc.h>
 #include <juce_core/juce_core.h>
-#include <sstream>
-#include <iostream>
 
 namespace kelly {
 namespace bridge {
@@ -27,25 +25,25 @@ bool OSCBridge::initialize(
         // Create OSC sender
         sender_ = std::make_unique<juce::OSCSender>();
         if (!sender_->connect(brainHost, brainPort)) {
-            juce::Logger::writeToLog("OSCBridge: Failed to connect sender to " +
-                                     brainHost + ":" + juce::String(brainPort));
+            juce::Logger::writeToLog(juce::String("OSCBridge: Failed to connect sender to ") +
+                                     juce::String(brainHost.c_str()) + juce::String(":") + juce::String(brainPort));
             return false;
         }
 
         // Create OSC receiver
         receiver_ = std::make_unique<juce::OSCReceiver>();
         if (!receiver_->connect(listenPort)) {
-            juce::Logger::writeToLog("OSCBridge: Failed to bind receiver to port " +
+            juce::Logger::writeToLog(juce::String("OSCBridge: Failed to bind receiver to port ") +
                                      juce::String(listenPort));
             return false;
         }
 
-        // Register message handler
+        // Register message handler (will receive all messages)
         receiver_->addListener(this);
 
         connected_ = true;
-        juce::Logger::writeToLog("OSCBridge: Connected to brain server at " +
-                                 brainHost + ":" + juce::String(brainPort));
+        juce::Logger::writeToLog(juce::String("OSCBridge: Connected to brain server at ") +
+                                 juce::String(brainHost.c_str()) + juce::String(":") + juce::String(brainPort));
         return true;
     } catch (const std::exception& e) {
         juce::Logger::writeToLog("OSCBridge: Exception during initialization: " +
@@ -173,7 +171,7 @@ bool OSCBridge::sendMessage(const OSCMessage& message)
         return false;
     }
 
-    juce::OSCMessage oscMsg(message.address);
+    juce::OSCMessage oscMsg(juce::OSCAddressPattern(message.address));
     for (const auto& arg : message.arguments) {
         // Convert juce::var to appropriate OSC argument type
         if (arg.isInt()) {
@@ -190,7 +188,7 @@ bool OSCBridge::sendMessage(const OSCMessage& message)
     return sender_->send(oscMsg);
 }
 
-void OSCBridge::handleOSCMessage(const juce::OSCMessage& message)
+void OSCBridge::oscMessageReceived(const juce::OSCMessage& message)
 {
     // Extract message ID if present
     int msgId = -1;
@@ -220,18 +218,9 @@ void OSCBridge::handleOSCMessage(const juce::OSCMessage& message)
     }
 }
 
-void OSCBridge::oscMessageReceived(const juce::OSCMessage& message)
+void OSCBridge::handleOSCMessage(const juce::OSCMessage& message)
 {
-    handleOSCMessage(message);
-}
-
-void OSCBridge::oscBundleReceived(const juce::OSCBundle& bundle)
-{
-    for (const auto& element : bundle) {
-        if (element.isMessage()) {
-            handleOSCMessage(element.getMessage());
-        }
-    }
+    oscMessageReceived(message);
 }
 
 } // namespace bridge

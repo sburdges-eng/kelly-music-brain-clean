@@ -46,7 +46,7 @@ using OSCResponseHandler = std::function<void(const juce::var& response)>;
 /**
  * OSCBridge - Client for communicating with Python brain server
  */
-class OSCBridge {
+class OSCBridge : public juce::OSCReceiver::Listener<juce::OSCReceiver::MessageLoopCallback> {
 public:
     OSCBridge();
     ~OSCBridge();
@@ -154,6 +154,11 @@ private:
      * Generate unique message ID
      */
     int generateMessageId() { return ++nextMessageId_; }
+
+    /**
+     * OSCReceiver::ListenerWithOSCAddress callback
+     */
+    void oscMessageReceived(const juce::OSCMessage& message) override;
 };
 
 } // namespace bridge
