@@ -1,0 +1,90 @@
+# =============================================================================
+# Voice Activity Detector Training Configuration
+# =============================================================================
+# Task: Detect presence of vocals/speech in audio
+# Target: Ultra-fast inference (<1ms) for real-time processing
+# Architecture: Tiny CNN for binary classification
+# =============================================================================
+
+# Model Identity
+model_id: voiceactivitydetector
+model_type: RTNeural
+task: voice_activity_detection
+
+# Architecture (intentionally tiny for speed)
+# Input: 32-dim (small mel spectrogram slice)
+# Output: 1-dim (voice probability)
+input_size: 32
+output_size: 1
+hidden_layers: [64, 32]
+activation: relu
+dropout: 0.1
+
+# Use tiny CNN
+architecture_type: cnn
+cnn_config:
+  in_channels: 1
+  conv_layers:
+    - {out_channels: 16, kernel_size: 3, stride: 2, padding: 1}
+    - {out_channels: 32, kernel_size: 3, stride: 2, padding: 1}
+  pool_type: adaptive_avg
+  fc_layers: [64, 32, 1]
+
+# Data Configuration
+data_path: /Volumes/Extreme SSD/kelly-audio-data/raw/vad
+data_version: v1
+sample_rate: 16000
+n_mels: 32
+n_fft: 512
+hop_length: 160  # 10ms frames
+frame_length: 0.025  # 25ms
+max_duration: 30.0
+
+# Binary labels
+labels:
+  - no_voice
+  - voice
+
+# Split ratios
+train_split: 0.8
+val_split: 0.1
+test_split: 0.1
+
+# Training Parameters (Mac-optimized)
+epochs: 50
+batch_size: 256  # Large batch for tiny model
+learning_rate: 0.002
+optimizer: adam
+weight_decay: 0.0001
+loss: binary_cross_entropy
+scheduler: step
+scheduler_step_size: 10
+scheduler_gamma: 0.5
+
+# Early stopping
+early_stopping_patience: 8
+min_delta: 0.0005
+
+# Mac-specific settings
+device: auto
+num_workers: 0
+pin_memory: false
+
+# Augmentation
+augmentation:
+  noise_injection: 0.1
+  gain_range: [-6, 6]
+
+# Output
+output_dir: checkpoints/vad
+export_onnx: true
+export_coreml: true
+
+# Logging
+log_interval: 50
+save_interval: 5
+
+# Metadata
+author: ""
+notes: "Tiny VAD model for real-time voice detection"
+

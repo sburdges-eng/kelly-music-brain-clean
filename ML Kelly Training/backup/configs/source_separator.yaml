@@ -1,0 +1,108 @@
+# =============================================================================
+# Source Separator Training Configuration
+# =============================================================================
+# Task: Separate audio sources (vocals, drums, bass, other)
+# Target: Near real-time separation (<100ms latency)
+# Architecture: U-Net style encoder-decoder
+# =============================================================================
+
+# Model Identity
+model_id: sourceseparator
+model_type: PyTorch
+task: source_separation
+
+# Architecture
+# Input: Spectrogram (1025 freq × 256 time)
+# Output: 4 masks (vocals, drums, bass, other)
+input_size: 1025
+output_size: 4100  # 1025 × 4
+hidden_layers: [512, 256, 128, 64]
+activation: relu
+dropout: 0.2
+
+# Use U-Net architecture
+architecture_type: unet
+unet_config:
+  in_channels: 2  # Stereo
+  out_channels: 8  # 4 sources × 2 channels
+  encoder_channels: [32, 64, 128, 256, 512]
+  decoder_channels: [256, 128, 64, 32]
+  skip_connections: true
+  use_attention: true
+  attention_layers: [3, 4]  # Add attention at deeper layers
+
+# Data Configuration
+data_path: /Volumes/Extreme SSD/kelly-audio-data/raw/stems
+data_version: v1
+sample_rate: 44100
+n_fft: 2048
+hop_length: 512
+segment_length: 6.0  # seconds
+overlap: 0.5
+
+# Source labels
+sources:
+  - vocals
+  - drums
+  - bass
+  - other
+
+# Split ratios
+train_split: 0.8
+val_split: 0.1
+test_split: 0.1
+
+# Training Parameters (Mac-optimized)
+epochs: 200
+batch_size: 2  # Very memory intensive
+learning_rate: 0.0001
+optimizer: adamw
+weight_decay: 0.01
+loss: l1_freq  # L1 in frequency domain
+scheduler: cosine_warmup
+warmup_epochs: 20
+
+# Gradient accumulation for effective larger batch
+gradient_accumulation_steps: 8
+
+# Early stopping
+early_stopping_patience: 30
+min_delta: 0.0001
+
+# Mac-specific settings
+device: auto
+num_workers: 0
+pin_memory: false
+
+# Mixed precision (if supported)
+use_amp: true
+amp_dtype: float16
+
+# Augmentation
+augmentation:
+  pitch_shift: [-2, 2]
+  time_stretch: [0.95, 1.05]
+  random_mix: 0.3  # Mix different songs
+  channel_swap: 0.5
+
+# Output
+output_dir: checkpoints/source_separator
+export_onnx: true
+export_coreml: false  # Too large for Core ML
+
+# Logging
+log_interval: 50
+save_interval: 20
+log_audio_samples: true
+
+# Evaluation metrics
+metrics:
+  - sdr  # Signal-to-Distortion Ratio
+  - sir  # Signal-to-Interference Ratio
+  - sar  # Signal-to-Artifact Ratio
+  - si_sdr  # Scale-Invariant SDR
+
+# Metadata
+author: ""
+notes: "U-Net source separator for vocals/drums/bass/other"
+

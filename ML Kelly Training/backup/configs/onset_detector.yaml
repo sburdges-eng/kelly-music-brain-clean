@@ -1,0 +1,105 @@
+# =============================================================================
+# Onset Detector Training Configuration
+# =============================================================================
+# Task: Detect note onsets in audio
+# Target: Ultra-fast inference (<2ms) for real-time onset detection
+# Architecture: Small CNN for frame-level classification
+# =============================================================================
+
+# Model Identity
+model_id: onsetdetector
+model_type: RTNeural
+task: onset_detection
+
+# Architecture (small for speed)
+# Input: Spectral frame context (3 frames × 80 bins)
+# Output: 1-dim onset probability
+input_size: 240
+output_size: 1
+hidden_layers: [128, 64]
+activation: relu
+dropout: 0.1
+
+# Use small CNN
+architecture_type: cnn
+cnn_config:
+  in_channels: 1
+  conv_layers:
+    - {out_channels: 32, kernel_size: 3, stride: 1, padding: 1}
+    - {out_channels: 64, kernel_size: 3, stride: 2, padding: 1}
+  pool_type: adaptive_avg
+  fc_layers: [128, 64, 1]
+
+# Data Configuration
+data_path: /Volumes/Extreme SSD/kelly-audio-data/raw/onsets
+data_version: v1
+sample_rate: 22050
+n_fft: 2048
+hop_length: 441  # ~10ms
+context_frames: 3  # Past frames for context
+
+# Onset annotation format
+annotation_format: onset_times  # List of onset times in seconds
+tolerance_ms: 50  # Tolerance for onset matching
+
+# Split ratios
+train_split: 0.8
+val_split: 0.1
+test_split: 0.1
+
+# Training Parameters (Mac-optimized)
+epochs: 80
+batch_size: 128
+learning_rate: 0.001
+optimizer: adam
+weight_decay: 0.0001
+loss: binary_cross_entropy
+scheduler: step
+scheduler_step_size: 20
+scheduler_gamma: 0.5
+
+# Class balancing (onsets are sparse)
+class_weights:
+  no_onset: 1.0
+  onset: 10.0
+
+# Early stopping
+early_stopping_patience: 12
+min_delta: 0.001
+
+# Mac-specific settings
+device: auto
+num_workers: 0
+pin_memory: false
+
+# Augmentation
+augmentation:
+  time_stretch: [0.9, 1.1]
+  pitch_shift: [-2, 2]
+  noise_injection: 0.01
+
+# Output
+output_dir: checkpoints/onset_detector
+export_onnx: true
+export_coreml: true
+
+# Logging
+log_interval: 30
+save_interval: 10
+
+# Evaluation metrics
+metrics:
+  - precision
+  - recall
+  - f_measure
+  - accuracy
+
+# Post-processing
+post_processing:
+  peak_picking_threshold: 0.5
+  min_onset_interval_ms: 30  # Minimum time between onsets
+
+# Metadata
+author: ""
+notes: "Fast onset detector for real-time note detection"
+

@@ -1,0 +1,47 @@
+# =============================================================================
+# NVIDIA CUDA Optimized Training Configuration
+# =============================================================================
+# Optimized for: NVIDIA GPUs (RTX 30-series/40-series, A-series)
+# Backend: CUDA
+# =============================================================================
+
+device: cuda
+precision: bf16                # Use bfloat16 for modern NVIDIA GPUs
+seed: 42
+budget_limit: 100              # Maximum allowed cost in USD
+
+data:
+  sample_rate: 44100
+  n_mels: 128
+  hop_length: 512
+  segment_seconds: 8
+  num_workers: 4               # Multi-process loading
+  cache_mels: true
+
+dataloader:
+  batch_size: 64               # Higher batch size for CUDA
+  shuffle: true
+  pin_memory: true             # Speed up CPU-to-GPU transfer
+  drop_last: true
+
+model:
+  backbone: htsat-small
+  embedding_dim: 256
+  dropout: 0.1
+
+optim:
+  name: adamw
+  lr: 5e-4                     # Slightly higher LR for larger batch
+  weight_decay: 0.01
+
+training:
+  epochs: 20
+  grad_accum_steps: 1          # No need for accumulation on high-end GPUs
+  log_every: 50
+  eval_every: 500
+  ema: true
+
+# Safety Settings
+ensure_model_copy: true        # Use a copy of the model for training
+output_dir: checkpoints/nvidia_cuda_optimized
+

@@ -1,0 +1,96 @@
+# =============================================================================
+# Beat Tracker Training Configuration
+# =============================================================================
+# Task: Track beat positions in audio
+# Target: Real-time beat tracking (<10ms latency)
+# Architecture: LSTM with onset features
+# =============================================================================
+
+# Model Identity
+model_id: beattracker
+model_type: RTNeural
+task: beat_tracking
+
+# Architecture
+# Input: Onset strength envelope + spectral flux
+# Output: Beat probability per frame
+input_size: 64
+output_size: 1
+hidden_layers: [128, 64]
+activation: tanh
+dropout: 0.2
+
+# Use LSTM for temporal modeling
+architecture_type: lstm
+lstm_config:
+  hidden_size: 128
+  num_layers: 2
+  bidirectional: false  # Causal for real-time
+  attention: true
+
+# Data Configuration
+data_path: /Volumes/Extreme SSD/kelly-audio-data/raw/beats
+data_version: v1
+sample_rate: 22050
+n_fft: 2048
+hop_length: 512
+frame_rate: 43.07  # frames per second
+
+# Beat annotation format
+annotation_format: beat_times  # List of beat times in seconds
+
+# Split ratios
+train_split: 0.8
+val_split: 0.1
+test_split: 0.1
+
+# Training Parameters (Mac-optimized)
+epochs: 100
+batch_size: 16
+learning_rate: 0.0005
+optimizer: adamw
+weight_decay: 0.01
+loss: binary_cross_entropy
+scheduler: cosine_warmup
+warmup_epochs: 10
+
+# Early stopping
+early_stopping_patience: 15
+min_delta: 0.001
+
+# Mac-specific settings
+device: auto
+num_workers: 0
+pin_memory: false
+
+# Augmentation
+augmentation:
+  time_stretch: [0.8, 1.2]
+  noise_injection: 0.01
+
+# Output
+output_dir: checkpoints/beat_tracker
+export_onnx: true
+export_coreml: true
+
+# Logging
+log_interval: 20
+save_interval: 10
+
+# Evaluation metrics
+metrics:
+  - f_measure
+  - cemgil  # Cemgil accuracy
+  - amlc  # AML continuity
+  - amlt  # AML total
+
+# Post-processing
+post_processing:
+  peak_picking_threshold: 0.5
+  min_beat_interval_ms: 200  # Max 300 BPM
+  max_beat_interval_ms: 2000  # Min 30 BPM
+
+# Metadata
+author: ""
+notes: "LSTM-based beat tracker for real-time applications"
+

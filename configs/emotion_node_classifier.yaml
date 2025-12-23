@@ -1,0 +1,327 @@
+# =============================================================================
+# Emotion Node Classifier Training Configuration
+# =============================================================================
+# Task: Classify audio into ALL 216 emotion nodes from 6×6×6 thesaurus
+# Target: Validate entire DAiW emotion system across all 24 keys
+# Architecture: Multi-head CNN for comprehensive emotion node classification
+#
+# Structure:
+#   - 6 Base Emotions (Happy, Sad, Angry, Fear, Surprise, Disgust)
+#   - 6 Sub-Emotions per base (36 total)
+#   - 6 Sub-Sub-Emotions per sub (216 total nodes)
+#   - 6 Intensity tiers per node (1296 intensity-aware classifications)
+#   - 24 Keys (12 major + 12 minor)
+# =============================================================================
+
+# Model Identity
+model_id: emotionnodeclassifier
+model_type: RTNeural
+task: emotion_node_classification
+version: "0.1.0"
+
+# =============================================================================
+# ARCHITECTURE - Multi-Head for 6×6×6 × 24 Keys
+# =============================================================================
+# Input: Mel spectrogram (64 mel × 128 time frames)
+# Output: Multiple heads for hierarchical + key-aware classification
+
+input_size: 128  # Time frames
+output_size: 258  # 216 nodes + 6 intensity + 24 keys + 6 base + 6 sub = 258 outputs
+hidden_layers: [512, 384, 256]
+activation: gelu
+dropout: 0.35
+
+# Multi-head CNN architecture for spectrogram classification
+architecture_type: cnn_multi_head_hierarchical
+cnn_config:
+  in_channels: 1
+  conv_layers:
+    - {out_channels: 64, kernel_size: 3, stride: 1, padding: 1}
+    - {out_channels: 128, kernel_size: 3, stride: 2, padding: 1}
+    - {out_channels: 256, kernel_size: 3, stride: 2, padding: 1}
+    - {out_channels: 512, kernel_size: 3, stride: 2, padding: 1}
+  pool_type: adaptive_avg
+  shared_fc_layers: [384, 256]  # Shared layers before heads
+
+# =============================================================================
+# CLASSIFICATION HEADS
+# =============================================================================
+heads:
+  # Primary: Full 216-node classification (6×6×6)
+  emotion_node:
+    type: linear
+    output_size: 216
+    loss: cross_entropy
+    weight: 1.0
+    description: "Full 216-node classification from thesaurus"
+  
+  # Hierarchical: Base emotion (coarse classification)
+  base_emotion:
+    type: linear
+    output_size: 6
+    loss: cross_entropy
+    weight: 0.5
+    labels:
+      - HAPPY
+      - SAD
+      - ANGRY
+      - FEAR
+      - SURPRISE
+      - DISGUST
+    description: "Coarse 6-class base emotion"
+  
+  # Hierarchical: Sub-emotion (medium granularity)
+  sub_emotion:
+    type: linear
+    output_size: 36
+    loss: cross_entropy
+    weight: 0.3
+    description: "Medium 36-class sub-emotion"
+  
+  # Intensity tier classification
+  intensity_tier:
+    type: linear
+    output_size: 6
+    loss: cross_entropy
+    weight: 0.3
+    labels:
+      - subtle
+      - mild
+      - moderate
+      - strong
+      - intense
+      - overwhelming
+    description: "6-level intensity classification"
+  
+  # Key detection (for key-invariant learning)
+  key_detection:
+    type: linear
+    output_size: 24
+    loss: cross_entropy
+    weight: 0.2
+    labels:
+      # Major keys
+      - C_major
+      - Db_major
+      - D_major
+      - Eb_major
+      - E_major
+      - F_major
+      - Gb_major
+      - G_major
+      - Ab_major
+      - A_major
+      - Bb_major
+      - B_major
+      # Minor keys
+      - C_minor
+      - Db_minor
+      - D_minor
+      - Eb_minor
+      - E_minor
+      - F_minor
+      - Gb_minor
+      - G_minor
+      - Ab_minor
+      - A_minor
+      - Bb_minor
+      - B_minor
+    description: "24-key detection (12 major + 12 minor)"
+
+# =============================================================================
+# 6×6×6 THESAURUS STRUCTURE
+# =============================================================================
+thesaurus:
+  source: data/emotion_thesaurus/
+  files:
+    - happy.json
+    - sad.json
+    - angry.json
+    - fear.json
+    - surprise.json
+    - disgust.json
+  
+  # Node ID mapping: base_idx * 36 + sub_idx * 6 + subsub_idx
+  # Example: HAPPY/JOY/cheerful = 0*36 + 1*6 + 0 = 6
+  
+  base_emotions:
+    0: {id: I, name: HAPPY, sub_count: 6}
+    1: {id: II, name: SAD, sub_count: 6}
+    2: {id: III, name: ANGRY, sub_count: 6}
+    3: {id: IV, name: FEAR, sub_count: 6}
+    4: {id: V, name: SURPRISE, sub_count: 6}
+    5: {id: VI, name: DISGUST, sub_count: 6}
+  
+  # Musical mappings from thesaurus
+  valence_to_mode:
+    positive: [lydian, ionian, mixolydian]
+    negative: [aeolian, phrygian, locrian, dorian]
+    mixed: [dorian, mixolydian]  # Modal mixture
+  
+  arousal_to_tempo:
+    low: [40, 70]    # BPM range
+    medium: [70, 120]
+    high: [120, 180]
+
+# =============================================================================
+# DATA CONFIGURATION
+# =============================================================================
+data_path: /Volumes/Extreme SSD/kelly-audio-data/raw/emotion_thesaurus
+data_version: v1
+sample_rate: 44100
+n_mels: 64
+n_fft: 2048
+hop_length: 512
+max_duration: 8.0  # 8 second clips
+min_duration: 2.0
+
+# Data loading
+train_split: 0.75
+val_split: 0.15
+test_split: 0.10
+
+# Balanced sampling for 216 classes
+sampling:
+  strategy: balanced  # Ensures all 216 nodes are represented
+  min_samples_per_class: 50
+  target_samples_per_class: 200
+  augment_minority_classes: true
+
+# =============================================================================
+# TRAINING PARAMETERS (Mac-Optimized)
+# =============================================================================
+epochs: 200
+batch_size: 8  # Small batch for 216-class problem
+learning_rate: 0.0005
+optimizer: adamw
+weight_decay: 0.0001
+loss: hierarchical_cross_entropy  # Custom loss for hierarchical labels
+scheduler: cosine_warmup
+warmup_epochs: 15
+label_smoothing: 0.1  # Helps with 216-class classification
+
+# Early stopping
+early_stopping_patience: 25
+min_delta: 0.0003
+
+# Mac-specific settings
+device: auto  # MPS on Apple Silicon, CPU on Intel
+num_workers: 0
+pin_memory: false
+mixed_precision: false  # Disable for Mac compatibility
+
+# =============================================================================
+# DATA AUGMENTATION (Key-Invariant Learning)
+# =============================================================================
+augmentation:
+  # Key transposition (critical for key-invariant learning!)
+  transpose_all_keys: true  # Transpose each sample to all 12 keys
+  pitch_shift: [-12, 12]  # Full octave transposition
+  
+  # Time-domain augmentation
+  time_stretch: [0.85, 1.15]
+  
+  # Spectral augmentation
+  spec_augment:
+    freq_mask_param: 8
+    time_mask_param: 16
+    num_freq_masks: 2
+    num_time_masks: 2
+  
+  # Additional augmentation
+  noise_injection: 0.02
+  gain_jitter: [-6, 6]  # dB
+  reverb_probability: 0.15
+  
+  # Mixup for regularization
+  mixup:
+    enabled: true
+    alpha: 0.2
+    within_class: true  # Mix within same base emotion
+
+# =============================================================================
+# HIERARCHICAL CONSISTENCY REGULARIZATION
+# =============================================================================
+regularization:
+  # Ensure predictions are consistent across hierarchy
+  # If model predicts sub_sub = "cheerful", it should predict sub = "JOY" and base = "HAPPY"
+  hierarchical_consistency:
+    enabled: true
+    weight: 0.1
+  
+  # VAD (Valence-Arousal-Dominance) consistency
+  vad_embedding:
+    enabled: true
+    dim: 3
+    loss_weight: 0.05
+
+# =============================================================================
+# OUTPUT
+# =============================================================================
+output_dir: checkpoints/emotion_node_classifier
+export_onnx: true
+export_coreml: true
+
+# Logging
+log_interval: 5
+save_interval: 10
+log_audio_samples: true
+log_confusion_matrix: true  # Per-base emotion confusion matrix
+log_hierarchy_accuracy: true  # Accuracy at each level
+
+# =============================================================================
+# VALIDATION METRICS
+# =============================================================================
+metrics:
+  primary: node_accuracy  # Accuracy on 216 nodes
+  secondary:
+    - base_accuracy      # Accuracy on 6 base emotions
+    - sub_accuracy       # Accuracy on 36 sub-emotions
+    - intensity_accuracy # Accuracy on intensity tier
+    - key_accuracy       # Accuracy on key detection
+    - hierarchical_f1    # F1 with hierarchical weighting
+    - top_3_accuracy     # Top-3 accuracy for 216 classes
+    - key_invariance_score  # Same emotion across transpositions
+
+# =============================================================================
+# TEST CONFIGURATION (Validation Suite)
+# =============================================================================
+test:
+  # Test all 216 nodes × 24 keys = 5,184 combinations
+  exhaustive_key_test: true
+  
+  # Per-emotion test samples
+  samples_per_node: 10
+  
+  # Cross-key consistency: same audio transposed should give same emotion
+  cross_key_consistency_test: true
+  
+  # Intensity gradient test: samples at different intensities
+  intensity_gradient_test: true
+  
+  # Edge case tests
+  edge_cases:
+    - blend_emotions  # Emotions between nodes
+    - ambiguous_samples  # Low confidence cases
+    - cross_cultural  # Non-Western music
+
+# =============================================================================
+# METADATA
+# =============================================================================
+author: ""
+notes: |
+  Comprehensive 6×6×6 emotion node classifier for validating 
+  the entire DAiW emotion thesaurus across all 24 keys.
+  
+  This model serves as a test harness for the emotion system:
+  - Validates all 216 emotion nodes can be distinguished
+  - Tests key-invariance (same emotion regardless of key)
+  - Validates hierarchical consistency
+  - Measures intensity tier discrimination
+  
+  Training data should cover:
+  - All 216 emotion nodes
+  - All 6 intensity tiers (1296 combinations)
+  - All 24 keys (12 major + 12 minor)
+  - Multiple genres and tempos per node
+

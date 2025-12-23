@@ -171,13 +171,25 @@ class AudioDataset:
             with open(metadata_file) as f:
                 metadata = json.load(f)
             
-            for entry in metadata.get("samples", metadata):
+            # Handle both root array and root object with "samples" key
+            entries = metadata if isinstance(metadata, list) else metadata.get("samples", [])
+            
+            for entry in entries:
+                if not isinstance(entry, dict):
+                    continue
+                    
                 path = self.data_dir / entry.get("file", entry.get("path", ""))
                 if path.exists():
+                    duration = entry.get("duration")
+                    
+                    # Filter by minimum duration if provided in metadata
+                    if duration is not None and duration < self.min_duration:
+                        continue
+                        
                     sample = AudioSample(
                         path=path,
                         label=entry.get("label"),
-                        duration=entry.get("duration"),
+                        duration=duration,
                         sample_rate=entry.get("sample_rate"),
                         emotion=entry.get("emotion"),
                         genre=entry.get("genre"),
@@ -195,10 +207,16 @@ class AudioDataset:
                 for row in reader:
                     path = self.data_dir / row.get("file", row.get("path", ""))
                     if path.exists():
+                        duration = float(row["duration"]) if row.get("duration") else None
+                        
+                        # Filter by minimum duration if provided in metadata
+                        if duration is not None and duration < self.min_duration:
+                            continue
+                            
                         sample = AudioSample(
                             path=path,
                             label=row.get("label"),
-                            duration=float(row["duration"]) if row.get("duration") else None,
+                            duration=duration,
                             emotion=row.get("emotion"),
                             genre=row.get("genre"),
                             tempo=float(row["tempo"]) if row.get("tempo") else None,
@@ -211,21 +229,29 @@ class AudioDataset:
         Lazy-load audio from disk.
         
         Uses soundfile for efficiency (no librosa overhead on load).
+        Falls back to librosa if soundfile is unavailable.
         """
+        sf = None
         try:
-            import soundfile as sf
+            import soundfile as _sf  # type: ignore
+            sf = _sf
         except ImportError:
+            sf = None
+
+        # Fallback: librosa load if soundfile not available
+        if sf is None:
             import librosa
+
             waveform, sr = librosa.load(
                 sample.path,
                 sr=self.sample_rate,
                 mono=self.mono,
                 duration=self.max_duration,
             )
-            return waveform
-        
-        # Load with soundfile (faster)
-        waveform, sr = sf.read(sample.path, dtype="float32")
+            # librosa.load already returns the desired sample rate
+        else:
+            # Load with soundfile (faster)
+            waveform, sr = sf.read(sample.path, dtype="float32")
         
         # Convert to mono if needed
         if self.mono and len(waveform.shape) > 1:
@@ -235,9 +261,11 @@ class AudioDataset:
         if sr != self.sample_rate:
             try:
                 import resampy
+
                 waveform = resampy.resample(waveform, sr, self.sample_rate)
             except ImportError:
                 import librosa
+
                 waveform = librosa.resample(waveform, orig_sr=sr, target_sr=self.sample_rate)
         
         # Truncate if needed
@@ -280,12 +308,25 @@ class AudioDataset:
             
             return 10 * np.log10(Sxx + 1e-10)
     
+    def _get_cache_filename(self, sample: AudioSample) -> str:
+        """
+        Generate a unique cache filename for a sample.
+        
+        Uses hash of full path to prevent collisions when files have
+        identical names in different subdirectories (e.g., happy/audio_001.wav
+        and sad/audio_001.wav).
+        """
+        import hashlib
+        # Use full path to ensure uniqueness
+        path_hash = hashlib.md5(str(sample.path).encode()).hexdigest()[:12]
+        return f"{sample.path.stem}_{path_hash}.npy"
+    
     def _get_cached_features(self, sample: AudioSample) -> Optional[np.ndarray]:
         """Load cached features if available."""
         if not self.feature_cache_dir:
             return None
         
-        cache_path = self.feature_cache_dir / f"{sample.path.stem}.npy"
+        cache_path = self.feature_cache_dir / self._get_cache_filename(sample)
         if cache_path.exists():
             return np.load(cache_path)
         return None
@@ -295,7 +336,7 @@ class AudioDataset:
         if not self.feature_cache_dir:
             return
         
-        cache_path = self.feature_cache_dir / f"{sample.path.stem}.npy"
+        cache_path = self.feature_cache_dir / self._get_cache_filename(sample)
         np.save(cache_path, features)
     
     def _precompute_all_features(self) -> None:
@@ -383,13 +424,22 @@ class AudioDatasetTorch:
         """Get item as PyTorch tensors."""
         import torch
         
-        features, label = self.dataset[idx]
+        if self.return_waveform:
+            sample = self.dataset.get_sample_info(idx)
+            waveform = self.dataset._load_audio(sample)
+            features = waveform
+            label = sample.label_id
+        else:
+            features, label = self.dataset[idx]
         
         # Convert to tensor
         features_tensor = torch.from_numpy(features).float()
         
         # Add channel dimension if needed (for CNN input)
         if features_tensor.dim() == 2:
+            features_tensor = features_tensor.unsqueeze(0)
+        elif features_tensor.dim() == 1:
+            # Waveform: (T,) -> (1, T)
             features_tensor = features_tensor.unsqueeze(0)
         
         if label is not None:

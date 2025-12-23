@@ -226,7 +226,7 @@ class AudioDownloader:
             
             for sound in sounds[:max_files]:
                 sound_id = sound["id"]
-                sound_name = sound["name"]
+                sound_name = Path(sound["name"]).name.replace("..", "")
                 
                 # Get download URL
                 sound_url = f"https://freesound.org/apiv2/sounds/{sound_id}/download/"
@@ -307,6 +307,7 @@ class AudioDownloader:
                     label = item.get("label", item.get("text", "unknown"))
                     if isinstance(label, int):
                         label = f"class_{label}"
+                    label = Path(str(label)).name.replace("..", "")
                     
                     # Create label subdirectory
                     label_dir = output_path / str(label)
@@ -408,11 +409,20 @@ class AudioDownloader:
                 zf.extractall(extract_to)
                 files_count = len(zf.namelist())
         
-        elif archive_path.suffix in [".tar", ".gz", ".tgz"] or archive_path.name.endswith(".tar.gz"):
-            mode = "r:gz" if ".gz" in archive_path.name else "r"
+        elif archive_path.name.endswith((".tar.gz", ".tgz", ".tar")):
+            mode = "r:gz" if archive_path.name.endswith((".tar.gz", ".tgz")) else "r"
             with tarfile.open(archive_path, mode) as tf:
                 tf.extractall(extract_to)
                 files_count = len(tf.getnames())
+        
+        elif archive_path.suffix == ".gz":
+            # Plain gzip file (single file)
+            import gzip
+            output_file = extract_to / archive_path.stem
+            with gzip.open(archive_path, "rb") as f_in:
+                with open(output_file, "wb") as f_out:
+                    shutil.copyfileobj(f_in, f_out)
+            files_count = 1
         
         logger.info(f"Extracted {files_count} files to {extract_to}")
         return files_count

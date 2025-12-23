@@ -1,0 +1,45 @@
+# =============================================================================
+# Music Foundation Model Dry-Run Configuration
+# =============================================================================
+# Task: Verify SSL pre-training logic on a small subset
+# =============================================================================
+
+model_id: music_foundation_dry_run
+device: auto
+precision: fp16
+seed: 42
+spending_limit_usd: 5.0
+use_streaming: true
+
+data:
+  train_manifest: /Volumes/Extreme SSD/kelly-audio-data/manifests/dry_run.jsonl
+  sample_rate: 44100
+  segment_seconds: 2.0
+  manifest_audio_key: audio
+  num_workers: 0
+
+model:
+  backbone: simple_cnn
+  embedding_dim: 128
+  projection_dim: 64
+  dropout: 0.1
+
+optim:
+  name: adamw
+  lr: 1e-3
+  weight_decay: 0.01
+  betas: [0.9, 0.999]
+
+training:
+  epochs: 2
+  batch_size: 4
+  grad_accum_steps: 1
+  log_every: 5
+  eval_every: 10
+  ckpt_every: 20
+  max_steps: 50
+
+ssl:
+  temperature: 0.07
+  augment_positive_pairs: true
+

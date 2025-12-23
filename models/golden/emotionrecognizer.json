@@ -1,0 +1,10 @@
+{
+  "model_id": "emotionrecognizer",
+  "input_checksum": "00000000000000000000000000000000",
+  "output_checksum": "00000000000000000000000000000000",
+  "feature_version": "0.1.0",
+  "input_size": 64,
+  "sample_rate": 16000,
+  "note": "Stub golden vector for registry smoke tests; replace with real hashes when trained."
+}
+

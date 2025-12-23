@@ -1,0 +1,103 @@
+# =============================================================================
+# Audio Classifier Training Configuration
+# =============================================================================
+# Task: General audio classification (genre, mood, instrument detection)
+# Target: Real-time inference (<10ms on Apple Silicon)
+# Architecture: CNN with attention for spectrogram classification
+# =============================================================================
+
+# Model Identity
+model_id: audioclassifier
+model_type: RTNeural
+task: audio_classification
+
+# Architecture
+# Input: Mel spectrogram (128 mel bands × 256 time frames)
+# Output: Multi-label classification (genre + mood + instruments)
+input_size: 256
+output_size: 128
+hidden_layers: [512, 256, 128]
+activation: relu
+dropout: 0.4
+
+# Use CNN architecture for spectrograms
+architecture_type: cnn
+cnn_config:
+  in_channels: 1
+  conv_layers:
+    - {out_channels: 64, kernel_size: 3, stride: 1, padding: 1}
+    - {out_channels: 128, kernel_size: 3, stride: 2, padding: 1}
+    - {out_channels: 256, kernel_size: 3, stride: 2, padding: 1}
+    - {out_channels: 512, kernel_size: 3, stride: 2, padding: 1}
+  pool_type: adaptive_avg
+  fc_layers: [512, 256, 128]
+  use_attention: true
+
+# Data Configuration
+data_path: /Volumes/Extreme SSD/kelly-audio-data/raw/audio_classification
+data_version: v1
+sample_rate: 22050
+n_mels: 128
+n_fft: 2048
+hop_length: 512
+max_duration: 10.0
+min_duration: 1.0
+
+# Multi-task outputs
+classification_heads:
+  genre:
+    num_classes: 10
+    labels: [rock, pop, jazz, classical, electronic, hip-hop, country, blues, metal, folk]
+  mood:
+    num_classes: 8
+    labels: [happy, sad, energetic, calm, aggressive, romantic, mysterious, uplifting]
+  instrument_presence:
+    num_classes: 12
+    labels: [vocals, guitar, bass, drums, piano, synth, strings, brass, woodwind, percussion, organ, other]
+
+# Split ratios
+train_split: 0.8
+val_split: 0.1
+test_split: 0.1
+
+# Training Parameters (Mac-optimized)
+epochs: 150
+batch_size: 8  # Keep small for multi-task
+learning_rate: 0.0005
+optimizer: adamw
+weight_decay: 0.01
+loss: multi_task_bce  # Binary cross-entropy for multi-label
+scheduler: cosine_warmup
+warmup_epochs: 10
+
+# Early stopping
+early_stopping_patience: 20
+min_delta: 0.001
+
+# Mac-specific settings
+device: auto
+num_workers: 0
+pin_memory: false
+
+# Augmentation
+augmentation:
+  time_stretch: [0.8, 1.2]
+  pitch_shift: [-3, 3]
+  noise_injection: 0.02
+  spec_augment: true
+  mixup_alpha: 0.3
+
+# Output
+output_dir: checkpoints/audio_classifier
+export_onnx: true
+export_coreml: true
+
+# Logging
+log_interval: 20
+save_interval: 10
+log_audio_samples: true
+
+# Metadata
+author: ""
+notes: "Multi-task audio classifier for genre, mood, and instrument detection"
+

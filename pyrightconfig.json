@@ -1,0 +1,39 @@
+{
+  "include": [
+    "python",
+    "scripts",
+    "music_brain",
+    "kelly"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "**/__pycache__",
+    "**/.*",
+    "build",
+    "dist",
+    "target",
+    "venv",
+    ".venv",
+    "env",
+    "ML Kelly Training",
+    "datasets",
+    "data",
+    "checkpoints",
+    "logs",
+    "models/*.onnx",
+    "models/*.mlmodel",
+    "**/*.egg-info",
+    ".git"
+  ],
+  "ignore": [
+    "**/tests/**"
+  ],
+  "pythonVersion": "3.10",
+  "pythonPlatform": "Darwin",
+  "typeCheckingMode": "basic",
+  "reportMissingImports": "warning",
+  "reportMissingTypeStubs": false,
+  "reportUnusedImport": "warning",
+  "reportUnusedVariable": "warning"
+}
+

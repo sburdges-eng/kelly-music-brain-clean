@@ -1,0 +1,41 @@
+device: cuda
+precision: bf16
+seed: 42
+spending_limit_usd: 100.0
+
+data:
+  train_manifest: data/manifests/train.jsonl
+  val_manifest: data/manifests/val.jsonl
+  sample_rate: 44100
+  target_lufs: -14
+  manifest_audio_key: audio
+  manifest_label_key: label
+  n_mels: 128
+  hop_length: 512
+  segment_seconds: 5.0
+  num_workers: 4
+  cache_mels: true
+
+dataloader:
+  batch_size: 32
+  shuffle: true
+  pin_memory: true
+  drop_last: true
+
+model:
+  backbone: lightweight_cnn
+  embedding_dim: 128
+  dropout: 0.2
+
+optim:
+  name: adamw
+  lr: 1e-3
+  weight_decay: 0.01
+  betas: [0.9, 0.99]
+
+training:
+  epochs: 5
+  grad_accum_steps: 1
+  log_every: 10
+  eval_every: 50
+  max_steps: 500

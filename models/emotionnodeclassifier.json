@@ -1,0 +1,75 @@
+{
+  "model_type": "RTNeural",
+  "model_id": "emotionnodeclassifier",
+  "version": "0.1.0",
+  "task": "emotion_node_classification",
+  "purpose": "6×6×6 emotion thesaurus validation across 24 keys",
+  "input_size": 128,
+  "output_size": 258,
+  "architecture": "cnn_multi_head_hierarchical",
+  "layers": [],
+  "trained": false,
+  
+  "thesaurus": {
+    "structure": "6×6×6",
+    "total_nodes": 216,
+    "intensity_tiers": 6,
+    "total_intensity_states": 1296,
+    "keys": 24,
+    "base_emotions": [
+      {"id": 0, "name": "HAPPY", "roman": "I"},
+      {"id": 1, "name": "SAD", "roman": "II"},
+      {"id": 2, "name": "ANGRY", "roman": "III"},
+      {"id": 3, "name": "FEAR", "roman": "IV"},
+      {"id": 4, "name": "SURPRISE", "roman": "V"},
+      {"id": 5, "name": "DISGUST", "roman": "VI"}
+    ]
+  },
+  
+  "heads": {
+    "emotion_node": {
+      "output_size": 216,
+      "loss": "cross_entropy",
+      "weight": 1.0,
+      "description": "Full 6×6×6 node classification"
+    },
+    "base_emotion": {
+      "output_size": 6,
+      "loss": "cross_entropy", 
+      "weight": 0.5,
+      "labels": ["HAPPY", "SAD", "ANGRY", "FEAR", "SURPRISE", "DISGUST"]
+    },
+    "sub_emotion": {
+      "output_size": 36,
+      "loss": "cross_entropy",
+      "weight": 0.3
+    },
+    "intensity_tier": {
+      "output_size": 6,
+      "loss": "cross_entropy",
+      "weight": 0.3,
+      "labels": ["subtle", "mild", "moderate", "strong", "intense", "overwhelming"]
+    },
+    "key_detection": {
+      "output_size": 24,
+      "loss": "cross_entropy",
+      "weight": 0.2,
+      "labels": [
+        "C_major", "C_minor", "Db_major", "Db_minor",
+        "D_major", "D_minor", "Eb_major", "Eb_minor",
+        "E_major", "E_minor", "F_major", "F_minor",
+        "Gb_major", "Gb_minor", "G_major", "G_minor",
+        "Ab_major", "Ab_minor", "A_major", "A_minor",
+        "Bb_major", "Bb_minor", "B_major", "B_minor"
+      ]
+    }
+  },
+  
+  "node_id_formula": "base_idx * 36 + sub_idx * 6 + subsub_idx",
+  
+  "run_id": "",
+  "git_commit": "",
+  "training_date": "",
+  "note": "Stub for EmotionNodeClassifier - 6×6×6 thesaurus validation model"
+}
+

@@ -1,0 +1,287 @@
+# =============================================================================
+# Instrument Recognizer Training Configuration
+# =============================================================================
+# Task: Recognize instruments BOTH technically AND emotionally
+# 
+# Technical Recognition:
+#   - What instrument is playing (piano, guitar, strings, etc.)
+#   - Playing technique (fingerstyle, bowed, strummed, etc.)
+#   - Articulation (staccato, legato, pizzicato, etc.)
+#   - Register (bass, mid, treble)
+#
+# Emotional Recognition:
+#   - Expression style (aggressive, gentle, melancholic, joyful)
+#   - Energy level (calm to intense)
+#   - Musical role (lead, rhythm, accompaniment, texture)
+#   - Sentiment valence (dark to bright)
+#
+# Architecture: Multi-head CNN with shared feature extraction
+# Target: Real-time inference (<10ms) for live instrument analysis
+# =============================================================================
+
+# Model Identity
+model_id: instrumentrecognizer
+model_type: RTNeural
+task: instrument_recognition
+
+# =============================================================================
+# Architecture: Dual-Head Design
+# =============================================================================
+# Input: Mel spectrogram (128 mel bands × 128 time frames)
+# Shared backbone extracts timbral features
+# Technical head: Instrument class + technique + articulation
+# Emotional head: Expression + energy + role + sentiment
+
+input_size: 128
+output_size: 160  # Combined: 80 technical + 80 emotional
+
+# Shared backbone (extracts timbral features)
+architecture_type: multi_head_cnn
+backbone_config:
+  in_channels: 1
+  conv_layers:
+    - {out_channels: 64, kernel_size: 7, stride: 2, padding: 3}   # Initial wide kernel for timbre
+    - {out_channels: 128, kernel_size: 3, stride: 2, padding: 1}
+    - {out_channels: 256, kernel_size: 3, stride: 2, padding: 1}
+    - {out_channels: 512, kernel_size: 3, stride: 2, padding: 1}
+  pool_type: adaptive_avg
+  shared_fc: 512  # Shared feature dimension
+
+# Technical head (what + how)
+technical_head:
+  fc_layers: [256, 128, 80]
+  activation: relu
+  dropout: 0.3
+  outputs:
+    instrument_family: 16    # Piano, Strings, Brass, Woodwind, etc.
+    instrument_specific: 32  # Specific instruments within family
+    technique: 16            # Fingerstyle, bowed, strummed, etc.
+    articulation: 8          # Staccato, legato, pizzicato, etc.
+    register: 4              # Bass, low-mid, high-mid, treble
+    timbre_brightness: 4     # Dark to bright
+
+# Emotional head (expression + feel)
+emotional_head:
+  fc_layers: [256, 128, 80]
+  activation: gelu  # Smoother for emotional gradients
+  dropout: 0.25
+  outputs:
+    expression_style: 12     # Aggressive, gentle, melancholic, joyful, etc.
+    energy_level: 8          # 1-8 scale from calm to intense
+    musical_role: 8          # Lead, rhythm, bass, pad, texture, etc.
+    sentiment_valence: 8     # Dark/sad to bright/happy
+    sentiment_arousal: 8     # Calm to excited
+    dynamic_range: 4         # pp to ff
+    human_feel: 8            # Mechanical to highly expressive
+    vibrato_intensity: 4     # None to heavy
+    attack_character: 8      # Soft attack to sharp attack
+    sustain_character: 8     # Short decay to long sustain
+    genre_feel: 4            # Classical, jazz, rock, electronic
+
+# =============================================================================
+# Data Configuration
+# =============================================================================
+data_path: /Volumes/Extreme SSD/kelly-audio-data/raw/instruments
+data_version: v1
+sample_rate: 22050
+n_mels: 128
+n_fft: 2048
+hop_length: 512
+max_duration: 5.0   # 5 second clips
+min_duration: 0.5   # Minimum 0.5 second
+
+# Split ratios
+train_split: 0.8
+val_split: 0.1
+test_split: 0.1
+
+# =============================================================================
+# Instrument Taxonomy
+# =============================================================================
+
+# Instrument families (16 classes)
+instrument_families:
+  - piano           # Acoustic & electric piano
+  - organ           # Pipe, electric, Hammond
+  - guitar          # Acoustic, electric, bass guitar
+  - strings_bowed   # Violin, viola, cello, bass
+  - strings_plucked # Harp, mandolin, banjo
+  - brass           # Trumpet, trombone, horn, tuba
+  - woodwind_reed   # Saxophone, clarinet, oboe, bassoon
+  - woodwind_flute  # Flute, recorder, piccolo
+  - percussion_tuned    # Marimba, vibraphone, timpani
+  - percussion_untuned  # Drums, cymbals, tambourine
+  - synth_lead      # Lead synthesizers
+  - synth_pad       # Pad synthesizers
+  - synth_bass      # Bass synthesizers
+  - voice           # Human voice (sung)
+  - ethnic          # World instruments
+  - electronic      # Effects, textures, noise
+
+# Playing techniques (16 classes)
+techniques:
+  - sustained       # Long held notes
+  - staccato        # Short detached notes
+  - legato          # Smooth connected notes
+  - tremolo         # Rapid repetition
+  - trill           # Alternating notes
+  - glissando       # Sliding between notes
+  - vibrato         # Pitch oscillation
+  - bowed           # String bow technique
+  - plucked         # Finger pluck
+  - picked          # Pick/plectrum
+  - strummed        # Chord strumming
+  - hammered        # Piano/mallet striking
+  - blown           # Wind instrument breath
+  - slapped         # Bass slap technique
+  - palm_muted      # Muted strings
+  - harmonics       # Natural/artificial harmonics
+
+# Articulations (8 classes)
+articulations:
+  - normal          # Standard articulation
+  - accented        # Emphasized attack
+  - marcato         # Strong accent
+  - tenuto          # Full duration
+  - sforzando       # Sudden loud
+  - pizzicato       # Plucked (strings)
+  - con_sordino     # Muted
+  - flutter_tongue  # Wind flutter
+
+# Expression styles (12 classes)
+expression_styles:
+  - aggressive      # Forceful, attacking
+  - gentle          # Soft, tender
+  - melancholic     # Sad, wistful
+  - joyful          # Happy, bright
+  - mysterious      # Enigmatic, questioning
+  - triumphant      # Victorious, heroic
+  - playful         # Light, fun
+  - solemn          # Serious, grave
+  - passionate      # Intense, romantic
+  - contemplative   # Thoughtful, reflective
+  - anxious         # Tense, nervous
+  - serene          # Peaceful, calm
+
+# Musical roles (8 classes)
+musical_roles:
+  - lead_melody     # Primary melodic voice
+  - counter_melody  # Secondary melodic voice
+  - harmony         # Chord/harmonic support
+  - bass            # Low frequency foundation
+  - rhythm          # Rhythmic pattern
+  - pad             # Sustained texture
+  - accent          # Punctuation/emphasis
+  - ambient         # Background/texture
+
+# =============================================================================
+# Training Parameters (Mac-optimized)
+# =============================================================================
+epochs: 150
+batch_size: 12          # Smaller for dual-head memory
+learning_rate: 0.0005
+optimizer: adamw
+weight_decay: 0.01
+scheduler: cosine_warmup
+warmup_epochs: 10
+
+# Multi-task loss weights
+loss_config:
+  type: multi_task
+  technical_weight: 0.5
+  emotional_weight: 0.5
+  # Sub-weights within each head
+  instrument_family_weight: 1.0
+  instrument_specific_weight: 0.8
+  technique_weight: 0.6
+  articulation_weight: 0.4
+  expression_weight: 1.0
+  energy_weight: 0.8
+  role_weight: 0.6
+  sentiment_weight: 0.8
+
+# Label smoothing for soft predictions
+label_smoothing: 0.1
+
+# Early stopping
+early_stopping_patience: 20
+min_delta: 0.0005
+
+# Mac-specific settings
+device: auto
+num_workers: 0
+pin_memory: false
+
+# =============================================================================
+# Augmentation
+# =============================================================================
+augmentation:
+  # Technical augmentation (preserve instrument identity)
+  pitch_shift: [-3, 3]          # Small range to preserve timbre
+  time_stretch: [0.9, 1.1]
+  
+  # Timbral augmentation
+  eq_bands:                     # Random EQ
+    low_shelf: [-3, 3]
+    mid: [-2, 2]
+    high_shelf: [-3, 3]
+  
+  # Expression augmentation (should change emotional labels!)
+  velocity_scale: [0.7, 1.3]    # Changes energy perception
+  attack_modify: [-0.1, 0.1]    # Changes attack character
+  
+  # Noise/environment
+  noise_snr_db: [30, 50]
+  reverb_wet: [0.0, 0.3]
+  
+  # Mixup for regularization
+  mixup_alpha: 0.2
+  mixup_within_family: true     # Mix within instrument families
+
+# =============================================================================
+# Output
+# =============================================================================
+output_dir: checkpoints/instrument_recognizer
+export_onnx: true
+export_coreml: true
+
+# Logging
+log_interval: 10
+save_interval: 5
+log_audio_samples: true
+log_attention_maps: true        # Visualize what the model focuses on
+
+# =============================================================================
+# Inference Configuration
+# =============================================================================
+inference:
+  # Return top-k predictions for each category
+  top_k_instruments: 3
+  top_k_techniques: 2
+  top_k_emotions: 3
+  
+  # Confidence thresholds
+  min_confidence: 0.3
+  
+  # Temporal smoothing for live analysis
+  temporal_smoothing: 0.7       # EMA factor for consecutive frames
+  
+  # Output format
+  output_format: structured     # Returns structured dict with all predictions
+
+# =============================================================================
+# Metadata
+# =============================================================================
+author: ""
+notes: |
+  Dual-head instrument recognition model.
+  
+  Technical head answers: "What instrument is this and how is it being played?"
+  Emotional head answers: "What is the expression, energy, and feel?"
+  
+  Use cases:
+  - Intelligent instrument detection for auto-tagging
+  - Expression analysis for music production
+  - Live performance analysis
+  - Emotion-aware mixing suggestions
+

@@ -1,0 +1,105 @@
+# =============================================================================
+# Pitch Tracker Training Configuration
+# =============================================================================
+# Task: Track fundamental frequency (F0) in audio
+# Target: Real-time pitch tracking (<5ms latency)
+# Architecture: CREPE-style CNN
+# =============================================================================
+
+# Model Identity
+model_id: pitchtracker
+model_type: RTNeural
+task: pitch_tracking
+
+# Architecture
+# Input: Raw audio frame (1024 samples)
+# Output: 360-dim pitch bins (6 octaves × 60 cents)
+input_size: 1024
+output_size: 360
+hidden_layers: [512, 256, 128]
+activation: relu
+dropout: 0.25
+
+# Use 1D CNN (CREPE-style)
+architecture_type: cnn1d
+cnn_config:
+  in_channels: 1
+  conv_layers:
+    - {out_channels: 32, kernel_size: 512, stride: 4}
+    - {out_channels: 64, kernel_size: 64, stride: 2}
+    - {out_channels: 128, kernel_size: 64, stride: 2}
+    - {out_channels: 256, kernel_size: 64, stride: 2}
+    - {out_channels: 512, kernel_size: 64, stride: 2}
+  pool_type: max
+  fc_layers: [512, 360]
+
+# Data Configuration
+data_path: /Volumes/Extreme SSD/kelly-audio-data/raw/pitch
+data_version: v1
+sample_rate: 16000
+frame_length: 1024  # 64ms at 16kHz
+hop_length: 160  # 10ms
+
+# Pitch range
+pitch_config:
+  min_hz: 32.7  # C1
+  max_hz: 2093.0  # C7
+  cents_per_bin: 20
+  num_bins: 360
+
+# Split ratios
+train_split: 0.8
+val_split: 0.1
+test_split: 0.1
+
+# Training Parameters (Mac-optimized)
+epochs: 100
+batch_size: 32
+learning_rate: 0.0002
+optimizer: adam
+weight_decay: 0.0001
+loss: cross_entropy  # Pitch bins as classes
+scheduler: cosine
+warmup_epochs: 5
+
+# Early stopping
+early_stopping_patience: 15
+min_delta: 0.001
+
+# Mac-specific settings
+device: auto
+num_workers: 0
+pin_memory: false
+
+# Augmentation
+augmentation:
+  pitch_shift: [-12, 12]  # Semitones (shift labels too)
+  noise_injection: 0.02
+  gain_range: [-6, 6]
+
+# Output
+output_dir: checkpoints/pitch_tracker
+export_onnx: true
+export_coreml: true
+
+# Logging
+log_interval: 20
+save_interval: 10
+
+# Evaluation metrics
+metrics:
+  - raw_pitch_accuracy
+  - raw_chroma_accuracy
+  - voicing_accuracy
+  - overall_accuracy
+
+# Post-processing
+post_processing:
+  confidence_threshold: 0.5
+  voicing_threshold: 0.3
+  median_filter_frames: 3
+
+# Metadata
+author: ""
+notes: "CREPE-style pitch tracker for monophonic audio"
+

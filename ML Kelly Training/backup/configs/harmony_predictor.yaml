@@ -1,0 +1,102 @@
+# =============================================================================
+# Harmony Predictor Training Configuration
+# =============================================================================
+# Task: Predict chord progressions from melody and context
+# Target: Real-time chord suggestion (<3ms inference)
+# Architecture: Small MLP or RNN for chord sequence prediction
+# =============================================================================
+
+# Model Identity
+model_id: harmonypredictor
+model_type: RTNeural
+task: harmony_prediction
+
+# Architecture
+# Input: 128-dim (melody context, key, previous chords)
+# Output: 64-dim chord embedding (can decode to chord symbol)
+input_size: 128
+output_size: 64
+hidden_layers: [256, 128]
+activation: relu
+dropout: 0.2
+
+# Use MLP for fast inference
+architecture_type: mlp
+mlp_config:
+  hidden_sizes: [256, 128, 64]
+  batch_norm: true
+  residual: false
+
+# Data Configuration
+# Data stored on external SSD for performance
+data_path: /Volumes/Extreme SSD/kelly-audio-data/raw/chord_progressions
+data_version: v1
+
+# Chord representation
+chord_config:
+  vocab_size: 48  # Common chord types
+  include_extensions: true  # 7ths, 9ths, etc.
+  include_inversions: false  # Root position only for simplicity
+  context_length: 4  # Previous N chords as context
+
+# Key detection
+key_config:
+  num_keys: 24  # 12 major + 12 minor
+  include_mode: true
+
+# Split ratios
+train_split: 0.8
+val_split: 0.1
+test_split: 0.1
+
+# Training Parameters (Mac-optimized)
+epochs: 80
+batch_size: 64  # Can be larger for non-audio data
+learning_rate: 0.001
+optimizer: adam
+weight_decay: 0.0001
+loss: cross_entropy
+scheduler: step
+scheduler_step_size: 20
+scheduler_gamma: 0.5
+
+# Early stopping
+early_stopping_patience: 15
+min_delta: 0.001
+
+# Mac-specific settings
+device: auto
+num_workers: 0
+pin_memory: false
+
+# Augmentation
+augmentation:
+  transpose_key: true  # Transpose to all 12 keys
+  chord_substitution: 0.1  # Random substitution probability
+
+# Output
+output_dir: checkpoints/harmony_predictor
+export_onnx: true
+export_coreml: true
+
+# Logging
+log_interval: 10
+save_interval: 5
+
+# Chord vocabulary (common chords)
+chord_types:
+  - major
+  - minor
+  - dominant7
+  - major7
+  - minor7
+  - diminished
+  - augmented
+  - sus2
+  - sus4
+  - add9
+
+# Metadata
+author: ""
+notes: "Chord progression prediction from melodic context"
+

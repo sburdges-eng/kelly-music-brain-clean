@@ -1,782 +1,1032 @@
 #!/usr/bin/env python3
 """
-Kelly ML Dataset Preparation Script
+Real Dataset Preparation Script for Kelly ML Training.
 
-Complete pipeline for preparing training datasets for Kelly's 5-model architecture.
+Downloads, preprocesses, and prepares real audio datasets for training:
+- Emotion recognition datasets
+- MIDI melody datasets
+- Chord progression datasets
+- Groove/timing datasets
 
-Workflow:
-1. Create dataset structure
-2. Import raw files (MIDI/audio)
-3. Annotate samples (interactive or auto)
-4. Extract features
-5. Augment data (expand 100 → 1000+)
-6. Generate synthetic data (from music theory)
-7. Validate dataset
-8. Export for training
-
-Target: 1000 samples per category, <3TB total
+All data is stored on: /Volumes/Extreme SSD/kelly-audio-data/
 
 Usage:
-    # Full pipeline
-    python scripts/prepare_datasets.py --all --target-model emotion_recognizer
-    
-    # Individual steps
-    python scripts/prepare_datasets.py --create --dataset emotion_dataset_v1
-    python scripts/prepare_datasets.py --import-dir /path/to/midi --dataset emotion_dataset_v1
-    python scripts/prepare_datasets.py --annotate --dataset emotion_dataset_v1
-    python scripts/prepare_datasets.py --extract-features --dataset emotion_dataset_v1
-    python scripts/prepare_datasets.py --augment --multiplier 10 --dataset emotion_dataset_v1
-    python scripts/prepare_datasets.py --synthesize --count 5000 --dataset emotion_dataset_v1
-    python scripts/prepare_datasets.py --validate --dataset emotion_dataset_v1
-    
-    # Quick stats
-    python scripts/prepare_datasets.py --stats --dataset emotion_dataset_v1
+    python scripts/prepare_datasets.py --dataset emotion --download
+    python scripts/prepare_datasets.py --dataset all --preprocess
+    python scripts/prepare_datasets.py --list
 """
 
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import logging
 import os
 import shutil
 import sys
-from datetime import datetime
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
+
+import numpy as np
 
 # Add project root to path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger(__name__)
 
-# Paths
-DATASETS_DIR = ROOT / "datasets"
-DATA_DIR = ROOT / "data"
+# Audio data root on external SSD
+AUDIO_DATA_ROOT = Path("/Volumes/Extreme SSD/kelly-audio-data")
 
 
 # =============================================================================
-# Dataset Creation
+# Dataset Configurations
 # =============================================================================
 
-
-def create_dataset(
-    dataset_id: str,
-    target_model: str = "emotionrecognizer",
-    description: str = "",
-) -> Path:
-    """Create a new dataset with standard structure."""
-    from python.penta_core.ml.datasets.base import (
-        DatasetConfig,
-        create_dataset_structure,
-    )
-    
-    config = DatasetConfig(
-        dataset_id=dataset_id,
-        target_model=target_model,
-        description=description or f"Dataset for {target_model}",
-        created_at=datetime.now().isoformat(),
-    )
-    
-    # Model-specific settings
-    if target_model == "emotionrecognizer":
-        config.sample_type = "audio"
-        config.emotion_labels = ["happy", "sad", "angry", "peaceful", "tense", "melancholic", "energetic", "neutral"]
-    elif target_model == "melodytransformer":
-        config.sample_type = "midi"
-    elif target_model == "harmonypredictor":
-        config.sample_type = "midi"
-    elif target_model == "dynamicsengine":
-        config.sample_type = "midi"
-    elif target_model == "groovepredictor":
-        config.sample_type = "midi"
-        config.groove_labels = ["straight", "swing", "shuffle", "laid_back", "rushed"]
-    
-    manifest = create_dataset_structure(DATASETS_DIR, config)
-    dataset_path = DATASETS_DIR / dataset_id
-    
-    logger.info(f"Created dataset: {dataset_path}")
-    return dataset_path
+@dataclass
+class DatasetConfig:
+    """Configuration for a dataset."""
+    name: str
+    task: str
+    description: str
+    sources: List[Dict[str, Any]]
+    output_dir: str
+    sample_rate: int = 16000
+    max_duration: float = 10.0
+    min_duration: float = 0.5
 
 
-# =============================================================================
-# File Import
-# =============================================================================
-
-
-def import_files(
-    source_dir: Path,
-    dataset_id: str,
-    file_types: List[str] = None,
-    recursive: bool = True,
-) -> int:
-    """Import files from a directory into the dataset."""
-    from python.penta_core.ml.datasets.base import (
-        load_manifest,
-        save_manifest,
-        create_sample_from_file,
-    )
-    
-    dataset_path = DATASETS_DIR / dataset_id
-    manifest_path = dataset_path / "manifest.json"
-    
-    if not manifest_path.exists():
-        logger.error(f"Dataset not found: {dataset_id}")
-        return 0
-    
-    manifest = load_manifest(manifest_path)
-    source_dir = Path(source_dir)
-    
-    file_types = file_types or ['midi', 'audio']
-    patterns = []
-    if 'midi' in file_types:
-        patterns.extend(['*.mid', '*.midi'])
-    if 'audio' in file_types:
-        patterns.extend(['*.wav', '*.mp3', '*.flac', '*.ogg'])
-    
-    imported = 0
-    glob_fn = source_dir.rglob if recursive else source_dir.glob
-    
-    for pattern in patterns:
-        for file_path in glob_fn(pattern):
-            # Determine destination
-            if file_path.suffix.lower() in ['.mid', '.midi']:
-                dest_dir = dataset_path / "raw" / "midi"
-            else:
-                dest_dir = dataset_path / "raw" / "audio"
-            
-            dest_path = dest_dir / file_path.name
-            
-            # Copy file
-            shutil.copy2(file_path, dest_path)
-            
-            # Create sample entry
-            sample = create_sample_from_file(dest_path, dataset_path)
-            manifest.add_sample(sample)
-            
-            imported += 1
-            if imported % 100 == 0:
-                logger.info(f"Imported {imported} files...")
-    
-    # Save manifest
-    save_manifest(manifest, manifest_path)
-    logger.info(f"Imported {imported} files into {dataset_id}")
-    
-    return imported
-
-
-# =============================================================================
-# Annotation
-# =============================================================================
-
-
-def auto_annotate(
-    dataset_id: str,
-    use_directory_labels: bool = True,
-    use_filename_labels: bool = True,
-) -> int:
-    """Auto-annotate samples based on directory structure and filenames."""
-    from python.penta_core.ml.datasets.base import (
-        load_manifest,
-        save_manifest,
-        SampleAnnotation,
-    )
-    
-    dataset_path = DATASETS_DIR / dataset_id
-    manifest = load_manifest(dataset_path / "manifest.json")
-    
-    annotated = 0
-    
-    for sample in manifest.samples:
-        if sample.annotations and sample.annotations.emotion:
-            continue  # Already annotated
-        
-        file_path = Path(sample.file_path)
-        emotion = None
-        
-        # Try directory name
-        if use_directory_labels:
-            parent = file_path.parent.name.lower()
-            emotions = ["happy", "sad", "angry", "peaceful", "tense", "melancholic", "energetic", "neutral"]
-            for e in emotions:
-                if e in parent:
-                    emotion = e
-                    break
-        
-        # Try filename
-        if not emotion and use_filename_labels:
-            name = file_path.stem.lower()
-            for e in ["happy", "sad", "angry", "peaceful", "tense", "melancholic", "energetic", "neutral"]:
-                if e in name:
-                    emotion = e
-                    break
-        
-        if emotion:
-            if not sample.annotations:
-                sample.annotations = SampleAnnotation()
-            sample.annotations.emotion = emotion
-            annotated += 1
-    
-    save_manifest(manifest, dataset_path / "manifest.json")
-    logger.info(f"Auto-annotated {annotated} samples in {dataset_id}")
-    
-    return annotated
-
-
-def interactive_annotate(dataset_id: str, limit: int = None) -> int:
-    """Interactively annotate samples."""
-    from python.penta_core.ml.datasets.base import (
-        load_manifest,
-        save_manifest,
-        SampleAnnotation,
-    )
-    
-    dataset_path = DATASETS_DIR / dataset_id
-    manifest = load_manifest(dataset_path / "manifest.json")
-    
-    # Find unannotated samples
-    unannotated = [s for s in manifest.samples 
-                   if not s.annotations or not s.annotations.emotion]
-    
-    if limit:
-        unannotated = unannotated[:limit]
-    
-    if not unannotated:
-        logger.info("All samples are annotated!")
-        return 0
-    
-    emotions = ["happy", "sad", "angry", "peaceful", "tense", "melancholic", "energetic", "neutral", "skip"]
-    
-    print("\n" + "=" * 50)
-    print("Interactive Annotation")
-    print("=" * 50)
-    print(f"Samples to annotate: {len(unannotated)}")
-    print(f"Options: {', '.join(f'{i}={e}' for i, e in enumerate(emotions))}")
-    print("Enter 'q' to quit and save")
-    print("=" * 50 + "\n")
-    
-    annotated = 0
-    
-    for i, sample in enumerate(unannotated):
-        print(f"\n[{i+1}/{len(unannotated)}] {sample.file_path}")
-        
-        # Try to play audio if possible
-        # (Would need audio playback library)
-        
-        choice = input(f"Emotion [0-{len(emotions)-1}]: ").strip()
-        
-        if choice.lower() == 'q':
-            break
-        
-        try:
-            idx = int(choice)
-            if 0 <= idx < len(emotions) - 1:  # Exclude 'skip'
-                if not sample.annotations:
-                    sample.annotations = SampleAnnotation()
-                sample.annotations.emotion = emotions[idx]
-                annotated += 1
-        except ValueError:
-            print("Invalid input, skipping")
-    
-    save_manifest(manifest, dataset_path / "manifest.json")
-    logger.info(f"Annotated {annotated} samples")
-    
-    return annotated
+DATASETS = {
+    "emotion_ravdess": DatasetConfig(
+        name="RAVDESS",
+        task="emotion",
+        description="Ryerson Audio-Visual Database of Emotional Speech and Song",
+        sources=[
+            {
+                "type": "kaggle",
+                "dataset": "uwrfkaggler/ravdess-emotional-speech-audio",
+                "files": ["*.wav"],
+            }
+        ],
+        output_dir="emotions/ravdess",
+        sample_rate=16000,
+        max_duration=5.0,
+    ),
+    "emotion_cremad": DatasetConfig(
+        name="CREMA-D",
+        task="emotion",
+        description="Crowd-sourced Emotional Multimodal Actors Dataset",
+        sources=[
+            {
+                "type": "url",
+                "url": "https://github.com/CheyneyComputerScience/CREMA-D/archive/refs/heads/master.zip",
+            }
+        ],
+        output_dir="emotions/cremad",
+        sample_rate=16000,
+    ),
+    "emotion_tess": DatasetConfig(
+        name="TESS",
+        task="emotion",
+        description="Toronto Emotional Speech Set",
+        sources=[
+            {
+                "type": "kaggle",
+                "dataset": "ejlok1/toronto-emotional-speech-set-tess",
+            }
+        ],
+        output_dir="emotions/tess",
+        sample_rate=16000,
+    ),
+    "groove_midi": DatasetConfig(
+        name="Groove MIDI Dataset",
+        task="groove",
+        description="Expressive drum performances from Magenta",
+        sources=[
+            {
+                "type": "url",
+                "url": "https://storage.googleapis.com/magentadata/datasets/groove/groove-v1.0.0-midionly.zip",
+            }
+        ],
+        output_dir="grooves/groove_midi",
+    ),
+    "maestro": DatasetConfig(
+        name="MAESTRO",
+        task="melody",
+        description="MIDI and Audio Edited for Synchronous TRacks and Organization",
+        sources=[
+            {
+                "type": "url",
+                "url": "https://storage.googleapis.com/magentadata/datasets/maestro/v3.0.0/maestro-v3.0.0-midi.zip",
+            }
+        ],
+        output_dir="melodies/maestro",
+    ),
+    "lakh_midi": DatasetConfig(
+        name="Lakh MIDI Dataset (Clean)",
+        task="harmony",
+        description="Clean subset of Lakh MIDI Dataset",
+        sources=[
+            {
+                "type": "url",
+                "url": "http://hog.ee.columbia.edu/craffel/lmd/lmd_matched.tar.gz",
+            }
+        ],
+        output_dir="chord_progressions/lakh",
+    ),
+    "musicnet": DatasetConfig(
+        name="MusicNet",
+        task="melody",
+        description="Classical music with note annotations (168GB)",
+        sources=[
+            {
+                "type": "url",
+                "url": "https://zenodo.org/record/5120004/files/musicnet.tar.gz",
+            }
+        ],
+        output_dir="melodies/musicnet",
+    ),
+    "gtzan": DatasetConfig(
+        name="GTZAN",
+        task="emotion",
+        description="Music genre classification dataset (10 genres)",
+        sources=[
+            {
+                "type": "url",
+                "url": "https://mirg.city.ac.uk/datasets/gtzan/genres.tar.gz",
+            }
+        ],
+        output_dir="emotions/gtzan",
+        sample_rate=22050,
+        max_duration=30.0,
+    ),
+    "fma_small": DatasetConfig(
+        name="Free Music Archive (Small)",
+        task="all",
+        description="8,000 tracks of 30s, 8 genres (7.2GB)",
+        sources=[
+            {
+                "type": "url",
+                "url": "https://os.unil.cloud.switch.ch/fma/fma_small.zip",
+            }
+        ],
+        output_dir="raw/fma_small",
+    ),
+    "fma_medium": DatasetConfig(
+        name="Free Music Archive (Medium)",
+        task="all",
+        description="25,000 tracks of 30s, 16 genres (22GB)",
+        sources=[
+            {
+                "type": "url",
+                "url": "https://os.unil.cloud.switch.ch/fma/fma_medium.zip",
+            }
+        ],
+        output_dir="raw/fma_medium",
+    ),
+    "fma_full": DatasetConfig(
+        name="Free Music Archive (Full)",
+        task="all",
+        description="Massive collection of 106,574 tracks (~900GB)",
+        sources=[
+            {
+                "type": "url",
+                "url": "https://os.unil.cloud.switch.ch/fma/fma_full.zip",
+            }
+        ],
+        output_dir="raw/fma_full",
+    ),
+    "mtg_jamendo": DatasetConfig(
+        name="MTG-Jamendo",
+        task="all",
+        description="Multi-label dataset for music classification (~1TB)",
+        sources=[
+            {
+                "type": "url",
+                "url": "https://mtg.github.io/mtg-jamendo-dataset/data/autotagging_moodtheme.tsv",
+            },
+            {
+                "type": "url",
+                "url": "https://mtg.github.io/mtg-jamendo-dataset/data/autotagging_genre.tsv",
+            }
+        ],
+        output_dir="raw/mtg_jamendo",
+    ),
+    "nsynth_full": DatasetConfig(
+        name="NSynth (Full)",
+        task="instrument",
+        description="Large-scale dataset of musical notes (~30GB)",
+        sources=[
+            {
+                "type": "url",
+                "url": "https://storage.googleapis.com/magentadata/datasets/nsynth/nsynth-train.jsonwav.tar.gz",
+            }
+        ],
+        output_dir="raw/nsynth",
+    ),
+    "musdb18": DatasetConfig(
+        name="MUSDB18",
+        task="source_separation",
+        description="Dataset for music source separation (~10GB compressed)",
+        sources=[
+            {
+                "type": "url",
+                "url": "https://zenodo.org/record/1117372/files/musdb18.zip",
+            }
+        ],
+        output_dir="raw/musdb18",
+    ),
+    "local_music": DatasetConfig(
+        name="Local Music Library",
+        task="all",
+        description="Files copied from the local ~/Music directory",
+        sources=[
+            {
+                "type": "local",
+                "path": "~/Music",
+            }
+        ],
+        output_dir="raw/local_music",
+    ),
+}
 
 
 # =============================================================================
-# Feature Extraction
+# Download Functions
 # =============================================================================
 
-
-def extract_features(dataset_id: str, batch_size: int = 100) -> int:
-    """Extract features from all samples in a dataset."""
-    from python.penta_core.ml.datasets.base import load_manifest, save_manifest
-    from python.penta_core.ml.datasets.midi_features import MIDIFeatureExtractor
-    from python.penta_core.ml.datasets.audio_features import AudioFeatureExtractor
+def download_from_url(url: str, output_dir: Path) -> Optional[Path]:
+    """Download file from URL."""
+    try:
+        import requests
+        from tqdm import tqdm
+    except ImportError:
+        logger.error("requests and tqdm required: pip install requests tqdm")
+        return None
     
-    dataset_path = DATASETS_DIR / dataset_id
-    manifest = load_manifest(dataset_path / "manifest.json")
+    output_dir.mkdir(parents=True, exist_ok=True)
     
-    features_dir = dataset_path / "processed" / "features"
-    features_dir.mkdir(parents=True, exist_ok=True)
+    # Get filename from URL
+    filename = url.split("/")[-1]
+    output_path = output_dir / filename
+    partial_path = output_path.with_suffix(output_path.suffix + ".partial")
     
-    midi_extractor = MIDIFeatureExtractor()
-    audio_extractor = AudioFeatureExtractor()
+    if output_path.exists():
+        logger.info(f"Already downloaded: {output_path}")
+        return output_path
     
-    extracted = 0
+    logger.info(f"Downloading: {url}")
+    
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    }
     
     try:
-        from tqdm import tqdm
-        samples = tqdm(manifest.samples, desc="Extracting features")
-    except ImportError:
-        samples = manifest.samples
-    
-    for sample in samples:
-        file_path = dataset_path / sample.file_path
+        response = requests.get(url, stream=True, headers=headers, timeout=30)
+        response.raise_for_status()
         
-        if not file_path.exists():
-            logger.warning(f"File not found: {sample.file_path}")
-            continue
+        total_size = int(response.headers.get("content-length", 0))
         
-        try:
-            if sample.file_type == 'midi':
-                features = midi_extractor.extract(file_path)
-                features_path = features_dir / f"{sample.sample_id}_features.json"
-                features.save(features_path)
-            elif sample.file_type == 'audio':
-                features = audio_extractor.extract(file_path)
-                features_path = features_dir / f"{sample.sample_id}_features.npz"
-                features.save_npz(features_path)
-            
-            sample.features_path = str(features_path.relative_to(dataset_path))
-            extracted += 1
-            
-        except Exception as e:
-            logger.warning(f"Failed to extract features from {sample.file_path}: {e}")
-    
-    save_manifest(manifest, dataset_path / "manifest.json")
-    logger.info(f"Extracted features for {extracted} samples")
-    
-    return extracted
+        with open(partial_path, "wb") as f:
+            with tqdm(total=total_size, unit="B", unit_scale=True, desc=filename) as pbar:
+                for chunk in response.iter_content(chunk_size=1024*1024): # 1MB chunks
+                    if chunk:
+                        f.write(chunk)
+                        pbar.update(len(chunk))
+        
+        partial_path.rename(output_path)
+        logger.info(f"Downloaded: {output_path}")
+        return output_path
+    except Exception as e:
+        logger.error(f"Download failed for {url}: {e}")
+        if partial_path.exists():
+            partial_path.unlink()
+        return None
 
 
-# =============================================================================
-# Augmentation
-# =============================================================================
-
-
-def augment_dataset(
-    dataset_id: str,
-    multiplier: int = 10,
-    include_original: bool = True,
-) -> int:
-    """Augment all samples in a dataset."""
-    from python.penta_core.ml.datasets.base import (
-        load_manifest,
-        save_manifest,
-        create_sample_from_file,
-        SampleAnnotation,
-    )
-    from python.penta_core.ml.datasets.augmentation import (
-        MIDIAugmenter,
-        AudioAugmenter,
-        AugmentationConfig,
-    )
-    
-    dataset_path = DATASETS_DIR / dataset_id
-    manifest = load_manifest(dataset_path / "manifest.json")
-    
-    augmented_dir = dataset_path / "processed" / "augmented"
-    
-    config = AugmentationConfig(
-        preserve_original=include_original,
-        max_augmentations_per_sample=multiplier,
-    )
-    
-    midi_augmenter = MIDIAugmenter(config)
-    audio_augmenter = AudioAugmenter(config)
-    
-    total_generated = 0
-    original_samples = list(manifest.samples)  # Copy to avoid modifying during iteration
-    
+def download_from_kaggle(dataset: str, output_dir: Path) -> bool:
+    """Download dataset from Kaggle."""
     try:
-        from tqdm import tqdm
-        samples = tqdm(original_samples, desc="Augmenting")
+        import kaggle
     except ImportError:
-        samples = original_samples
-    
-    for sample in samples:
-        file_path = dataset_path / sample.file_path
-        
-        if not file_path.exists():
-            continue
-        
-        try:
-            if sample.file_type == 'midi':
-                output_paths = midi_augmenter.augment(
-                    file_path,
-                    augmented_dir / "midi",
-                    num_variations=multiplier,
-                )
-            elif sample.file_type == 'audio':
-                output_paths = audio_augmenter.augment(
-                    file_path,
-                    augmented_dir / "audio",
-                    num_variations=multiplier // 2,  # Audio augmentation is slower
-                )
-            else:
-                continue
-            
-            # Add augmented samples to manifest
-            for aug_path in output_paths:
-                if aug_path == file_path:
-                    continue  # Skip original
-                
-                aug_sample = create_sample_from_file(aug_path, dataset_path)
-                aug_sample.is_synthetic = True
-                aug_sample.parent_id = sample.sample_id
-                aug_sample.augmentation_type = "augmented"
-                
-                # Copy annotations from original
-                if sample.annotations:
-                    aug_sample.annotations = SampleAnnotation(**sample.annotations.to_dict())
-                
-                manifest.add_sample(aug_sample)
-                total_generated += 1
-                
-        except Exception as e:
-            logger.warning(f"Failed to augment {sample.file_path}: {e}")
-    
-    save_manifest(manifest, dataset_path / "manifest.json")
-    logger.info(f"Generated {total_generated} augmented samples")
-    
-    return total_generated
-
-
-# =============================================================================
-# Synthetic Data Generation
-# =============================================================================
-
-
-def generate_synthetic(
-    dataset_id: str,
-    target_model: str,
-    num_samples: int = 5000,
-) -> int:
-    """Generate synthetic training data."""
-    from python.penta_core.ml.datasets.base import (
-        load_manifest,
-        save_manifest,
-        Sample,
-        SampleAnnotation,
-    )
-    from python.penta_core.ml.datasets.synthetic import SyntheticGenerator
-    
-    dataset_path = DATASETS_DIR / dataset_id
-    manifest = load_manifest(dataset_path / "manifest.json")
-    
-    synthetic_dir = dataset_path / "raw" / "synthetic"
-    synthetic_dir.mkdir(parents=True, exist_ok=True)
-    
-    generator = SyntheticGenerator()
-    generated = 0
-    
-    logger.info(f"Generating {num_samples} synthetic samples for {target_model}...")
-    
-    if target_model in ["emotionrecognizer", "emotion_recognizer"]:
-        samples = generator.generate_emotion_samples(num_samples, synthetic_dir)
-    elif target_model in ["melodytransformer", "melody_transformer"]:
-        samples = generator.generate_melody_samples(num_samples, synthetic_dir)
-    elif target_model in ["harmonypredictor", "harmony_predictor"]:
-        samples = generator.generate_harmony_samples(num_samples, synthetic_dir)
-    elif target_model in ["groovepredictor", "groove_predictor"]:
-        samples = generator.generate_groove_samples(num_samples, synthetic_dir)
-    elif target_model in ["dynamicsengine", "dynamics_engine"]:
-        # Use emotion samples with dynamics focus
-        samples = generator.generate_emotion_samples(num_samples, synthetic_dir)
-    else:
-        logger.error(f"Unknown target model: {target_model}")
-        return 0
-    
-    # Add synthetic samples to manifest
-    for syn_data in samples:
-        sample = Sample(
-            sample_id=syn_data['id'],
-            file_path=f"raw/synthetic/{syn_data.get('emotion', target_model)}/{syn_data['id']}.mid",
-            file_type='midi',
-            split='train',
-            is_synthetic=True,
-            annotations=SampleAnnotation(
-                emotion=syn_data.get('emotion', ''),
-                valence=syn_data.get('valence', 0.0),
-                arousal=syn_data.get('arousal', 0.0),
-                key=syn_data.get('key', ''),
-                mode=syn_data.get('mode', ''),
-                tempo_bpm=syn_data.get('tempo_bpm', 0.0),
-                groove_type=syn_data.get('groove_type', ''),
-                swing_ratio=syn_data.get('swing_ratio', 0.5),
-            ),
-        )
-        manifest.add_sample(sample)
-        generated += 1
-    
-    save_manifest(manifest, dataset_path / "manifest.json")
-    logger.info(f"Generated {generated} synthetic samples")
-    
-    return generated
-
-
-# =============================================================================
-# Validation
-# =============================================================================
-
-
-def validate_dataset_cmd(dataset_id: str) -> bool:
-    """Validate a dataset and print report."""
-    from python.penta_core.ml.datasets.validation import validate_dataset
-    
-    dataset_path = DATASETS_DIR / dataset_id
-    
-    if not dataset_path.exists():
-        logger.error(f"Dataset not found: {dataset_id}")
+        logger.error("kaggle package required: pip install kaggle")
+        logger.info("Also set up ~/.kaggle/kaggle.json with your API key")
         return False
     
-    report = validate_dataset(dataset_path)
-    report.print_summary()
+    output_dir.mkdir(parents=True, exist_ok=True)
     
-    # Save report
-    report_path = dataset_path / "validation_report.json"
-    report.save(report_path)
-    logger.info(f"Report saved to: {report_path}")
+    logger.info(f"Downloading from Kaggle: {dataset}")
     
-    return report.is_valid
+    try:
+        kaggle.api.dataset_download_files(
+            dataset,
+            path=str(output_dir),
+            unzip=True,
+        )
+        logger.info(f"Downloaded to: {output_dir}")
+        return True
+    except Exception as e:
+        logger.error(f"Kaggle download failed: {e}")
+        return False
+
+
+def download_from_huggingface(dataset_name: str, output_dir: Path, split: str = "train") -> bool:
+    """Download dataset from Hugging Face."""
+    try:
+        from datasets import load_dataset
+    except ImportError:
+        logger.error("datasets package required: pip install datasets")
+        return False
+    
+    output_dir.mkdir(parents=True, exist_ok=True)
+    
+    logger.info(f"Loading from Hugging Face: {dataset_name}")
+    
+    try:
+        dataset = load_dataset(dataset_name, split=split)
+        
+        # Save to disk
+        dataset.save_to_disk(str(output_dir))
+        logger.info(f"Saved to: {output_dir}")
+        return True
+    except Exception as e:
+        logger.error(f"Hugging Face download failed: {e}")
+        return False
+
+
+def extract_archive(archive_path: Path, output_dir: Path) -> bool:
+    """Extract zip/tar archive."""
+    import tarfile
+    import zipfile
+    
+    logger.info(f"Extracting: {archive_path}")
+    
+    try:
+        if archive_path.suffix == ".zip":
+            with zipfile.ZipFile(archive_path, "r") as zf:
+                zf.extractall(output_dir)
+        elif archive_path.suffix in [".tar", ".gz", ".tgz"] or ".tar" in archive_path.name:
+            mode = "r:gz" if ".gz" in archive_path.name else "r"
+            with tarfile.open(archive_path, mode) as tf:
+                tf.extractall(output_dir)
+        else:
+            logger.error(f"Unknown archive format: {archive_path}")
+            return False
+        
+        logger.info(f"Extracted to: {output_dir}")
+        return True
+    except Exception as e:
+        logger.error(f"Extraction failed: {e}")
+        return False
+
+
+def download_dataset(config: DatasetConfig) -> bool:
+    """Download a dataset based on its configuration."""
+    downloads_dir = AUDIO_DATA_ROOT / "downloads"
+    raw_dir = AUDIO_DATA_ROOT / "raw" / config.output_dir
+    
+    success = True
+    
+    for source in config.sources:
+        source_type = source.get("type")
+        
+        if source_type == "url":
+            archive_path = download_from_url(source["url"], downloads_dir)
+            if archive_path:
+                extract_archive(archive_path, raw_dir)
+            else:
+                success = False
+                
+        elif source_type == "kaggle":
+            if not download_from_kaggle(source["dataset"], raw_dir):
+                success = False
+                
+        elif source_type == "huggingface":
+            if not download_from_huggingface(source["dataset"], raw_dir):
+                success = False
+                
+        elif source_type == "local":
+            source_path = Path(source["path"]).expanduser()
+            if source_path.exists():
+                logger.info(f"Copying local files from: {source_path}")
+                # Recursively copy audio files
+                extensions = [".wav", ".mp3", ".flac", ".ogg", ".mid", ".midi"]
+                for ext in extensions:
+                    for src_file in source_path.rglob(f"*{ext}"):
+                        rel_path = src_file.relative_to(source_path)
+                        dst_file = raw_dir / rel_path
+                        dst_file.parent.mkdir(parents=True, exist_ok=True)
+                        if not dst_file.exists():
+                            shutil.copy2(src_file, dst_file)
+            else:
+                logger.error(f"Local path not found: {source_path}")
+                success = False
+    
+    return success
 
 
 # =============================================================================
-# Statistics
+# Preprocessing Functions
 # =============================================================================
 
-
-def print_stats(dataset_id: str):
-    """Print dataset statistics."""
-    from python.penta_core.ml.datasets.base import load_manifest
-    from collections import Counter
+def preprocess_audio_file(
+    input_path: Path,
+    output_path: Path,
+    target_sr: int = 16000,
+    max_duration: float = 10.0,
+    normalize: bool = True,
+) -> bool:
+    """Preprocess a single audio file."""
+    try:
+        import librosa
+        import soundfile as sf
+    except ImportError:
+        logger.error("librosa and soundfile required")
+        return False
     
-    dataset_path = DATASETS_DIR / dataset_id
-    manifest_path = dataset_path / "manifest.json"
-    
-    if not manifest_path.exists():
-        logger.error(f"Dataset not found: {dataset_id}")
-        return
-    
-    manifest = load_manifest(manifest_path)
-    
-    print("\n" + "=" * 60)
-    print(f"Dataset: {dataset_id}")
-    print("=" * 60)
-    
-    print(f"\nTotal samples: {len(manifest.samples)}")
-    print(f"  Train: {sum(1 for s in manifest.samples if s.split == 'train')}")
-    print(f"  Val:   {sum(1 for s in manifest.samples if s.split == 'val')}")
-    print(f"  Test:  {sum(1 for s in manifest.samples if s.split == 'test')}")
-    
-    # File types
-    types = Counter(s.file_type for s in manifest.samples)
-    print(f"\nFile types:")
-    for t, c in types.items():
-        print(f"  {t}: {c}")
-    
-    # Synthetic vs real
-    synthetic = sum(1 for s in manifest.samples if s.is_synthetic)
-    print(f"\nSynthetic: {synthetic} ({100*synthetic/len(manifest.samples):.1f}%)")
-    
-    # Categories
-    emotions = Counter()
-    for s in manifest.samples:
-        if s.annotations and s.annotations.emotion:
-            emotions[s.annotations.emotion] += 1
-    
-    if emotions:
-        print(f"\nEmotion distribution:")
-        for e, c in sorted(emotions.items(), key=lambda x: -x[1]):
-            bar = "█" * min(40, int(c / max(emotions.values()) * 40))
-            print(f"  {e:12} {c:5} {bar}")
-    
-    # Duration
-    durations = [s.duration_sec for s in manifest.samples if s.duration_sec > 0]
-    if durations:
-        import numpy as np
-        print(f"\nDuration:")
-        print(f"  Total:   {sum(durations)/3600:.2f} hours")
-        print(f"  Average: {np.mean(durations):.1f} sec")
-        print(f"  Range:   {min(durations):.1f} - {max(durations):.1f} sec")
-    
-    # Size
-    sizes = [s.file_size_bytes for s in manifest.samples if s.file_size_bytes > 0]
-    if sizes:
-        total_gb = sum(sizes) / (1024**3)
-        print(f"\nSize: {total_gb:.2f} GB")
-    
-    print("\n" + "=" * 60)
+    try:
+        # Load audio
+        y, sr = librosa.load(str(input_path), sr=target_sr, duration=max_duration)
+        
+        # Normalize
+        if normalize:
+            y = y / (np.max(np.abs(y)) + 1e-8)
+        
+        # Save
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        sf.write(str(output_path), y, target_sr)
+        
+        return True
+    except Exception as e:
+        logger.debug(f"Failed to process {input_path}: {e}")
+        return False
 
 
-# =============================================================================
-# Full Pipeline
-# =============================================================================
+def extract_mel_spectrogram(
+    audio_path: Path,
+    output_path: Path,
+    sr: int = 16000,
+    n_mels: int = 64,
+    n_fft: int = 1024,
+    hop_length: int = 256,
+) -> bool:
+    """Extract and save mel spectrogram."""
+    try:
+        import librosa
+    except ImportError:
+        return False
+    
+    try:
+        y, _ = librosa.load(str(audio_path), sr=sr)
+        
+        mel_spec = librosa.feature.melspectrogram(
+            y=y, sr=sr, n_mels=n_mels, n_fft=n_fft, hop_length=hop_length
+        )
+        mel_spec_db = librosa.power_to_db(mel_spec, ref=np.max)
+        
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        np.save(str(output_path), mel_spec_db)
+        
+        return True
+    except Exception as e:
+        logger.debug(f"Failed to extract mel: {e}")
+        return False
 
 
-def run_full_pipeline(
-    dataset_id: str,
-    target_model: str,
-    source_dir: Optional[Path] = None,
-    target_samples: int = 1000,
-    augment_multiplier: int = 10,
-    synthetic_ratio: float = 0.5,
-):
-    """Run the complete dataset preparation pipeline."""
-    logger.info("=" * 60)
-    logger.info("Kelly ML Dataset Preparation Pipeline")
-    logger.info("=" * 60)
+def parse_ravdess_filename(filename: str) -> Dict[str, Any]:
+    """Parse RAVDESS filename to extract metadata."""
+    # Format: 03-01-06-01-02-01-12.wav
+    # Modality-Vocal-Emotion-Intensity-Statement-Repetition-Actor
     
-    # 1. Create dataset
-    logger.info("\n[1/7] Creating dataset structure...")
-    create_dataset(dataset_id, target_model)
+    parts = filename.replace(".wav", "").split("-")
+    if len(parts) != 7:
+        return {}
     
-    # 2. Import files if source provided
-    if source_dir:
-        logger.info("\n[2/7] Importing files...")
-        import_files(source_dir, dataset_id)
+    emotion_map = {
+        "01": "neutral",
+        "02": "calm",
+        "03": "happy",
+        "04": "sad",
+        "05": "angry",
+        "06": "fear",
+        "07": "disgust",
+        "08": "surprise",
+    }
+    
+    return {
+        "modality": parts[0],
+        "vocal_channel": parts[1],
+        "emotion": emotion_map.get(parts[2], "unknown"),
+        "intensity": "normal" if parts[3] == "01" else "strong",
+        "statement": parts[4],
+        "repetition": parts[5],
+        "actor": parts[6],
+    }
+
+
+def parse_cremad_filename(filename: str) -> str:
+    """Parse CREMA-D filename to extract emotion."""
+    # Format: 1001_DFA_ANG_XX.wav
+    parts = filename.split("_")
+    if len(parts) < 3:
+        return "unknown"
+    
+    code = parts[2]
+    emotion_map = {
+        "ANG": "angry",
+        "DIS": "disgust",
+        "FEA": "fear",
+        "HAP": "happy",
+        "NEU": "neutral",
+        "SAD": "sad",
+    }
+    return emotion_map.get(code, "unknown")
+
+
+def preprocess_emotion_dataset(
+    input_dir: Path,
+    output_dir: Path,
+    config: DatasetConfig,
+) -> Tuple[int, int]:
+    """Preprocess emotion dataset and create metadata."""
+    from tqdm import tqdm
+    
+    processed_dir = output_dir / "processed"
+    processed_dir.mkdir(parents=True, exist_ok=True)
+    
+    metadata = []
+    success_count = 0
+    fail_count = 0
+    
+    # Find all audio files
+    audio_files = list(input_dir.rglob("*.wav")) + list(input_dir.rglob("*.mp3"))
+    
+    logger.info(f"Found {len(audio_files)} audio files")
+    
+    for audio_path in tqdm(audio_files, desc="Processing"):
+        # Parse filename for metadata
+        if "ravdess" in str(input_dir).lower():
+            meta = parse_ravdess_filename(audio_path.name)
+            emotion = meta.get("emotion", "unknown")
+        elif "cremad" in str(input_dir).lower():
+            emotion = parse_cremad_filename(audio_path.name)
+        else:
+            # Try to infer emotion from directory structure
+            emotion = audio_path.parent.name.lower()
+        
+        if emotion == "unknown":
+            fail_count += 1
+            continue
+        
+        # Create output path
+        output_filename = f"{audio_path.stem}.wav"
+        emotion_dir = processed_dir / emotion
+        output_path = emotion_dir / output_filename
+        
+        # Process audio
+        if preprocess_audio_file(
+            audio_path,
+            output_path,
+            target_sr=config.sample_rate,
+            max_duration=config.max_duration,
+        ):
+            metadata.append({
+                "file": str(output_path.relative_to(output_dir)),
+                "emotion": emotion,
+                "original_file": audio_path.name,
+            })
+            success_count += 1
+        else:
+            fail_count += 1
+    
+    # Save metadata
+    metadata_path = output_dir / "metadata.json"
+    with open(metadata_path, "w") as f:
+        json.dump({"samples": metadata}, f, indent=2)
+    
+    # Also save as CSV
+    csv_path = output_dir / "metadata.csv"
+    with open(csv_path, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=["file", "emotion", "original_file"])
+        writer.writeheader()
+        writer.writerows(metadata)
+    
+    logger.info(f"Saved metadata: {len(metadata)} samples")
+    
+    return success_count, fail_count
+
+
+def preprocess_midi_dataset(
+    input_dir: Path,
+    output_dir: Path,
+    config: DatasetConfig,
+) -> Tuple[int, int]:
+    """Preprocess MIDI dataset for melody/harmony training."""
+    try:
+        import mido
+    except ImportError:
+        logger.error("mido required for MIDI processing: pip install mido")
+        return 0, 0
+    
+    from tqdm import tqdm
+    
+    processed_dir = output_dir / "processed"
+    processed_dir.mkdir(parents=True, exist_ok=True)
+    
+    metadata = []
+    success_count = 0
+    fail_count = 0
+    
+    # Find all MIDI files
+    midi_files = list(input_dir.rglob("*.mid")) + list(input_dir.rglob("*.midi"))
+    
+    logger.info(f"Found {len(midi_files)} MIDI files")
+    
+    for midi_path in tqdm(midi_files, desc="Processing MIDI"):
+        try:
+            mid = mido.MidiFile(str(midi_path))
+            
+            # Extract note sequences
+            notes = []
+            current_time = 0
+            
+            for track in mid.tracks:
+                for msg in track:
+                    current_time += msg.time
+                    if msg.type == "note_on" and msg.velocity > 0:
+                        notes.append({
+                            "time": current_time,
+                            "pitch": msg.note,
+                            "velocity": msg.velocity,
+                            "channel": msg.channel,
+                        })
+            
+            if len(notes) < 10:
+                fail_count += 1
+                continue
+            
+            # Save processed notes
+            output_path = processed_dir / f"{midi_path.stem}.json"
+            with open(output_path, "w") as f:
+                json.dump({
+                    "notes": notes,
+                    "ticks_per_beat": mid.ticks_per_beat,
+                    "length": mid.length,
+                }, f)
+            
+            metadata.append({
+                "file": str(output_path.relative_to(output_dir)),
+                "original_file": midi_path.name,
+                "num_notes": len(notes),
+                "duration": mid.length,
+            })
+            success_count += 1
+            
+        except Exception as e:
+            logger.debug(f"Failed to process {midi_path}: {e}")
+            fail_count += 1
+    
+    # Save metadata
+    metadata_path = output_dir / "metadata.json"
+    with open(metadata_path, "w") as f:
+        json.dump({"samples": metadata}, f, indent=2)
+    
+    return success_count, fail_count
+
+
+def preprocess_instrument_dataset(
+    input_dir: Path,
+    output_dir: Path,
+    config: DatasetConfig,
+) -> Tuple[int, int]:
+    """Preprocess instrument dataset (e.g., NSynth)."""
+    from tqdm import tqdm
+    
+    processed_dir = output_dir / "processed"
+    processed_dir.mkdir(parents=True, exist_ok=True)
+    
+    # NSynth specific metadata file
+    nsynth_meta = input_dir / "examples.json"
+    if nsynth_meta.exists():
+        with open(nsynth_meta) as f:
+            examples = json.load(f)
+            
+        metadata = []
+        success_count = 0
+        fail_count = 0
+        
+        for key, info in tqdm(examples.items(), desc="Processing NSynth"):
+            audio_path = input_dir / "audio" / f"{key}.wav"
+            if not audio_path.exists():
+                fail_count += 1
+                continue
+                
+            # Create output path
+            instrument_family = info.get("instrument_family_str", "unknown")
+            output_path = processed_dir / instrument_family / f"{key}.wav"
+            
+            if preprocess_audio_file(
+                audio_path,
+                output_path,
+                target_sr=config.sample_rate,
+                max_duration=config.max_duration,
+            ):
+                metadata.append({
+                    "file": str(output_path.relative_to(output_dir)),
+                    "instrument_family": instrument_family,
+                    "pitch": info.get("pitch"),
+                    "velocity": info.get("velocity"),
+                    "source": info.get("instrument_source_str"),
+                })
+                success_count += 1
+            else:
+                fail_count += 1
+                
+        # Save metadata
+        metadata_path = output_dir / "metadata.json"
+        with open(metadata_path, "w") as f:
+            json.dump({"samples": metadata}, f, indent=2)
+            
+        return success_count, fail_count
+        
+    return 0, 0
+
+
+def preprocess_generic_dataset(
+    input_dir: Path,
+    output_dir: Path,
+    config: DatasetConfig,
+) -> Tuple[int, int]:
+    """Generic preprocessor for any audio files."""
+    from tqdm import tqdm
+    
+    processed_dir = output_dir / "processed"
+    processed_dir.mkdir(parents=True, exist_ok=True)
+    
+    metadata = []
+    success_count = 0
+    fail_count = 0
+    
+    # Find all audio files
+    extensions = [".wav", ".mp3", ".flac", ".ogg"]
+    audio_files = []
+    for ext in extensions:
+        audio_files.extend(list(input_dir.rglob(f"*{ext}")))
+    
+    logger.info(f"Found {len(audio_files)} audio files for generic processing")
+    
+    for audio_path in tqdm(audio_files, desc="Processing"):
+        # Create output path preserving some structure or just flattening
+        # For local music, we preserve relative structure
+        try:
+            rel_path = audio_path.relative_to(input_dir)
+            output_path = processed_dir / rel_path.with_suffix(".wav")
+        except ValueError:
+            output_path = processed_dir / f"{audio_path.stem}.wav"
+            
+        if preprocess_audio_file(
+            audio_path,
+            output_path,
+            target_sr=config.sample_rate,
+            max_duration=config.max_duration,
+        ):
+            metadata.append({
+                "file": str(output_path.relative_to(output_dir)),
+                "original_file": str(audio_path),
+                "label": "generic",
+            })
+            success_count += 1
+        else:
+            fail_count += 1
+            
+    # Save metadata
+    metadata_path = output_dir / "metadata.json"
+    with open(metadata_path, "w") as f:
+        json.dump({"samples": metadata}, f, indent=2)
+        
+    return success_count, fail_count
+
+
+def preprocess_dataset(dataset_name: str) -> bool:
+    """Preprocess a downloaded dataset."""
+    if dataset_name not in DATASETS:
+        logger.error(f"Unknown dataset: {dataset_name}")
+        return False
+    
+    config = DATASETS[dataset_name]
+    
+    input_dir = AUDIO_DATA_ROOT / "raw" / config.output_dir
+    output_dir = AUDIO_DATA_ROOT / "processed" / config.output_dir
+    
+    if not input_dir.exists():
+        logger.error(f"Dataset not downloaded: {input_dir}")
+        return False
+    
+    logger.info(f"Preprocessing: {config.name}")
+    
+    if config.task == "emotion":
+        success, fail = preprocess_emotion_dataset(input_dir, output_dir, config)
+    elif config.task == "instrument":
+        success, fail = preprocess_instrument_dataset(input_dir, output_dir, config)
+    elif config.task in ["melody", "harmony", "groove"]:
+        success, fail = preprocess_midi_dataset(input_dir, output_dir, config)
+    elif config.task in ["all", "source_separation"]:
+        success, fail = preprocess_generic_dataset(input_dir, output_dir, config)
     else:
-        logger.info("\n[2/7] No source directory provided, skipping import")
+        logger.error(f"Unknown task type: {config.task}")
+        return False
     
-    # 3. Auto-annotate
-    logger.info("\n[3/7] Auto-annotating samples...")
-    auto_annotate(dataset_id)
+    logger.info(f"Preprocessing complete: {success} success, {fail} failed")
+    return success > 0
+
+
+# =============================================================================
+# Dataset Statistics
+# =============================================================================
+
+def compute_dataset_stats(dataset_name: str) -> Dict[str, Any]:
+    """Compute statistics for a processed dataset."""
+    if dataset_name not in DATASETS:
+        return {}
     
-    # 4. Extract features
-    logger.info("\n[4/7] Extracting features...")
-    extract_features(dataset_id)
+    config = DATASETS[dataset_name]
+    processed_dir = AUDIO_DATA_ROOT / "processed" / config.output_dir
     
-    # 5. Augment
-    logger.info("\n[5/7] Augmenting data...")
-    augment_dataset(dataset_id, multiplier=augment_multiplier)
+    if not processed_dir.exists():
+        return {"error": "Dataset not processed"}
     
-    # 6. Generate synthetic
-    synthetic_count = int(target_samples * synthetic_ratio)
-    logger.info(f"\n[6/7] Generating {synthetic_count} synthetic samples...")
-    generate_synthetic(dataset_id, target_model, num_samples=synthetic_count)
+    metadata_path = processed_dir / "metadata.json"
+    if not metadata_path.exists():
+        return {"error": "Metadata not found"}
     
-    # 7. Validate
-    logger.info("\n[7/7] Validating dataset...")
-    is_valid = validate_dataset_cmd(dataset_id)
+    with open(metadata_path) as f:
+        metadata = json.load(f)
     
-    # Summary
-    print_stats(dataset_id)
+    samples = metadata.get("samples", [])
     
-    if is_valid:
-        logger.info("✅ Dataset preparation complete!")
-    else:
-        logger.warning("⚠️ Dataset has validation issues - review before training")
+    stats = {
+        "name": config.name,
+        "task": config.task,
+        "total_samples": len(samples),
+    }
+    
+    if config.task == "emotion":
+        # Count per emotion
+        emotion_counts = {}
+        for sample in samples:
+            emotion = sample.get("emotion", "unknown")
+            emotion_counts[emotion] = emotion_counts.get(emotion, 0) + 1
+        stats["emotion_distribution"] = emotion_counts
+    
+    return stats
 
 
 # =============================================================================
 # Main
 # =============================================================================
 
+def list_datasets():
+    """List available datasets."""
+    print("\n" + "=" * 70)
+    print("Available Datasets")
+    print("=" * 70)
+    
+    for name, config in DATASETS.items():
+        raw_dir = AUDIO_DATA_ROOT / "raw" / config.output_dir
+        processed_dir = AUDIO_DATA_ROOT / "processed" / config.output_dir
+        
+        status = "❌ Not downloaded"
+        if processed_dir.exists():
+            status = "✅ Processed"
+        elif raw_dir.exists():
+            status = "📦 Downloaded (not processed)"
+        
+        print(f"\n  {name}")
+        print(f"    Name: {config.name}")
+        print(f"    Task: {config.task}")
+        print(f"    Status: {status}")
+        print(f"    Description: {config.description}")
+    
+    print("\n" + "=" * 70)
+
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Kelly ML Dataset Preparation",
+        description="Prepare datasets for Kelly ML training",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-    # Create new dataset
-    python scripts/prepare_datasets.py --create --dataset emotion_dataset_v1 --target-model emotionrecognizer
-    
-    # Import files
-    python scripts/prepare_datasets.py --import-dir /path/to/midi --dataset emotion_dataset_v1
-    
-    # Run full pipeline
-    python scripts/prepare_datasets.py --all --dataset emotion_dataset_v1 --target-model emotionrecognizer
-    
-    # Generate synthetic data only
-    python scripts/prepare_datasets.py --synthesize --count 5000 --dataset emotion_dataset_v1 --target-model emotionrecognizer
-    
-    # Validate and show stats
-    python scripts/prepare_datasets.py --validate --stats --dataset emotion_dataset_v1
+    python scripts/prepare_datasets.py --list
+    python scripts/prepare_datasets.py --dataset emotion_ravdess --download
+    python scripts/prepare_datasets.py --dataset emotion_ravdess --preprocess
+    python scripts/prepare_datasets.py --dataset all --download --preprocess
         """,
     )
     
-    # Dataset selection
-    parser.add_argument("--dataset", type=str, default="emotion_dataset_v1",
-                       help="Dataset ID")
-    parser.add_argument("--target-model", type=str, default="emotionrecognizer",
-                       choices=["emotionrecognizer", "melodytransformer", "harmonypredictor", 
-                               "dynamicsengine", "groovepredictor"],
-                       help="Target model for the dataset")
-    
-    # Actions
-    parser.add_argument("--all", action="store_true",
-                       help="Run full pipeline")
-    parser.add_argument("--create", action="store_true",
-                       help="Create dataset structure")
-    parser.add_argument("--import-dir", type=str,
-                       help="Import files from directory")
-    parser.add_argument("--annotate", action="store_true",
-                       help="Auto-annotate samples")
-    parser.add_argument("--annotate-interactive", action="store_true",
-                       help="Interactively annotate samples")
-    parser.add_argument("--extract-features", action="store_true",
-                       help="Extract features")
-    parser.add_argument("--augment", action="store_true",
-                       help="Augment data")
-    parser.add_argument("--synthesize", action="store_true",
-                       help="Generate synthetic data")
-    parser.add_argument("--validate", action="store_true",
-                       help="Validate dataset")
-    parser.add_argument("--stats", action="store_true",
-                       help="Print statistics")
-    
-    # Options
-    parser.add_argument("--multiplier", type=int, default=10,
-                       help="Augmentation multiplier")
-    parser.add_argument("--count", type=int, default=5000,
-                       help="Number of synthetic samples")
-    parser.add_argument("--target-samples", type=int, default=1000,
-                       help="Target samples per category")
+    parser.add_argument("--list", action="store_true", help="List available datasets")
+    parser.add_argument("--dataset", type=str, help="Dataset name (or 'all')")
+    parser.add_argument("--download", action="store_true", help="Download dataset")
+    parser.add_argument("--preprocess", action="store_true", help="Preprocess dataset")
+    parser.add_argument("--stats", action="store_true", help="Show dataset statistics")
+    parser.add_argument("--sanitize", action="store_true", help="Sanitize dataset (check for silence/corruption)")
+    parser.add_argument("--golden", action="store_true", help="Mark this dataset as the 'Golden' validation set")
+    parser.add_argument("--pack", action="store_true", help="Pack dataset into LMDB for high-speed I/O")
     
     args = parser.parse_args()
     
-    # Ensure datasets directory exists
-    DATASETS_DIR.mkdir(parents=True, exist_ok=True)
+    # Check SSD is mounted
+    if not AUDIO_DATA_ROOT.parent.exists():
+        logger.error(f"External SSD not mounted: {AUDIO_DATA_ROOT.parent}")
+        logger.info("Please connect the external SSD and try again")
+        sys.exit(1)
     
-    # Run requested actions
-    if args.all:
-        source_dir = Path(args.import_dir) if args.import_dir else None
-        run_full_pipeline(
-            args.dataset,
-            args.target_model,
-            source_dir=source_dir,
-            target_samples=args.target_samples,
-            augment_multiplier=args.multiplier,
-        )
+    # Ensure directories exist
+    AUDIO_DATA_ROOT.mkdir(parents=True, exist_ok=True)
+    (AUDIO_DATA_ROOT / "raw").mkdir(exist_ok=True)
+    (AUDIO_DATA_ROOT / "processed").mkdir(exist_ok=True)
+    (AUDIO_DATA_ROOT / "downloads").mkdir(exist_ok=True)
+    
+    if args.list:
+        list_datasets()
+        return
+    
+    if not args.dataset:
+        parser.print_help()
+        return
+    
+    # Get datasets to process
+    if args.dataset == "all":
+        datasets = list(DATASETS.keys())
     else:
-        if args.create:
-            create_dataset(args.dataset, args.target_model)
+        if args.dataset not in DATASETS:
+            logger.error(f"Unknown dataset: {args.dataset}")
+            list_datasets()
+            sys.exit(1)
+        datasets = [args.dataset]
+    
+    # Process each dataset
+    for dataset_name in datasets:
+        logger.info(f"\n{'=' * 50}")
+        logger.info(f"Processing: {dataset_name}")
+        logger.info("=" * 50)
         
-        if args.import_dir:
-            import_files(Path(args.import_dir), args.dataset)
+        if args.download:
+            download_dataset(DATASETS[dataset_name])
         
-        if args.annotate:
-            auto_annotate(args.dataset)
+        if args.preprocess:
+            preprocess_dataset(dataset_name)
         
-        if args.annotate_interactive:
-            interactive_annotate(args.dataset)
-        
-        if args.extract_features:
-            extract_features(args.dataset)
-        
-        if args.augment:
-            augment_dataset(args.dataset, multiplier=args.multiplier)
-        
-        if args.synthesize:
-            generate_synthetic(args.dataset, args.target_model, num_samples=args.count)
-        
-        if args.validate:
-            validate_dataset_cmd(args.dataset)
+        if args.sanitize:
+            logger.info(f"Sanitizing: {dataset_name}")
+            config = DATASETS[dataset_name]
+            raw_dir = AUDIO_DATA_ROOT / "raw" / config.output_dir
+            if raw_dir.exists():
+                from scripts.sanitize_datasets import sanitize_directory
+                sanitize_directory(raw_dir, quarantine_path=raw_dir.parent / "quarantine")
+            else:
+                logger.error(f"Raw directory not found for {dataset_name}")
+
+        if args.golden:
+            logger.info(f"Setting {dataset_name} as Golden Validation Set...")
+            config = DATASETS[dataset_name]
+            processed_dir = AUDIO_DATA_ROOT / "processed" / config.output_dir
+            metadata_path = processed_dir / "metadata.json"
+            if metadata_path.exists():
+                golden_path = AUDIO_DATA_ROOT / "golden_manifest.json"
+                shutil.copy(metadata_path, golden_path)
+                logger.info(f"Golden manifest saved to {golden_path}")
+            else:
+                logger.error(f"Metadata not found for {dataset_name}. Process it first.")
+
+        if args.pack:
+            logger.info(f"Packing: {dataset_name} into LMDB...")
+            config = DATASETS[dataset_name]
+            raw_dir = AUDIO_DATA_ROOT / "raw" / config.output_dir
+            # Generate a manifest if it doesn't exist
+            manifest_path = raw_dir / "manifest.jsonl"
+            if not manifest_path.exists():
+                logger.info("Creating temporary manifest for packing...")
+                raw_dir.mkdir(parents=True, exist_ok=True)
+                with open(manifest_path, "w") as f:
+                    for audio_file in raw_dir.rglob("*.wav"):
+                        f.write(json.dumps({"audio": str(audio_file)}) + "\n")
+            
+            from scripts.pack_dataset import pack_dataset
+            db_path = AUDIO_DATA_ROOT / "packed" / dataset_name
+            db_path.mkdir(parents=True, exist_ok=True)
+            pack_dataset(str(manifest_path), str(db_path))
         
         if args.stats:
-            print_stats(args.dataset)
+            stats = compute_dataset_stats(dataset_name)
+            print(f"\nStatistics for {dataset_name}:")
+            print(json.dumps(stats, indent=2))
 
 
 if __name__ == "__main__":
     main()
-

@@ -1,0 +1,114 @@
+# =============================================================================
+# Chord Recognizer Training Configuration
+# =============================================================================
+# Task: Recognize chords from audio
+# Target: Real-time chord recognition (<10ms)
+# Architecture: CNN with chromagram input
+# =============================================================================
+
+# Model Identity
+model_id: chordrecognizer
+model_type: RTNeural
+task: chord_recognition
+
+# Architecture
+# Input: Chromagram (12 pitch classes × 32 frames)
+# Output: 170-dim (chord vocabulary)
+input_size: 384
+output_size: 170
+hidden_layers: [256, 128]
+activation: relu
+dropout: 0.3
+
+# Use CNN for chord patterns
+architecture_type: cnn
+cnn_config:
+  in_channels: 1
+  conv_layers:
+    - {out_channels: 32, kernel_size: [3, 5], stride: 1, padding: [1, 2]}
+    - {out_channels: 64, kernel_size: [3, 3], stride: 2, padding: 1}
+    - {out_channels: 128, kernel_size: [3, 3], stride: 2, padding: 1}
+  pool_type: adaptive_avg
+  fc_layers: [256, 128, 170]
+
+# Data Configuration
+data_path: /Volumes/Extreme SSD/kelly-audio-data/raw/chords
+data_version: v1
+sample_rate: 22050
+n_chroma: 12
+n_fft: 4096
+hop_length: 2048
+segment_frames: 32
+
+# Chord vocabulary
+chord_vocab:
+  roots: [C, C#, D, D#, E, F, F#, G, G#, A, A#, B]
+  qualities:
+    - maj
+    - min
+    - dim
+    - aug
+    - maj7
+    - min7
+    - 7
+    - dim7
+    - hdim7
+    - minmaj7
+    - maj6
+    - min6
+    - sus2
+    - sus4
+  special:
+    - N  # No chord
+    - X  # Unknown
+
+# Split ratios
+train_split: 0.8
+val_split: 0.1
+test_split: 0.1
+
+# Training Parameters (Mac-optimized)
+epochs: 120
+batch_size: 32
+learning_rate: 0.0005
+optimizer: adamw
+weight_decay: 0.01
+loss: cross_entropy
+scheduler: cosine_warmup
+warmup_epochs: 10
+
+# Early stopping
+early_stopping_patience: 15
+min_delta: 0.001
+
+# Mac-specific settings
+device: auto
+num_workers: 0
+pin_memory: false
+
+# Augmentation
+augmentation:
+  pitch_shift: [-6, 6]  # Transpose chords
+  time_stretch: [0.9, 1.1]
+  noise_injection: 0.01
+
+# Output
+output_dir: checkpoints/chord_recognizer
+export_onnx: true
+export_coreml: true
+
+# Logging
+log_interval: 20
+save_interval: 10
+
+# Evaluation metrics
+metrics:
+  - accuracy
+  - root_accuracy
+  - thirds_accuracy
+  - mirex_score
+
+# Metadata
+author: ""
+notes: "Chord recognition from chromagram features"
+

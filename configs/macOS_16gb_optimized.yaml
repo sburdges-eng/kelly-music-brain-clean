@@ -1,0 +1,47 @@
+# =============================================================================
+# macOS 16GB Optimized Training Configuration
+# =============================================================================
+# Optimized for: Apple Silicon (M1/M2/M3/M4) with 16GB RAM
+# Backend: MPS (Metal Performance Shaders)
+# =============================================================================
+
+device: mps
+precision: fp16
+seed: 42
+budget_limit: 100  # Maximum allowed cost in USD (placeholder)
+
+data:
+  sample_rate: 44100
+  n_mels: 128
+  hop_length: 512
+  segment_seconds: 8
+  num_workers: 0               # MPS works best with 0 workers (main thread)
+  cache_mels: true
+
+dataloader:
+  batch_size: 8                # Conservative for 16GB
+  shuffle: true
+  pin_memory: false            # Leave false for MPS
+  drop_last: true
+
+model:
+  backbone: htsat-small
+  embedding_dim: 256
+  dropout: 0.1
+
+optim:
+  name: adamw
+  lr: 3e-4
+  weight_decay: 0.01
+
+training:
+  epochs: 20
+  grad_accum_steps: 4          # Effective batch size = 32
+  log_every: 50
+  eval_every: 500
+  ema: false
+
+# Safety Settings
+ensure_model_copy: true        # Use a copy of the model for training
+output_dir: checkpoints/macos_16gb_optimized
+

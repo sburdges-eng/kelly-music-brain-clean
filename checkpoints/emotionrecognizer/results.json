@@ -1,0 +1,43 @@
+{
+  "config": {
+    "aug_noise": 0.2,
+    "aug_pitch_shift": 0.3,
+    "aug_time_stretch": 0.3,
+    "batch_size": 16,
+    "data_path": "",
+    "device": "auto",
+    "early_stopping_patience": 15,
+    "epochs": 1,
+    "focal_gamma": 2.0,
+    "label_smoothing": 0.1,
+    "learning_rate": 0.001,
+    "log_interval": 10,
+    "loss_type": "cross_entropy",
+    "max_duration": 5.0,
+    "model_id": "emotionrecognizer",
+    "model_type": "emotion",
+    "n_mels": 64,
+    "num_workers": 0,
+    "output_dir": "",
+    "sample_rate": 16000,
+    "save_best": true,
+    "test_split": 0.1,
+    "use_augmentation": true,
+    "val_split": 0.1,
+    "weight_decay": 0.0001
+  },
+  "results": {
+    "best_val_loss": 1.9490258523396082,
+    "total_time": 2.078333854675293,
+    "test_results": {
+      "accuracy": 0.1,
+      "per_class_accuracy": 0.14285714285714285,
+      "macro_f1": 0.025974025971617472,
+      "ece": 0.05212990343570709,
+      "mce": 0.05212990343570709,
+      "emotional_distance_error": 0.6341116336913688,
+      "va_accuracy": 0.39
+    }
+  },
+  "timestamp": "2025-12-23T08:10:59.524055"
+}

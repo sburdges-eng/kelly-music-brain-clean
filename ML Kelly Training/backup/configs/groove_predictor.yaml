@@ -1,0 +1,95 @@
+# =============================================================================
+# Groove Predictor Training Configuration
+# =============================================================================
+# Task: Predict groove/timing patterns for humanization
+# Target: Fast inference (<2ms) for real-time groove application
+# Architecture: Small RNN or MLP for timing prediction
+# =============================================================================
+
+# Model Identity
+model_id: groovepredictor
+model_type: RTNeural
+task: groove_prediction
+
+# Architecture
+# Input: 64-dim (note position, tempo, style context)
+# Output: 32-dim (timing offsets, velocity adjustments)
+input_size: 64
+output_size: 32
+hidden_layers: [128, 64]
+activation: tanh
+dropout: 0.15
+
+# Use small LSTM for temporal patterns
+architecture_type: lstm
+lstm_config:
+  hidden_size: 64
+  num_layers: 1
+  bidirectional: false
+  attention: false  # Keep simple for speed
+
+# Data Configuration
+# Data stored on external SSD for performance
+data_path: /Volumes/Extreme SSD/kelly-audio-data/raw/grooves
+data_version: v1
+
+# Groove representation
+groove_config:
+  timing_resolution: 480  # Ticks per quarter note
+  max_offset_ms: 50  # Maximum timing deviation
+  velocity_range: [-20, 20]  # Velocity adjustment range
+
+# Style categories
+style_categories:
+  - straight
+  - swing
+  - shuffle
+  - laid_back
+  - pushed
+  - funk
+  - jazz
+  - latin
+
+# Split ratios
+train_split: 0.8
+val_split: 0.1
+test_split: 0.1
+
+# Training Parameters (Mac-optimized)
+epochs: 60
+batch_size: 64
+learning_rate: 0.001
+optimizer: adam
+weight_decay: 0.0001
+loss: mse
+scheduler: step
+scheduler_step_size: 15
+scheduler_gamma: 0.5
+
+# Early stopping
+early_stopping_patience: 12
+min_delta: 0.0005
+
+# Mac-specific settings
+device: auto
+num_workers: 0
+pin_memory: false
+
+# Augmentation
+augmentation:
+  tempo_scale: [0.8, 1.2]
+  style_mixing: 0.1
+
+# Output
+output_dir: checkpoints/groove_predictor
+export_onnx: true
+export_coreml: true
+
+# Logging
+log_interval: 15
+save_interval: 5
+
+# Metadata
+author: ""
+notes: "Groove pattern prediction for MIDI humanization"
+

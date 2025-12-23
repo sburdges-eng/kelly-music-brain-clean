@@ -1,0 +1,97 @@
+# =============================================================================
+# Key Detector Training Configuration
+# =============================================================================
+# Task: Detect musical key from audio
+# Target: Fast inference (<5ms) for real-time key detection
+# Architecture: CNN with chromagram input
+# =============================================================================
+
+# Model Identity
+model_id: keydetector
+model_type: RTNeural
+task: key_detection
+
+# Architecture
+# Input: Chromagram (12 pitch classes × 128 frames)
+# Output: 24-dim (12 major + 12 minor keys)
+input_size: 12
+output_size: 24
+hidden_layers: [128, 64]
+activation: relu
+dropout: 0.2
+
+# Use CNN for temporal pitch patterns
+architecture_type: cnn
+cnn_config:
+  in_channels: 1
+  conv_layers:
+    - {out_channels: 32, kernel_size: [3, 5], stride: 1, padding: [1, 2]}
+    - {out_channels: 64, kernel_size: [3, 3], stride: 2, padding: 1}
+    - {out_channels: 128, kernel_size: [3, 3], stride: 2, padding: 1}
+  pool_type: adaptive_avg
+  fc_layers: [128, 64, 24]
+
+# Data Configuration
+data_path: /Volumes/Extreme SSD/kelly-audio-data/raw/keys
+data_version: v1
+sample_rate: 22050
+n_chroma: 12
+n_fft: 4096
+hop_length: 512
+max_duration: 30.0
+min_duration: 5.0
+
+# Key labels
+key_labels:
+  major: [C, C#, D, D#, E, F, F#, G, G#, A, A#, B]
+  minor: [Cm, C#m, Dm, D#m, Em, Fm, F#m, Gm, G#m, Am, A#m, Bm]
+
+# Split ratios
+train_split: 0.8
+val_split: 0.1
+test_split: 0.1
+
+# Training Parameters (Mac-optimized)
+epochs: 100
+batch_size: 32
+learning_rate: 0.001
+optimizer: adam
+weight_decay: 0.0001
+loss: cross_entropy
+scheduler: cosine
+warmup_epochs: 5
+
+# Early stopping
+early_stopping_patience: 15
+min_delta: 0.001
+
+# Mac-specific settings
+device: auto
+num_workers: 0
+pin_memory: false
+
+# Augmentation
+augmentation:
+  pitch_shift: [-6, 6]  # Transpose and adjust labels accordingly
+  time_stretch: [0.9, 1.1]
+  noise_injection: 0.01
+
+# Output
+output_dir: checkpoints/key_detector
+export_onnx: true
+export_coreml: true
+
+# Logging
+log_interval: 20
+save_interval: 10
+
+# Evaluation metrics
+metrics:
+  - accuracy
+  - fifth_accuracy  # Allow perfect fifth confusion
+  - relative_accuracy  # Allow relative major/minor confusion
+
+# Metadata
+author: ""
+notes: "Key detection from chromagram features"
+

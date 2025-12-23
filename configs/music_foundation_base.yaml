@@ -1,0 +1,52 @@
+# =============================================================================
+# Music Foundation Model Pre-training Configuration
+# =============================================================================
+# Task: Self-Supervised Learning (SSL) on 3 TB unlabeled audio
+# Target: High-quality music representation learning
+# Device: mps (Apple Silicon) or cuda (NVIDIA)
+# =============================================================================
+
+model_id: music_foundation
+device: auto
+precision: fp16
+seed: 42
+spending_limit_usd: 100.0
+use_streaming: true
+
+data:
+  train_manifest: /Volumes/Extreme SSD/kelly-audio-data/manifests/full_unlabeled.jsonl
+  sample_rate: 44100
+  segment_seconds: 5.0
+  manifest_audio_key: audio
+  num_workers: 4
+
+model:
+  backbone: htsat-small        # High-performance audio transformer
+  embedding_dim: 512
+  projection_dim: 128          # SSL projection head dim
+  dropout: 0.1
+
+optim:
+  name: adamw
+  lr: 1e-4
+  weight_decay: 0.01
+  betas: [0.9, 0.999]
+
+scheduler:
+  name: cosine_warmup
+  warmup_steps: 2000
+  max_steps: 100000
+
+training:
+  epochs: 50
+  batch_size: 16               # Keep small for 16GB RAM with streaming
+  grad_accum_steps: 4          # Effective batch size = 64
+  log_every: 50
+  eval_every: 500
+  ckpt_every: 1000
+  max_steps: 100000            # Total iterations for pre-training
+
+ssl:
+  temperature: 0.07            # InfoNCE temperature
+  augment_positive_pairs: true # Use random augmentations for positives
+

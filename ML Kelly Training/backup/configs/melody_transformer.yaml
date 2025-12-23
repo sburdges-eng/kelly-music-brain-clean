@@ -1,0 +1,105 @@
+# =============================================================================
+# Melody Transformer Training Configuration
+# =============================================================================
+# Task: Generate melodic sequences from seed notes and context
+# Target: Real-time melody suggestion (<5ms inference)
+# Architecture: Small transformer or LSTM for sequence generation
+# =============================================================================
+
+# Model Identity
+model_id: melodytransformer
+model_type: RTNeural
+task: melody_generation
+
+# Architecture
+# Input: 64-dim context (previous notes, harmony, rhythm)
+# Output: 128-dim note prediction (pitch, duration, velocity, timing)
+input_size: 64
+output_size: 128
+hidden_layers: [256, 256, 256]
+activation: gelu
+dropout: 0.2
+
+# Sequence model architecture
+architecture_type: lstm
+lstm_config:
+  hidden_size: 256
+  num_layers: 2
+  bidirectional: false
+  attention: true  # Add attention mechanism
+
+# Alternative: Small transformer (comment out lstm_config if using)
+# architecture_type: transformer
+# transformer_config:
+#   d_model: 128
+#   nhead: 4
+#   num_encoder_layers: 2
+#   dim_feedforward: 256
+#   max_seq_length: 64
+
+# Data Configuration
+# Audio/MIDI data stored on external SSD for performance
+data_path: /Volumes/Extreme SSD/kelly-audio-data/raw/melodies
+data_version: v1
+sequence_length: 32  # Notes per sequence
+note_representation: midi  # midi, piano_roll, or pitch_class
+
+# MIDI processing
+midi_config:
+  min_pitch: 36  # C2
+  max_pitch: 96  # C7
+  velocity_bins: 32
+  duration_bins: 64
+  quantize_to: 16  # 16th notes
+
+# Split ratios
+train_split: 0.8
+val_split: 0.1
+test_split: 0.1
+
+# Training Parameters (Mac-optimized)
+epochs: 150
+batch_size: 32
+learning_rate: 0.0005
+optimizer: adamw
+weight_decay: 0.01
+loss: cross_entropy  # For next-note prediction
+scheduler: cosine_warmup
+warmup_epochs: 10
+
+# Early stopping
+early_stopping_patience: 20
+min_delta: 0.0005
+
+# Mac-specific settings
+device: auto
+num_workers: 0
+pin_memory: false
+
+# Augmentation
+augmentation:
+  transpose: [-6, 6]  # semitones
+  tempo_scale: [0.8, 1.2]
+  velocity_jitter: 0.1
+
+# Output
+output_dir: checkpoints/melody_transformer
+export_onnx: true
+export_coreml: true
+
+# Generation settings (for inference)
+generation:
+  temperature: 0.8
+  top_k: 10
+  top_p: 0.9
+  max_length: 64
+
+# Logging
+log_interval: 20
+save_interval: 10
+log_midi_samples: true
+
+# Metadata
+author: ""
+notes: "Melody generation using LSTM with attention"
+

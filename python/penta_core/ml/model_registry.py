@@ -11,6 +11,11 @@ from enum import Enum
 import json
 import os
 
+try:
+    import jsonschema
+except ImportError:
+    jsonschema = None
+
 
 class ModelBackend(Enum):
     """Supported ML backends."""
@@ -19,10 +24,19 @@ class ModelBackend(Enum):
     COREML = "coreml"
     PYTORCH = "pytorch"
     TORCHSCRIPT = "torchscript"
+    RTNEURAL_JSON = "rtneural-json"
 
 
 class ModelTask(Enum):
     """Supported ML tasks."""
+    EMOTION_EMBEDDING = "emotion_embedding"
+    MELODY_GENERATION = "melody_generation"
+    HARMONY_PREDICTION = "harmony_prediction"
+    DYNAMICS_MAPPING = "dynamics_mapping"
+    GROOVE_PREDICTION = "groove_prediction"
+    INTENT_MAPPING = "intent_mapping"
+    AUDIO_CLASSIFICATION = "audio_classification"
+    CUSTOM = "custom"
     CHORD_PREDICTION = "chord_prediction"
     CHORD_DETECTION = "chord_detection"
     KEY_DETECTION = "key_detection"
@@ -253,12 +267,116 @@ class ModelRegistry:
         with open(path) as f:
             data = json.load(f)
 
+        # If this looks like the new manifest format, delegate to manifest loader
+        if "registry_version" in data or "$schema" in data:
+            self.load_registry_manifest(path, validate=False)
+            return
+
         for model_data in data.get("models", []):
             model = ModelInfo.from_dict(model_data)
             self.register(model)
 
         for dir_path in data.get("model_dirs", []):
             self.add_model_dir(dir_path)
+
+    # ------------------------------------------------------------------ #
+    # New manifest loader (registry.json / registry.schema.json)
+    # ------------------------------------------------------------------ #
+    def load_registry_manifest(
+        self,
+        path: str,
+        validate: bool = True,
+        schema_path: Optional[str] = None,
+    ) -> int:
+        """
+        Load a modern registry.json with schema validation.
+
+        Returns:
+            Number of models registered.
+        """
+        manifest_path = Path(path)
+        with open(manifest_path, "r", encoding="utf-8") as f:
+            manifest = json.load(f)
+
+        if validate and jsonschema is not None:
+            schema_file = (
+                Path(schema_path)
+                if schema_path
+                else manifest_path.parent / "registry.schema.json"
+            )
+            if schema_file.exists():
+                with open(schema_file, "r", encoding="utf-8") as sf:
+                    schema = json.load(sf)
+                jsonschema.validate(instance=manifest, schema=schema)
+
+        base_dir = manifest_path.parent
+        count = 0
+        for entry in manifest.get("models", []):
+            try:
+                model = self._modelinfo_from_manifest_entry(entry, base_dir)
+            except Exception:
+                # Skip malformed entries rather than crashing
+                continue
+            self.register(model)
+            count += 1
+        return count
+
+    # Helpers ----------------------------------------------------------- #
+    def _map_backend(self, fmt: str) -> ModelBackend:
+        fmt = (fmt or "").lower()
+        if fmt in ("onnx",):
+            return ModelBackend.ONNX
+        if fmt in ("coreml", "mlmodel"):
+            return ModelBackend.COREML
+        if fmt in ("pytorch", "torchscript"):
+            return ModelBackend.PYTORCH
+        if fmt in ("rtneural-json", "rtneural"):
+            return ModelBackend.RTNEURAL_JSON
+        if fmt in ("tflite", "tensorflow"):
+            return ModelBackend.TENSORFLOW_LITE
+        return ModelBackend.ONNX
+
+    def _map_task(self, task: str) -> ModelTask:
+        value = (task or "custom").lower()
+        for t in ModelTask:
+            if t.value == value:
+                return t
+        return ModelTask.CUSTOM
+
+    def _resolve_path(self, base_dir: Path, path_str: str) -> str:
+        if not path_str:
+            return ""
+        p = Path(path_str)
+        if p.is_absolute():
+            return str(p)
+        return str((base_dir / p).resolve())
+
+    def _modelinfo_from_manifest_entry(self, entry: Dict[str, Any], base_dir: Path) -> ModelInfo:
+        file_path = (
+            entry.get("onnx_path")
+            or entry.get("coreml_path")
+            or entry.get("file")
+            or ""
+        )
+        resolved_path = self._resolve_path(base_dir, file_path) if file_path else ""
+
+        input_size = entry.get("input_size")
+        output_size = entry.get("output_size")
+
+        return ModelInfo(
+            name=entry["id"],
+            task=self._map_task(entry.get("task")),
+            backend=self._map_backend(entry.get("format")),
+            path=resolved_path,
+            version=entry.get("version", "1.0.0"),
+            input_shape=[input_size] if input_size else None,
+            output_shape=[output_size] if output_size else None,
+            sample_rate=entry.get("sample_rate"),
+            latency_ms=entry.get("inference_target_ms"),
+            description=entry.get("note", ""),
+            license=entry.get("license", ""),
+            tags=[entry.get("status", "")] if entry.get("status") else [],
+        )
 
 
 # Singleton access functions
@@ -280,3 +398,17 @@ def get_model(name: str) -> Optional[ModelInfo]:
 def list_models(task: Optional[ModelTask] = None) -> List[ModelInfo]:
     """List models in the global registry."""
     return get_registry().list(task)
+
+
+def load_registry_manifest(
+    path: str,
+    validate: bool = True,
+    schema_path: Optional[str] = None,
+) -> int:
+    """
+    Load registry.json (schema-based) into the global registry.
+
+    Returns:
+        Number of models registered.
+    """
+    return get_registry().load_registry_manifest(path, validate=validate, schema_path=schema_path)

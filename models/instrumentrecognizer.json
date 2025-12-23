@@ -1,0 +1,115 @@
+{
+  "model_type": "RTNeural",
+  "model_id": "instrumentrecognizer",
+  "version": "0.1.0",
+  "task": "dual_instrument_recognition",
+  "description": "Dual-head instrument recognition: Technical (what/how) + Emotional (feel/expression)",
+  "input_size": 128,
+  "output_size": 160,
+  "architecture": "multi_head_cnn",
+  "trained": false,
+  "stub": true,
+
+  "backbone": {
+    "type": "cnn",
+    "layers": [
+      {"type": "conv2d", "in": 1, "out": 64, "kernel": 7, "stride": 2},
+      {"type": "conv2d", "in": 64, "out": 128, "kernel": 3, "stride": 2},
+      {"type": "conv2d", "in": 128, "out": 256, "kernel": 3, "stride": 2},
+      {"type": "conv2d", "in": 256, "out": 512, "kernel": 3, "stride": 2},
+      {"type": "adaptive_avg_pool"},
+      {"type": "flatten"},
+      {"type": "dense", "in": 512, "out": 512}
+    ]
+  },
+
+  "heads": {
+    "technical": {
+      "description": "What instrument + How it's played",
+      "layers": [
+        {"type": "dense", "in": 512, "out": 256, "activation": "relu"},
+        {"type": "dropout", "p": 0.3},
+        {"type": "dense", "in": 256, "out": 128, "activation": "relu"},
+        {"type": "dense", "in": 128, "out": 80}
+      ],
+      "outputs": {
+        "instrument_family": {"dim": 16, "type": "classification"},
+        "instrument_specific": {"dim": 32, "type": "classification"},
+        "technique": {"dim": 16, "type": "classification"},
+        "articulation": {"dim": 8, "type": "classification"},
+        "register": {"dim": 4, "type": "classification"},
+        "timbre_brightness": {"dim": 4, "type": "regression"}
+      }
+    },
+    "emotional": {
+      "description": "Expression + Feel + Sentiment",
+      "layers": [
+        {"type": "dense", "in": 512, "out": 256, "activation": "gelu"},
+        {"type": "dropout", "p": 0.25},
+        {"type": "dense", "in": 256, "out": 128, "activation": "gelu"},
+        {"type": "dense", "in": 128, "out": 80}
+      ],
+      "outputs": {
+        "expression_style": {"dim": 12, "type": "classification"},
+        "energy_level": {"dim": 8, "type": "ordinal"},
+        "musical_role": {"dim": 8, "type": "classification"},
+        "sentiment_valence": {"dim": 8, "type": "regression"},
+        "sentiment_arousal": {"dim": 8, "type": "regression"},
+        "dynamic_range": {"dim": 4, "type": "ordinal"},
+        "human_feel": {"dim": 8, "type": "regression"},
+        "vibrato_intensity": {"dim": 4, "type": "ordinal"},
+        "attack_character": {"dim": 8, "type": "regression"},
+        "sustain_character": {"dim": 8, "type": "regression"},
+        "genre_feel": {"dim": 4, "type": "classification"}
+      }
+    }
+  },
+
+  "labels": {
+    "instrument_families": [
+      "piano", "organ", "guitar", "strings_bowed", "strings_plucked",
+      "brass", "woodwind_reed", "woodwind_flute", "percussion_tuned",
+      "percussion_untuned", "synth_lead", "synth_pad", "synth_bass",
+      "voice", "ethnic", "electronic"
+    ],
+    "techniques": [
+      "sustained", "staccato", "legato", "tremolo", "trill", "glissando",
+      "vibrato", "bowed", "plucked", "picked", "strummed", "hammered",
+      "blown", "slapped", "palm_muted", "harmonics"
+    ],
+    "articulations": [
+      "normal", "accented", "marcato", "tenuto", "sforzando",
+      "pizzicato", "con_sordino", "flutter_tongue"
+    ],
+    "expression_styles": [
+      "aggressive", "gentle", "melancholic", "joyful", "mysterious",
+      "triumphant", "playful", "solemn", "passionate", "contemplative",
+      "anxious", "serene"
+    ],
+    "musical_roles": [
+      "lead_melody", "counter_melody", "harmony", "bass",
+      "rhythm", "pad", "accent", "ambient"
+    ]
+  },
+
+  "fallback": {
+    "method": "spectral_heuristics",
+    "description": "When model unavailable, use spectral analysis heuristics",
+    "features": [
+      "spectral_centroid → brightness → instrument family guess",
+      "attack_time → technique guess (fast=plucked, slow=bowed)",
+      "harmonic_ratio → instrument type (high=tonal, low=percussion)",
+      "rms_variance → energy level",
+      "pitch_stability → vibrato detection"
+    ]
+  },
+
+  "metadata": {
+    "created_at": "2025-12-23",
+    "author": "Kelly ML Pipeline",
+    "config_file": "configs/instrument_recognizer.yaml",
+    "feature_extractor": "python/penta_core/ml/datasets/instrument_features.py",
+    "synthetic_generator": "python/penta_core/ml/datasets/instrument_synthetic.py"
+  }
+}
+

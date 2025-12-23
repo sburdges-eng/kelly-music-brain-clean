@@ -1,0 +1,99 @@
+# =============================================================================
+# Emotion Recognizer Training Configuration
+# =============================================================================
+# Task: Classify audio emotion from mel spectrogram features
+# Target: Real-time inference (<5ms on Apple Silicon)
+# Architecture: Small CNN for mel spectrogram classification
+# =============================================================================
+
+# Model Identity
+model_id: emotionrecognizer
+model_type: RTNeural
+task: emotion_embedding
+
+# Architecture
+# Input: Mel spectrogram (64 mel bands × ~128 time frames)
+# Output: 64-dim emotion embedding vector
+input_size: 128
+output_size: 64
+hidden_layers: [512, 256, 128]
+activation: relu
+dropout: 0.3
+
+# Use CNN architecture for spectrograms
+architecture_type: cnn
+cnn_config:
+  in_channels: 1
+  conv_layers:
+    - {out_channels: 32, kernel_size: 3, stride: 1, padding: 1}
+    - {out_channels: 64, kernel_size: 3, stride: 2, padding: 1}
+    - {out_channels: 128, kernel_size: 3, stride: 2, padding: 1}
+  pool_type: adaptive_avg
+  fc_layers: [256, 128, 64]
+
+# Data Configuration
+# Audio data stored on external SSD for performance
+data_path: /Volumes/Extreme SSD/kelly-audio-data/raw/emotions
+data_version: v1
+sample_rate: 16000
+n_mels: 64
+n_fft: 1024
+hop_length: 256
+max_duration: 5.0  # 5 second clips
+min_duration: 1.0
+
+# Split ratios
+train_split: 0.8
+val_split: 0.1
+test_split: 0.1
+
+# Training Parameters (Mac-optimized)
+epochs: 100
+batch_size: 16  # Keep small for Mac RAM
+learning_rate: 0.001
+optimizer: adam
+weight_decay: 0.0001
+loss: cross_entropy  # For classification
+scheduler: cosine
+warmup_epochs: 5
+
+# Early stopping
+early_stopping_patience: 15
+min_delta: 0.001
+
+# Mac-specific settings
+device: auto  # Will use MPS on Apple Silicon, CPU on Intel
+num_workers: 0  # Required for Mac compatibility
+pin_memory: false
+
+# Augmentation
+augmentation:
+  time_stretch: [0.9, 1.1]
+  pitch_shift: [-2, 2]  # semitones
+  noise_injection: 0.01
+  mixup_alpha: 0.2
+
+# Output
+output_dir: checkpoints/emotion_recognizer
+export_onnx: true
+export_coreml: true
+
+# Logging
+log_interval: 10  # Log every N batches
+save_interval: 5  # Save checkpoint every N epochs
+log_audio_samples: true  # Log sample predictions
+
+# Labels (emotion categories)
+labels:
+  - happy
+  - sad
+  - angry
+  - fear
+  - surprise
+  - disgust
+  - neutral
+
+# Metadata
+author: ""
+notes: "Emotion recognition from audio mel spectrograms"
+
