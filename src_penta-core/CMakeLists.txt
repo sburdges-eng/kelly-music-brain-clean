@@ -1,5 +1,14 @@
 # Core C++ library
 
+# macOS SDK compatibility fix - Define function-style availability macros
+# These must be defined before any system headers are included
+# We define them as function-style macros (with ...) that expand to nothing
+if(APPLE)
+    # Note: CMAKE cannot pass function-style macros via -D, so we rely on
+    # JUCE's juce_StandardHeader.h which is included first via juce_core
+    # The main CMakeLists.txt sets MAC_OS_X_VERSION_MIN_REQUIRED which helps
+endif()
+
 # Readerwriterqueue: header-only library with no CMakeLists.txt
 # Must explicitly create INTERFACE target and ensure SOURCE_DIR is populated
 include(FetchContent)

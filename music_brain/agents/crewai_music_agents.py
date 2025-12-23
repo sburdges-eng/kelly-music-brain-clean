@@ -913,8 +913,6 @@ def get_llm_status(
     cfg = getattr(llm, "config", None)
     if cfg and hasattr(cfg, "base_url"):
         status["url"] = getattr(cfg, "base_url", None)
-    elif cfg and hasattr(cfg, "base_url"):
-        status["url"] = getattr(cfg, "base_url", None)
     return status
 
 

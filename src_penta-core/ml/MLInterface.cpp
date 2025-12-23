@@ -199,6 +199,7 @@ public:
 private:
     ModelType modelTypeFromId(const std::string& id) const {
         if (id == "chordpredictor") return ModelType::ChordPredictor;
+        if (id == "groovetransfer") return ModelType::GrooveTransfer;
         if (id == "groovepredictor") return ModelType::GroovePredictor;
         if (id == "keydetector") return ModelType::KeyDetector;
         if (id == "intentmapper") return ModelType::IntentMapper;
