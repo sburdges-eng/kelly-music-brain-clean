@@ -1,0 +1,130 @@
+name: C++ CI (Monorepo)
+
+on:
+  push:
+    branches: [main, develop, 'feature/**', 'copilot/**']
+    paths:
+      - 'packages/core/cpp/**'
+      - 'packages/desktop/**'
+      - 'packages/plugins/**'
+      - 'tests/cpp/**'
+      - 'CMakeLists.txt'
+      - '.github/workflows/ci-cpp.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'packages/core/cpp/**'
+      - 'packages/desktop/**'
+      - 'packages/plugins/**'
+      - 'tests/cpp/**'
+      - 'CMakeLists.txt'
+
+jobs:
+  build:
+    name: ${{ matrix.build_type }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        build_type: [Debug, Release]
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Install dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake \
+            ninja-build \
+            qt6-base-dev \
+            qt6-multimedia-dev \
+            libasound2-dev \
+            portaudio19-dev \
+            libsndfile1-dev \
+            libfftw3-dev \
+            ccache
+      
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install cmake ninja qt@6 portaudio libsndfile fftw ccache
+      
+      - name: Install dependencies (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          choco install cmake ninja
+      
+      - name: Setup ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ matrix.os }}-${{ matrix.build_type }}
+      
+      - name: Configure CMake
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DBUILD_TESTS=ON \
+            -DBUILD_PLUGINS=OFF \
+            -DBUILD_DESKTOP=ON
+      
+      - name: Build
+        run: |
+          cmake --build build --config ${{ matrix.build_type }} -j $(nproc)
+      
+      - name: Run tests
+        run: |
+          cd build
+          ctest --output-on-failure -C ${{ matrix.build_type }}
+      
+      - name: Upload build artifacts (Release only)
+        if: matrix.build_type == 'Release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: kelly-core-${{ matrix.os }}-${{ matrix.build_type }}
+          path: |
+            build/packages/core/cpp/libKellyCore.*
+            build/packages/desktop/KellyDesktop*
+          retention-days: 7
+  
+  static-analysis:
+    name: Static Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-tidy cppcheck
+      
+      - name: Run clang-tidy
+        run: |
+          find packages/core/cpp packages/desktop -name '*.cpp' -o -name '*.h' | \
+            xargs clang-tidy -p build || true
+        continue-on-error: true
+      
+      - name: Run cppcheck
+        run: |
+          cppcheck --enable=all --inconclusive --xml --xml-version=2 \
+            packages/core/cpp packages/desktop 2> cppcheck-report.xml || true
+        continue-on-error: true
+      
+      - name: Upload analysis reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-analysis-reports
+          path: |
+            cppcheck-report.xml
+          retention-days: 30

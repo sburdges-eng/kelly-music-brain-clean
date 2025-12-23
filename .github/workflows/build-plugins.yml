@@ -2,13 +2,23 @@ name: Build Plugins
 
 on:
   push:
-    branches: [ main, develop ]
+    tags:
+      - 'v*'
+    branches:
+      - main
+      - develop
   pull_request:
-    branches: [ main, develop ]
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+
+env:
+  BUILD_TYPE: Release
 
 jobs:
-  build-plugins:
-    name: Build Plugins
+  build-vst3:
+    name: Build VST3 on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read
@@ -17,45 +27,48 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: recursive
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-    - name: Install dependencies (Ubuntu)
-      if: runner.os == 'Linux'
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y cmake ninja-build libasound2-dev
+      - name: Install dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build libasound2-dev
 
-    - name: Install dependencies (macOS)
-      if: runner.os == 'macOS'
-      run: |
-        brew install cmake ninja
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install cmake ninja
 
-    - name: Install dependencies (Windows)
-      if: runner.os == 'Windows'
-      run: |
-        choco install cmake ninja
+      - name: Install dependencies (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          choco install cmake ninja
 
-    - name: Install Qt6
-      uses: jurplel/install-qt-action@v4
-      with:
-        version: '6.5.*'
-        cache: true
+      - name: Install Qt6
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.5.*'
+          cache: true
 
-    - name: Configure CMake
-      run: |
-        cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_PLUGINS=ON -DBUILD_TESTS=OFF
+      - name: Configure CMake
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
+            -DBUILD_PLUGINS=ON \
+            -DBUILD_TESTS=OFF \
+            -DBUILD_DESKTOP=OFF
 
-    - name: Build Plugins
-      run: |
-        cmake --build build --config Release --target KellyPlugin
+      - name: Build VST3
+        run: cmake --build build --config ${{ env.BUILD_TYPE }} --parallel
 
-    - name: Upload Plugin Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: kelly-plugin-${{ matrix.os }}
-        path: |
-          build/**/*.vst3
-          build/**/*.clap
-
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: vst3-plugins-${{ matrix.os }}
+          path: |
+            build/plugins/**/*.vst3
+            build/plugins/**/*.component
