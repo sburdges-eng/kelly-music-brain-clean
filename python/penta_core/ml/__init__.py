@@ -12,6 +12,10 @@ Supports:
 - Style transfer for groove
 - Emotion classification
 - Audio feature extraction
+- Mac-optimized training (MPS/CPU)
+- Model export (ONNX, Core ML, RTNeural)
+
+See docs/MK_TRAINING_GUIDELINES.md for training workflow.
 """
 
 from python.penta_core.ml.model_registry import (
@@ -49,6 +53,30 @@ from python.penta_core.ml.gpu_utils import (
     DeviceType,
 )
 
+# Training and export utilities (optional imports)
+try:
+    from python.penta_core.ml.audio_dataset import (
+        AudioDataset,
+        AudioDatasetTorch,
+        AudioSample,
+        create_dataloaders,
+        create_metadata_template,
+    )
+    _HAS_DATASET = True
+except ImportError:
+    _HAS_DATASET = False
+
+try:
+    from python.penta_core.ml.export import (
+        ModelExporter,
+        ExportConfig,
+        verify_onnx_model,
+        verify_coreml_model,
+    )
+    _HAS_EXPORT = True
+except ImportError:
+    _HAS_EXPORT = False
+
 __all__ = [
     # Registry
     "ModelRegistry",
@@ -76,3 +104,22 @@ __all__ = [
     "GPUDevice",
     "DeviceType",
 ]
+
+# Add dataset exports if available
+if _HAS_DATASET:
+    __all__.extend([
+        "AudioDataset",
+        "AudioDatasetTorch",
+        "AudioSample",
+        "create_dataloaders",
+        "create_metadata_template",
+    ])
+
+# Add export utilities if available
+if _HAS_EXPORT:
+    __all__.extend([
+        "ModelExporter",
+        "ExportConfig",
+        "verify_onnx_model",
+        "verify_coreml_model",
+    ])

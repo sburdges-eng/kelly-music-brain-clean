@@ -1,6 +1,8 @@
 {
-  "registry_version": "1.0",
+  "$schema": "./registry.schema.json",
+  "registry_version": "1.1",
   "generated_at": "2025-12-23T00:00:00Z",
+  "description": "Kelly ML model registry. See docs/MK_TRAINING_GUIDELINES.md for training workflow.",
   "models": [
     {
       "id": "emotionrecognizer",
@@ -13,10 +15,40 @@
       "status": "stub",
       "note": "Replace with trained model. Fallback heuristics otherwise.",
       "arch_hint": "128→512→256→128→64",
-      "training_data": "emotion_dataset_v1",
-      "sha256": "",
-      "onnx_path": "",
-      "coreml_path": "",
+      "params_estimate": "~500K",
+      "inference_target_ms": 5,
+      "training": {
+        "dataset_id": "emotion_dataset_v1",
+        "dataset_version": "",
+        "dataset_license": "",
+        "epochs": 0,
+        "batch_size": 0,
+        "learning_rate": 0,
+        "optimizer": "",
+        "loss": "",
+        "train_loss": 0,
+        "val_loss": 0,
+        "test_loss": 0,
+        "run_id": "",
+        "git_commit": "",
+        "training_date": "",
+        "hardware": "",
+        "duration_seconds": 0
+      },
+      "exports": {
+        "sha256": "",
+        "onnx_path": "",
+        "onnx_sha256": "",
+        "coreml_path": "",
+        "coreml_sha256": ""
+      },
+      "integration": {
+        "python_api": false,
+        "cpp_mlinterface": false,
+        "tauri_ui": false,
+        "fallback_available": true
+      },
+      "model_card": "docs/model_cards/emotionrecognizer.md",
       "license": ""
     },
     {
@@ -30,10 +62,40 @@
       "status": "stub",
       "note": "Replace with trained model. Fallback heuristics otherwise.",
       "arch_hint": "64→256→256→256→128",
-      "training_data": "midi_melody_dataset_v1",
-      "sha256": "",
-      "onnx_path": "",
-      "coreml_path": "",
+      "params_estimate": "~400K",
+      "inference_target_ms": 5,
+      "training": {
+        "dataset_id": "midi_melody_dataset_v1",
+        "dataset_version": "",
+        "dataset_license": "",
+        "epochs": 0,
+        "batch_size": 0,
+        "learning_rate": 0,
+        "optimizer": "",
+        "loss": "",
+        "train_loss": 0,
+        "val_loss": 0,
+        "test_loss": 0,
+        "run_id": "",
+        "git_commit": "",
+        "training_date": "",
+        "hardware": "",
+        "duration_seconds": 0
+      },
+      "exports": {
+        "sha256": "",
+        "onnx_path": "",
+        "onnx_sha256": "",
+        "coreml_path": "",
+        "coreml_sha256": ""
+      },
+      "integration": {
+        "python_api": false,
+        "cpp_mlinterface": false,
+        "tauri_ui": false,
+        "fallback_available": true
+      },
+      "model_card": "docs/model_cards/melodytransformer.md",
       "license": ""
     },
     {
@@ -47,10 +109,40 @@
       "status": "stub",
       "note": "Replace with trained model. Fallback heuristics otherwise.",
       "arch_hint": "128→256→128→64",
-      "training_data": "chord_progression_dataset_v1",
-      "sha256": "",
-      "onnx_path": "",
-      "coreml_path": "",
+      "params_estimate": "~100K",
+      "inference_target_ms": 3,
+      "training": {
+        "dataset_id": "chord_progression_dataset_v1",
+        "dataset_version": "",
+        "dataset_license": "",
+        "epochs": 0,
+        "batch_size": 0,
+        "learning_rate": 0,
+        "optimizer": "",
+        "loss": "",
+        "train_loss": 0,
+        "val_loss": 0,
+        "test_loss": 0,
+        "run_id": "",
+        "git_commit": "",
+        "training_date": "",
+        "hardware": "",
+        "duration_seconds": 0
+      },
+      "exports": {
+        "sha256": "",
+        "onnx_path": "",
+        "onnx_sha256": "",
+        "coreml_path": "",
+        "coreml_sha256": ""
+      },
+      "integration": {
+        "python_api": false,
+        "cpp_mlinterface": false,
+        "tauri_ui": false,
+        "fallback_available": true
+      },
+      "model_card": "docs/model_cards/harmonypredictor.md",
       "license": ""
     },
     {
@@ -64,10 +156,40 @@
       "status": "stub",
       "note": "Replace with trained model. Fallback heuristics otherwise.",
       "arch_hint": "32→128→64→16",
-      "training_data": "expression_dataset_v1",
-      "sha256": "",
-      "onnx_path": "",
-      "coreml_path": "",
+      "params_estimate": "~20K",
+      "inference_target_ms": 1,
+      "training": {
+        "dataset_id": "expression_dataset_v1",
+        "dataset_version": "",
+        "dataset_license": "",
+        "epochs": 0,
+        "batch_size": 0,
+        "learning_rate": 0,
+        "optimizer": "",
+        "loss": "",
+        "train_loss": 0,
+        "val_loss": 0,
+        "test_loss": 0,
+        "run_id": "",
+        "git_commit": "",
+        "training_date": "",
+        "hardware": "",
+        "duration_seconds": 0
+      },
+      "exports": {
+        "sha256": "",
+        "onnx_path": "",
+        "onnx_sha256": "",
+        "coreml_path": "",
+        "coreml_sha256": ""
+      },
+      "integration": {
+        "python_api": false,
+        "cpp_mlinterface": false,
+        "tauri_ui": false,
+        "fallback_available": true
+      },
+      "model_card": "docs/model_cards/dynamicsengine.md",
       "license": ""
     },
     {
@@ -81,10 +203,40 @@
       "status": "stub",
       "note": "Replace with trained model. Fallback heuristics otherwise.",
       "arch_hint": "64→128→64→32",
-      "training_data": "groove_dataset_v1",
-      "sha256": "",
-      "onnx_path": "",
-      "coreml_path": "",
+      "params_estimate": "~25K",
+      "inference_target_ms": 2,
+      "training": {
+        "dataset_id": "groove_dataset_v1",
+        "dataset_version": "",
+        "dataset_license": "",
+        "epochs": 0,
+        "batch_size": 0,
+        "learning_rate": 0,
+        "optimizer": "",
+        "loss": "",
+        "train_loss": 0,
+        "val_loss": 0,
+        "test_loss": 0,
+        "run_id": "",
+        "git_commit": "",
+        "training_date": "",
+        "hardware": "",
+        "duration_seconds": 0
+      },
+      "exports": {
+        "sha256": "",
+        "onnx_path": "",
+        "onnx_sha256": "",
+        "coreml_path": "",
+        "coreml_sha256": ""
+      },
+      "integration": {
+        "python_api": false,
+        "cpp_mlinterface": false,
+        "tauri_ui": false,
+        "fallback_available": true
+      },
+      "model_card": "docs/model_cards/groovepredictor.md",
       "license": ""
     }
   ]

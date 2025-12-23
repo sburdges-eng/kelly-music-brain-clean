@@ -1,0 +1,93 @@
+# =============================================================================
+# Dynamics Engine Training Configuration
+# =============================================================================
+# Task: Map musical context to dynamic/expression parameters
+# Target: Ultra-fast inference (<1ms) for real-time expression
+# Architecture: Tiny MLP for parameter mapping
+# =============================================================================
+
+# Model Identity
+model_id: dynamicsengine
+model_type: RTNeural
+task: dynamics_mapping
+
+# Architecture (intentionally small for speed)
+# Input: 32-dim (note velocity, position, context)
+# Output: 16-dim (velocity curve, attack, release, expression)
+input_size: 32
+output_size: 16
+hidden_layers: [128, 64]
+activation: tanh  # Bounded output
+dropout: 0.1
+
+# Use tiny MLP
+architecture_type: mlp
+mlp_config:
+  hidden_sizes: [128, 64]
+  batch_norm: false  # Skip for speed
+  residual: false
+
+# Data Configuration
+# Data stored on external SSD for performance
+data_path: /Volumes/Extreme SSD/kelly-audio-data/raw/expression
+data_version: v1
+
+# Expression parameters
+expression_config:
+  velocity_range: [0, 127]
+  attack_range: [0, 1]  # Normalized
+  release_range: [0, 1]
+  expression_range: [0, 1]
+
+# Context features
+context_features:
+  - note_velocity
+  - note_duration
+  - position_in_bar
+  - position_in_phrase
+  - surrounding_velocities
+  - tempo
+  - time_signature
+
+# Split ratios
+train_split: 0.8
+val_split: 0.1
+test_split: 0.1
+
+# Training Parameters (Mac-optimized)
+epochs: 50
+batch_size: 128  # Large batch for small model
+learning_rate: 0.002
+optimizer: adam
+weight_decay: 0.0001
+loss: mse  # Regression task
+scheduler: cosine
+warmup_epochs: 3
+
+# Early stopping
+early_stopping_patience: 10
+min_delta: 0.0001
+
+# Mac-specific settings
+device: auto
+num_workers: 0
+pin_memory: false
+
+# Augmentation
+augmentation:
+  velocity_jitter: 0.05
+  tempo_scale: [0.9, 1.1]
+
+# Output
+output_dir: checkpoints/dynamics_engine
+export_onnx: true
+export_coreml: true
+
+# Logging
+log_interval: 20
+save_interval: 5
+
+# Metadata
+author: ""
+notes: "Expression parameter prediction for humanization"
+

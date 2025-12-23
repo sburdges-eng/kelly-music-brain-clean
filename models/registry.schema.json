@@ -1,0 +1,249 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/daiw/kelly/models/registry.schema.json",
+  "title": "Kelly ML Model Registry",
+  "description": "Schema for models/registry.json per MK_TRAINING_GUIDELINES.md",
+  "type": "object",
+  "required": ["registry_version", "models"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference"
+    },
+    "registry_version": {
+      "type": "string",
+      "description": "Registry format version",
+      "pattern": "^[0-9]+\\.[0-9]+$"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp"
+    },
+    "description": {
+      "type": "string",
+      "description": "Registry description"
+    },
+    "models": {
+      "type": "array",
+      "description": "List of model entries",
+      "items": {
+        "$ref": "#/definitions/ModelEntry"
+      }
+    }
+  },
+  "definitions": {
+    "ModelEntry": {
+      "type": "object",
+      "required": ["id", "file", "format", "task", "input_size", "output_size", "status"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique model identifier (lowercase, no spaces)",
+          "pattern": "^[a-z0-9_]+$"
+        },
+        "file": {
+          "type": "string",
+          "description": "Model weights filename"
+        },
+        "format": {
+          "type": "string",
+          "enum": ["rtneural-json", "onnx", "coreml", "pytorch", "tensorflow"],
+          "description": "Primary model format"
+        },
+        "model_type": {
+          "type": "string",
+          "description": "Framework/runtime type"
+        },
+        "task": {
+          "type": "string",
+          "enum": [
+            "emotion_embedding",
+            "melody_generation",
+            "harmony_prediction",
+            "dynamics_mapping",
+            "groove_prediction",
+            "key_detection",
+            "intent_mapping",
+            "audio_classification",
+            "custom"
+          ],
+          "description": "Model task type"
+        },
+        "input_size": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Input feature vector size"
+        },
+        "output_size": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Output vector size"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["stub", "training", "trained", "production", "deprecated"],
+          "description": "Model lifecycle status"
+        },
+        "note": {
+          "type": "string",
+          "description": "Human-readable note"
+        },
+        "arch_hint": {
+          "type": "string",
+          "description": "Architecture summary (e.g., 128→256→64)"
+        },
+        "params_estimate": {
+          "type": "string",
+          "description": "Approximate parameter count"
+        },
+        "inference_target_ms": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Target inference latency in milliseconds"
+        },
+        "training": {
+          "$ref": "#/definitions/TrainingMetadata"
+        },
+        "exports": {
+          "$ref": "#/definitions/ExportMetadata"
+        },
+        "integration": {
+          "$ref": "#/definitions/IntegrationStatus"
+        },
+        "model_card": {
+          "type": "string",
+          "description": "Path to model card markdown file"
+        },
+        "license": {
+          "type": "string",
+          "description": "Model license identifier"
+        }
+      }
+    },
+    "TrainingMetadata": {
+      "type": "object",
+      "description": "Training run metadata",
+      "properties": {
+        "dataset_id": {
+          "type": "string",
+          "description": "Dataset identifier"
+        },
+        "dataset_version": {
+          "type": "string",
+          "description": "Dataset version or commit"
+        },
+        "dataset_license": {
+          "type": "string",
+          "description": "Dataset license"
+        },
+        "epochs": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of training epochs"
+        },
+        "batch_size": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Training batch size"
+        },
+        "learning_rate": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Learning rate"
+        },
+        "optimizer": {
+          "type": "string",
+          "description": "Optimizer used"
+        },
+        "loss": {
+          "type": "string",
+          "description": "Loss function"
+        },
+        "train_loss": {
+          "type": "number",
+          "description": "Final training loss"
+        },
+        "val_loss": {
+          "type": "number",
+          "description": "Final validation loss"
+        },
+        "test_loss": {
+          "type": "number",
+          "description": "Final test loss"
+        },
+        "run_id": {
+          "type": "string",
+          "description": "Training run identifier"
+        },
+        "git_commit": {
+          "type": "string",
+          "description": "Git commit SHA at training time"
+        },
+        "training_date": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Training completion date"
+        },
+        "hardware": {
+          "type": "string",
+          "description": "Training hardware"
+        },
+        "duration_seconds": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Training duration in seconds"
+        }
+      }
+    },
+    "ExportMetadata": {
+      "type": "object",
+      "description": "Exported model artifacts",
+      "properties": {
+        "sha256": {
+          "type": "string",
+          "description": "SHA256 hash of primary model file"
+        },
+        "onnx_path": {
+          "type": "string",
+          "description": "Path to ONNX export"
+        },
+        "onnx_sha256": {
+          "type": "string",
+          "description": "SHA256 hash of ONNX file"
+        },
+        "coreml_path": {
+          "type": "string",
+          "description": "Path to Core ML export"
+        },
+        "coreml_sha256": {
+          "type": "string",
+          "description": "SHA256 hash of Core ML file"
+        }
+      }
+    },
+    "IntegrationStatus": {
+      "type": "object",
+      "description": "Integration verification status",
+      "properties": {
+        "python_api": {
+          "type": "boolean",
+          "description": "Verified in music_brain Python API"
+        },
+        "cpp_mlinterface": {
+          "type": "boolean",
+          "description": "Verified in C++ MLInterface"
+        },
+        "tauri_ui": {
+          "type": "boolean",
+          "description": "Verified in Tauri UI"
+        },
+        "fallback_available": {
+          "type": "boolean",
+          "description": "Heuristic fallback exists"
+        }
+      }
+    }
+  }
+}
+
