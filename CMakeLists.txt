@@ -69,6 +69,28 @@ if(NOT TARGET readerwriterqueue)
 endif()
 
 # ============================================================================
+# Penta-Core Library (C++ RT engines)
+# ============================================================================
+add_subdirectory(src_penta-core)
+
+# ============================================================================
+# Python Bindings (Optional)
+# ============================================================================
+option(BUILD_PYTHON_BINDINGS "Build Python bindings for penta-core" ON)
+
+if(BUILD_PYTHON_BINDINGS)
+    # Find pybind11
+    find_package(pybind11 QUIET)
+    if(pybind11_FOUND)
+        message(STATUS "pybind11 found, building Python bindings")
+        add_subdirectory(bindings)
+    else()
+        message(STATUS "pybind11 not found. Python bindings will not be built.")
+        message(STATUS "  Install via: pip install pybind11")
+    endif()
+endif()
+
+# ============================================================================
 # ML Dependencies (Optional)
 # ============================================================================
 
