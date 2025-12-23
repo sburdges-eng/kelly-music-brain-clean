@@ -69,6 +69,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: vst3-plugins-${{ matrix.os }}
+          if-no-files-found: error
           path: |
-            build/plugins/**/*.vst3
-            build/plugins/**/*.component
+            build/**/*.vst3
+            build/**/*.component
