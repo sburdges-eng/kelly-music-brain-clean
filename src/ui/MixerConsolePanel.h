@@ -31,6 +31,7 @@
 #include "../music_theory/MusicTheoryBrain.h"
 #include <memory>
 #include <vector>
+#include <string>
 
 namespace midikompanion {
 
@@ -64,6 +65,7 @@ public:
     float getPan() const { return pan_; }
     bool isMuted() const { return muted_; }
     bool isSoloed() const { return soloed_; }
+    const std::string& getName() const { return channelName_; }
 
     //==========================================================================
     // EQ Controls (3-band)
@@ -92,6 +94,11 @@ public:
     void setCompressorAttack(float ms);
     void setCompressorRelease(float ms);
     void setCompressorMakeupGain(float db);
+    void setEQVisible(bool show);
+    void setCompressorVisible(bool show);
+    void setInsertVisible(bool show);
+    void setSendsVisible(bool show);
+    void setMetersVisible(bool show);
 
     //==========================================================================
     // Insert Effects
@@ -107,6 +114,7 @@ public:
     void addInsertEffect(InsertSlot slot, const std::string& effectName);
     void removeInsertEffect(InsertSlot slot);
     void bypassInsertEffect(InsertSlot slot, bool bypassed);
+    std::vector<std::string> getInsertEffectNames() const;
 
     //==========================================================================
     // Send Effects
@@ -407,6 +415,7 @@ private:
     //==========================================================================
 
     std::vector<std::unique_ptr<ChannelStrip>> channels_;
+    std::map<int, juce::MidiBuffer> channelMidi_;
     std::vector<std::string> channelInstruments_;
     std::map<int, std::vector<AutomationPoint>> automation_;
     std::vector<MixerSnapshot> snapshots_;

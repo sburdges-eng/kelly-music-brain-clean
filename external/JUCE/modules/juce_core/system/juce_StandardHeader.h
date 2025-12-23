@@ -23,6 +23,66 @@
 #pragma once
 
 //==============================================================================
+// macOS SDK 26.2+ compatibility fix for __CLOCK_AVAILABILITY and __API_AVAILABLE
+// The SDK headers use these macros in function declarations and enum definitions.
+// For compatibility with older toolchains and to avoid complex availability checks,
+// we define these macros to be empty, which allows the code to compile on all versions.
+#if (defined(__APPLE__) || defined(__APPLE_CPP__) || defined(__APPLE_CC__))
+ #ifndef TARGET_OS_MAC
+  #include <TargetConditionals.h>
+ #endif
+ // Set deployment target macros if not already set (required for system headers)
+ // MIN_REQUIRED sets the minimum macOS version we support (10.12 = Sierra)
+ #ifndef MAC_OS_X_VERSION_MIN_REQUIRED
+  #define MAC_OS_X_VERSION_MIN_REQUIRED MAC_OS_X_VERSION_10_12
+ #endif
+ // Define SDK compatibility macros to empty to avoid compilation issues
+ // This allows modern SDK headers to compile with older deployment targets
+ #ifndef __CLOCK_AVAILABILITY
+  #define __CLOCK_AVAILABILITY
+ #endif
+ #ifndef __API_AVAILABLE
+  #define __API_AVAILABLE(...)
+ #endif
+ #ifndef __API_DEPRECATED
+  #define __API_DEPRECATED(...)
+ #endif
+ #ifndef __API_UNAVAILABLE
+  #define __API_UNAVAILABLE(...)
+ #endif
+ #ifndef __OSX_AVAILABLE
+  #define __OSX_AVAILABLE(...)
+ #endif
+ #ifndef __OSX_AVAILABLE_STARTING
+  #define __OSX_AVAILABLE_STARTING(...)
+ #endif
+ #ifndef __OSX_AVAILABLE_BUT_DEPRECATED
+  #define __OSX_AVAILABLE_BUT_DEPRECATED(...)
+ #endif
+ #ifndef __OSX_AVAILABLE_BUT_DEPRECATED_MSG
+  #define __OSX_AVAILABLE_BUT_DEPRECATED_MSG(...)
+ #endif
+ #ifndef __WATCHOS_PROHIBITED
+  #define __WATCHOS_PROHIBITED
+ #endif
+ #ifndef __TVOS_PROHIBITED
+  #define __TVOS_PROHIBITED
+ #endif
+ #ifndef __DARWIN_1050
+  #define __DARWIN_1050(...)
+ #endif
+ #ifndef __IOS_AVAILABLE
+  #define __IOS_AVAILABLE(...)
+ #endif
+ #ifndef __TVOS_AVAILABLE
+  #define __TVOS_AVAILABLE(...)
+ #endif
+ #ifndef __WATCHOS_AVAILABLE
+  #define __WATCHOS_AVAILABLE(...)
+ #endif
+#endif
+
+//==============================================================================
 /** Current JUCE version number.
 
     See also SystemStats::getJUCEVersion() for a string version.
@@ -47,39 +107,35 @@
 #endif
 
 //==============================================================================
-#include <algorithm>
-#include <array>
-#include <atomic>
-#include <cmath>
-#include <condition_variable>
-#include <cstddef>
-#include <functional>
-#include <future>
-#include <iomanip>
-#include <iostream>
-#include <limits>
-#include <list>
-#include <map>
-#include <memory>
-#include <mutex>
-#include <numeric>
-#include <optional>
-#include <queue>
-#include <set>
-#include <sstream>
-#include <string_view>
-#include <thread>
-#include <typeindex>
-#include <unordered_map>
-#include <unordered_set>
-#include <utility>
-#include <variant>
-#include <vector>
-
-//==============================================================================
 #include "juce_CompilerSupport.h"
 #include "juce_CompilerWarnings.h"
 #include "juce_PlatformDefs.h"
+
+//==============================================================================
+// Essential C++ Standard Library headers required by JUCE core
+#include <type_traits>
+#include <utility>
+#include <memory>
+#include <cstddef>
+#include <algorithm>
+#include <sstream>
+#include <iomanip>
+#include <iostream>
+#include <map>
+#include <set>
+#include <vector>
+#include <string>
+#include <limits>
+#include <cmath>
+#include <list>
+#include <typeindex>
+#include <functional>
+#include <array>
+#include <unordered_map>
+#include <optional>
+#include <atomic>
+#include <numeric>
+#include <future>
 
 //==============================================================================
 // Now we'll include some common OS headers..
