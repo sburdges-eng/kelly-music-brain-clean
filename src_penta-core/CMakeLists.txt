@@ -1,5 +1,23 @@
 # Core C++ library
 
+include(FetchContent)
+if(NOT TARGET readerwriterqueue)
+    FetchContent_Declare(
+        readerwriterqueue
+        GIT_REPOSITORY https://github.com/cameron314/readerwriterqueue.git
+        GIT_TAG v1.0.6
+        GIT_SHALLOW TRUE
+    )
+    FetchContent_MakeAvailable(readerwriterqueue)
+
+    if(NOT TARGET readerwriterqueue)
+        add_library(readerwriterqueue INTERFACE)
+        target_include_directories(readerwriterqueue INTERFACE
+            ${readerwriterqueue_SOURCE_DIR}
+        )
+    endif()
+endif()
+
 set(PENTA_CORE_SOURCES
     # Common utilities
     common/RTMemoryPool.cpp
@@ -72,8 +90,11 @@ target_include_directories(penta_core PUBLIC
 )
 
 target_link_libraries(penta_core PUBLIC
-    oscpack
     readerwriterqueue
+    juce::juce_core
+    juce::juce_audio_devices
+    juce::juce_dsp
+    juce::juce_osc
 )
 
 # Enable AVX2 SIMD optimizations if available

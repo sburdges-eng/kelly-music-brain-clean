@@ -23,8 +23,10 @@ React UI → Tauri command → HTTP → Music Brain API → JSON response → UI
 - Python 3.9+ with `pip` (virtualenv recommended)
 
 ## Setup
+
+From the repository root:
+
 ```bash
-cd "/Volumes/Extreme SSD/kelly-clean"
 npm install
 python -m pip install -e ".[dev]"
 ```

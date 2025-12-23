@@ -6,6 +6,16 @@ functionality, making it easier to integrate with desktop apps, web services,
 or other interfaces.
 """
 from typing import Dict, List, Optional, Any, Tuple
+import sys
+import logging
+
+try:
+    from fastapi import FastAPI, HTTPException
+    from pydantic import BaseModel
+    import uvicorn
+    FASTAPI_AVAILABLE = True
+except ImportError:  # pragma: no cover - optional dependency
+    FASTAPI_AVAILABLE = False
 from pathlib import Path
 import tempfile
 import os
@@ -55,6 +65,7 @@ from music_brain.session.intent_schema import (
     list_all_rules,
 )
 from music_brain.session.intent_processor import process_intent
+from music_brain.data.emotional_mapping import EMOTIONAL_PRESETS
 from music_brain.voice import (
     AutoTuneProcessor,
     AutoTuneSettings,
@@ -579,4 +590,93 @@ class DAiWAPI:
 api = DAiWAPI()
 
 __all__ = ['DAiWAPI', 'api']
+
+
+# ---------- Minimal HTTP API (FastAPI) ----------
+# This provides the server that `python -m music_brain.api` is expected to start.
+
+if FASTAPI_AVAILABLE:
+    class TechnicalIntent(BaseModel):
+        key: Optional[str] = None
+        bpm: Optional[int] = None
+        progression: Optional[List[str]] = None
+        genre: Optional[str] = None
+
+    class EmotionalIntent(BaseModel):
+        core_wound: Optional[str] = None
+        core_desire: Optional[str] = None
+        emotional_intent: str
+        technical: Optional[TechnicalIntent] = None
+
+    class GenerateRequest(BaseModel):
+        intent: EmotionalIntent
+        output_format: Optional[str] = None
+
+    class InterrogateRequest(BaseModel):
+        message: str
+        session_id: Optional[str] = None
+        context: Optional[Dict[str, Any]] = None
+
+    app = FastAPI(title="Music Brain API", version="0.1.0")
+
+    @app.get("/health")
+    async def health():
+        return {"status": "ok", "version": "0.1.0"}
+
+    @app.get("/emotions")
+    async def list_emotions():
+        try:
+            return sorted(EMOTIONAL_PRESETS.keys())
+        except Exception as exc:  # pragma: no cover
+            logging.exception("Failed to list emotions")
+            raise HTTPException(status_code=500, detail=str(exc))
+
+    @app.post("/generate")
+    async def generate_music(request: GenerateRequest):
+        try:
+            # Map the simple intent into the therapy session pipeline
+            chaos = 0.5
+            motivation = 7
+            if request.intent.technical and request.intent.technical.bpm:
+                # Use bpm as a proxy for motivation scaling (soft heuristic)
+                motivation = max(1, min(10, int(request.intent.technical.bpm / 20)))
+            result = api.therapy_session(
+                text=request.intent.emotional_intent,
+                motivation=motivation,
+                chaos_tolerance=chaos,
+                output_midi=None,
+            )
+            return {"status": "success", "result": result}
+        except Exception as exc:
+            logging.exception("generate failed")
+            raise HTTPException(status_code=500, detail=str(exc))
+
+    @app.post("/interrogate")
+    async def interrogate(request: InterrogateRequest):
+        # Placeholder: echo back the message with a simple tip
+        try:
+            return {
+                "status": "success",
+                "reply": f"Noted: {request.message}. Consider clarifying the desired mood or groove.",
+                "session_id": request.session_id,
+            }
+        except Exception as exc:  # pragma: no cover
+            logging.exception("interrogate failed")
+            raise HTTPException(status_code=500, detail=str(exc))
+
+
+def _main():
+    """Entry point for `python -m music_brain.api`."""
+    if not FASTAPI_AVAILABLE:
+        print(
+            "FastAPI/uvicorn not installed. Install with: pip install fastapi uvicorn",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    uvicorn.run("music_brain.api:app", host="127.0.0.1", port=8000, reload=False)
+
+
+if __name__ == "__main__":  # pragma: no cover
+    _main()
 

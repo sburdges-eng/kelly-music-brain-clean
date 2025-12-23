@@ -1,6 +1,7 @@
 #include "penta/groove/TempoEstimator.h"
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
 namespace penta::groove {
 
@@ -52,66 +53,78 @@ void TempoEstimator::estimateTempo() noexcept {
         return;  // Need at least 4 onsets
     }
     
-    // Calculate inter-onset intervals (IOI)
+    // Calculate inter-onset intervals (IOI) in seconds
     std::vector<float> intervals;
     intervals.reserve(onsetHistory_.size() - 1);
     
     for (size_t i = 1; i < onsetHistory_.size(); ++i) {
         uint64_t ioi = onsetHistory_[i] - onsetHistory_[i - 1];
-        // Convert to seconds
         float ioiSeconds = static_cast<float>(ioi) / static_cast<float>(config_.sampleRate);
         intervals.push_back(ioiSeconds);
     }
     
-    // Find most common interval using autocorrelation
-    float bestInterval = autocorrelate(intervals);
-    
-    if (bestInterval > 0.0f) {
-        // Convert interval to BPM
-        float estimatedTempo = 60.0f / bestInterval;
-        
-        // Clamp to valid range
-        estimatedTempo = std::max(config_.minTempo, std::min(config_.maxTempo, estimatedTempo));
-        
-        // Apply adaptive filtering
-        currentTempo_ = currentTempo_ * (1.0f - config_.adaptationRate) + 
-                        estimatedTempo * config_.adaptationRate;
-        
-        // Update confidence based on consistency of intervals
-        float variance = 0.0f;
-        float mean = bestInterval;
-        for (float interval : intervals) {
-            float diff = interval - mean;
-            variance += diff * diff;
-        }
-        variance /= intervals.size();
-        
-        // Higher confidence for lower variance
-        confidence_ = 1.0f / (1.0f + variance * 10.0f);
-        confidence_ = std::min(1.0f, confidence_);
+    // Search for best-fitting tempo using autocorrelation-style scoring
+    float bestInterval = findBestInterval(intervals);
+    if (bestInterval <= 0.0f) {
+        return;
     }
+    
+    // Convert interval to BPM and clamp to configured bounds
+    float estimatedTempo = 60.0f / bestInterval;
+    estimatedTempo = std::clamp(estimatedTempo, config_.minTempo, config_.maxTempo);
+    
+    // Apply adaptive smoothing to avoid jittery tempo updates
+    currentTempo_ = currentTempo_ * (1.0f - config_.adaptationRate) +
+                    estimatedTempo * config_.adaptationRate;
+    
+    // Confidence derived from best correlation score
+    confidence_ = std::clamp(computeCorrelation(intervals, bestInterval), 0.0f, 1.0f);
 }
 
-float TempoEstimator::autocorrelate(const std::vector<float>& intervals) const noexcept {
+float TempoEstimator::findBestInterval(const std::vector<float>& intervals) const noexcept {
     if (intervals.empty()) {
         return 0.0f;
     }
     
-    // Simple approach: find the median interval as the most stable tempo indicator
-    std::vector<float> sortedIntervals = intervals;
-    std::sort(sortedIntervals.begin(), sortedIntervals.end());
+    float bestInterval = 0.0f;
+    float bestScore = -std::numeric_limits<float>::infinity();
     
-    // Return median interval
-    size_t size = sortedIntervals.size();
-    if (size % 2 == 0 && size > 1) {
-        // For even size, average the two middle elements
-        size_t idx1 = (size / 2) - 1;
-        size_t idx2 = size / 2;
-        return (sortedIntervals[idx1] + sortedIntervals[idx2]) / 2.0f;
-    } else {
-        // For odd size, return the middle element
-        return sortedIntervals[size / 2];
+    // Sweep a reasonable tempo range to find the strongest periodicity
+    for (float testTempo = config_.minTempo; testTempo <= config_.maxTempo; testTempo += 0.5f) {
+        float testInterval = 60.0f / testTempo;
+        float score = computeCorrelation(intervals, testInterval);
+        if (score > bestScore) {
+            bestScore = score;
+            bestInterval = testInterval;
+        }
     }
+    
+    return bestInterval;
+}
+
+float TempoEstimator::computeCorrelation(
+    const std::vector<float>& intervals,
+    float testInterval
+) const noexcept {
+    if (intervals.empty() || testInterval <= 0.0f) {
+        return 0.0f;
+    }
+    
+    // Allow for slight human timing variations (~12% tolerance)
+    float tolerance = testInterval * 0.12f;
+    float invTwoSigmaSq = 1.0f / (2.0f * tolerance * tolerance);
+    
+    float score = 0.0f;
+    for (float interval : intervals) {
+        float multiple = std::max(1.0f, std::round(interval / testInterval));
+        float expected = multiple * testInterval;
+        float error = std::abs(interval - expected);
+        
+        // Gaussian weighting: tighter clustering yields higher score
+        score += std::exp(-(error * error) * invTwoSigmaSq);
+    }
+    
+    return score / static_cast<float>(intervals.size());
 }
 
 } // namespace penta::groove

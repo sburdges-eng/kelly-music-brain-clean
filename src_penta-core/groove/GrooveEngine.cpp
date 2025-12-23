@@ -1,13 +1,13 @@
 #include "penta/groove/GrooveEngine.h"
+#include <algorithm>
+#include <cmath>
+#include <numeric>
 
 namespace penta::groove {
 
 GrooveEngine::GrooveEngine(const Config& config)
     : config_(config)
     , analysis_{}
-    , onsetDetector_(std::make_unique<OnsetDetector>())
-    , tempoEstimator_(std::make_unique<TempoEstimator>())
-    , quantizer_(std::make_unique<RhythmQuantizer>())
     , samplePosition_(0)
 {
     analysis_.currentTempo = 120.0f;
@@ -15,7 +15,26 @@ GrooveEngine::GrooveEngine(const Config& config)
     analysis_.timeSignatureNum = 4;
     analysis_.timeSignatureDen = 4;
     analysis_.swing = 0.0f;
-    // Tempo, time signature, and swing analysis implemented
+    
+    // Configure onset detector
+    OnsetDetector::Config onsetConfig;
+    onsetConfig.sampleRate = config_.sampleRate;
+    onsetConfig.hopSize = config_.hopSize;
+    onsetDetector_ = std::make_unique<OnsetDetector>(onsetConfig);
+    
+    // Configure tempo estimator
+    TempoEstimator::Config tempoConfig;
+    tempoConfig.sampleRate = config_.sampleRate;
+    tempoConfig.minTempo = config_.minTempo;
+    tempoConfig.maxTempo = config_.maxTempo;
+    tempoEstimator_ = std::make_unique<TempoEstimator>(tempoConfig);
+    
+    // Configure quantizer
+    RhythmQuantizer::Config quantConfig;
+    quantConfig.strength = config_.quantizationStrength;
+    quantConfig.timeSignatureNum = analysis_.timeSignatureNum;
+    quantConfig.timeSignatureDen = analysis_.timeSignatureDen;
+    quantizer_ = std::make_unique<RhythmQuantizer>(quantConfig);
 }
 
 GrooveEngine::~GrooveEngine() = default;
@@ -29,6 +48,40 @@ void GrooveEngine::processAudio(const float* buffer, size_t frames) noexcept {
             float onsetStrength = onsetDetector_->getOnsetStrength();
             analysis_.onsetPositions.push_back(onsetPos);
             analysis_.onsetStrengths.push_back(onsetStrength);
+            onsetHistory_.push_back(onsetPos);
+            
+            // Keep a bounded history for tempo/time signature estimation
+            constexpr size_t kMaxOnsetHistory = 128;
+            auto trimHistory = [](auto& container) {
+                if (container.size() > kMaxOnsetHistory) {
+                    container.erase(container.begin());
+                }
+            };
+            trimHistory(analysis_.onsetPositions);
+            trimHistory(analysis_.onsetStrengths);
+            trimHistory(onsetHistory_);
+            
+            // Update tempo estimate in real-time
+            if (tempoEstimator_) {
+                tempoEstimator_->addOnset(onsetPos);
+                analysis_.currentTempo = tempoEstimator_->getCurrentTempo();
+                analysis_.tempoConfidence = tempoEstimator_->getConfidence();
+            }
+            
+            // Update time signature and swing analyses once we have data
+            detectTimeSignature();
+            analyzeSwing();
+            
+            // Keep quantizer in sync with latest analysis
+            if (quantizer_) {
+                RhythmQuantizer::Config qConfig;
+                qConfig.strength = config_.quantizationStrength;
+                qConfig.enableSwing = true;
+                qConfig.swingAmount = std::clamp(0.5f + (analysis_.swing * 0.25f), 0.0f, 1.0f);
+                qConfig.timeSignatureNum = analysis_.timeSignatureNum;
+                qConfig.timeSignatureDen = analysis_.timeSignatureDen;
+                quantizer_->updateConfig(qConfig);
+            }
         }
     }
     
@@ -81,6 +134,27 @@ uint64_t GrooveEngine::applySwing(uint64_t position) const noexcept {
 
 void GrooveEngine::updateConfig(const Config& config) {
     config_ = config;
+    
+    OnsetDetector::Config onsetConfig;
+    onsetConfig.sampleRate = config_.sampleRate;
+    onsetConfig.hopSize = config_.hopSize;
+    onsetDetector_ = std::make_unique<OnsetDetector>(onsetConfig);
+    
+    TempoEstimator::Config tempoConfig;
+    tempoConfig.sampleRate = config_.sampleRate;
+    tempoConfig.minTempo = config_.minTempo;
+    tempoConfig.maxTempo = config_.maxTempo;
+    tempoEstimator_ = std::make_unique<TempoEstimator>(tempoConfig);
+    
+    if (quantizer_) {
+        RhythmQuantizer::Config qConfig;
+        qConfig.strength = config_.quantizationStrength;
+        qConfig.enableSwing = true;
+        qConfig.timeSignatureNum = analysis_.timeSignatureNum;
+        qConfig.timeSignatureDen = analysis_.timeSignatureDen;
+        qConfig.swingAmount = std::clamp(0.5f + (analysis_.swing * 0.25f), 0.0f, 1.0f);
+        quantizer_->updateConfig(qConfig);
+    }
 }
 
 void GrooveEngine::reset() {
@@ -89,6 +163,11 @@ void GrooveEngine::reset() {
     samplePosition_ = 0;
     onsetHistory_.clear();
     analysis_ = GrooveAnalysis{};
+    analysis_.currentTempo = 120.0f;
+    analysis_.tempoConfidence = 0.0f;
+    analysis_.timeSignatureNum = 4;
+    analysis_.timeSignatureDen = 4;
+    analysis_.swing = 0.0f;
 }
 
 void GrooveEngine::updateTempoEstimate() noexcept {
@@ -96,106 +175,105 @@ void GrooveEngine::updateTempoEstimate() noexcept {
         return;
     }
     
-    // Feed onset history to tempo estimator
-    for (size_t i = 0; i < analysis_.onsetPositions.size(); ++i) {
-        tempoEstimator_->addOnset(analysis_.onsetPositions[i]);
+    tempoEstimator_->reset();
+    for (uint64_t onset : onsetHistory_) {
+        tempoEstimator_->addOnset(onset);
     }
     
-    // Update analysis with current tempo estimate
     analysis_.currentTempo = tempoEstimator_->getCurrentTempo();
     analysis_.tempoConfidence = tempoEstimator_->getConfidence();
 }
 
 void GrooveEngine::detectTimeSignature() noexcept {
-    // Simple time signature detection based on onset patterns
-    if (analysis_.onsetPositions.size() < 8) {
+    if (analysis_.onsetPositions.size() < 8 || analysis_.currentTempo <= 0.0f) {
         return;  // Need enough onsets for pattern detection
     }
     
-    // Analyze spacing between strong beats
-    // Look for patterns of strong/weak beats
-    std::vector<float> beatStrengths;
-    for (size_t i = 0; i < std::min(analysis_.onsetStrengths.size(), size_t(16)); ++i) {
-        beatStrengths.push_back(analysis_.onsetStrengths[i]);
+    double samplesPerBeat = (60.0 * config_.sampleRate) / analysis_.currentTempo;
+    if (samplesPerBeat <= 0.0) {
+        return;
     }
     
-    // Find strongest beats (potential downbeats)
-    float threshold = 0.7f;  // Consider onsets above 70% strength as strong
-    int strongBeatCount = 0;
-    for (float strength : beatStrengths) {
-        if (strength > threshold) {
-            strongBeatCount++;
+    // Build a simple beat-strength histogram relative to the first onset
+    constexpr size_t kMaxBeats = 64;
+    std::vector<float> beatStrengths(kMaxBeats, 0.0f);
+    uint64_t firstOnset = analysis_.onsetPositions.front();
+    
+    for (size_t i = 0; i < analysis_.onsetPositions.size(); ++i) {
+        uint64_t onset = analysis_.onsetPositions[i];
+        float strength = (i < analysis_.onsetStrengths.size()) ? analysis_.onsetStrengths[i] : 1.0f;
+        
+        auto beatIndex = static_cast<size_t>(std::llround(
+            static_cast<double>(onset - firstOnset) / samplesPerBeat));
+        
+        if (beatIndex < kMaxBeats) {
+            beatStrengths[beatIndex] += strength;
         }
     }
     
-    // Estimate time signature based on pattern
-    // This is a simplified heuristic - could be improved with autocorrelation
-    if (strongBeatCount <= beatStrengths.size() / 4) {
-        analysis_.timeSignatureNum = 4;  // Likely 4/4
-        analysis_.timeSignatureDen = 4;
-    } else if (strongBeatCount <= beatStrengths.size() / 3) {
-        analysis_.timeSignatureNum = 3;  // Likely 3/4
-        analysis_.timeSignatureDen = 4;
-    } else {
-        analysis_.timeSignatureNum = 4;  // Default to 4/4
-        analysis_.timeSignatureDen = 4;
+    float totalStrength = std::accumulate(beatStrengths.begin(), beatStrengths.end(), 0.0f);
+    if (totalStrength <= 0.0f) {
+        return;
     }
+    
+    // Score common signatures by how regularly strong beats repeat
+    const int candidates[] = {2, 3, 4, 6};
+    float bestScore = -1.0f;
+    int bestNum = 4;
+    
+    for (int candidate : candidates) {
+        float downbeatStrength = 0.0f;
+        for (size_t i = 0; i < beatStrengths.size(); ++i) {
+            if (i % candidate == 0) {
+                downbeatStrength += beatStrengths[i];
+            }
+        }
+        
+        float score = downbeatStrength / totalStrength;
+        if (score > bestScore) {
+            bestScore = score;
+            bestNum = candidate;
+        }
+    }
+    
+    analysis_.timeSignatureNum = static_cast<uint32_t>(bestNum);
+    analysis_.timeSignatureDen = 4; // Focus on simple meters for now
 }
 
 void GrooveEngine::analyzeSwing() noexcept {
-    if (analysis_.onsetPositions.size() < 4) {
-        return;  // Need at least 4 onsets
+    if (analysis_.onsetPositions.size() < 4 || analysis_.currentTempo <= 0.0f) {
+        analysis_.swing = 0.0f;
+        return;  // Need more data
     }
     
-    // Analyze timing deviations from strict grid
-    // Swing is detected when every other subdivision is consistently delayed
-    
-    // Calculate expected grid intervals
-    if (analysis_.currentTempo <= 0.0f) {
+    const double beatIntervalSamples = (60.0 / analysis_.currentTempo) * config_.sampleRate;
+    if (beatIntervalSamples <= 0.0) {
         return;
     }
     
-    uint64_t samplesPerBeat = static_cast<uint64_t>(
-        (60.0 * config_.sampleRate) / analysis_.currentTempo
-    );
+    std::vector<float> offBeatTimings;
+    offBeatTimings.reserve(analysis_.onsetPositions.size());
     
-    // Look at 8th note subdivisions (half beats)
-    uint64_t gridInterval = samplesPerBeat / 2;
-    if (gridInterval == 0) {
-        return;
-    }
-    
-    // Analyze deviations on odd vs even subdivisions
-    float oddDeviations = 0.0f;
-    float evenDeviations = 0.0f;
-    int oddCount = 0;
-    int evenCount = 0;
-    
-    for (size_t i = 1; i < std::min(analysis_.onsetPositions.size(), size_t(16)); ++i) {
-        uint64_t interval = analysis_.onsetPositions[i] - analysis_.onsetPositions[i - 1];
-        int64_t deviation = static_cast<int64_t>(interval) - static_cast<int64_t>(gridInterval);
+    for (uint64_t onset : analysis_.onsetPositions) {
+        double beatPos = std::fmod(static_cast<double>(onset), beatIntervalSamples) / beatIntervalSamples;
         
-        if (i % 2 == 0) {
-            evenDeviations += static_cast<float>(deviation);
-            evenCount++;
-        } else {
-            oddDeviations += static_cast<float>(deviation);
-            oddCount++;
+        // Focus on eighth-note upbeats (around 0.5 position in the beat)
+        if (beatPos > 0.3 && beatPos < 0.7) {
+            offBeatTimings.push_back(static_cast<float>(beatPos));
         }
     }
     
-    if (oddCount > 0 && evenCount > 0) {
-        oddDeviations /= oddCount;
-        evenDeviations /= evenCount;
-        
-        // If odd beats are consistently delayed relative to even beats, we have swing
-        float avgDeviation = oddDeviations - evenDeviations;
-        
-        // Convert deviation to swing amount (0.5 = straight, 0.66 = triplet)
-        // Positive deviation means upbeats are delayed
-        float swingRatio = 0.5f + (avgDeviation / static_cast<float>(gridInterval)) * 0.5f;
-        analysis_.swing = std::max(0.5f, std::min(0.75f, swingRatio));
+    if (offBeatTimings.empty()) {
+        analysis_.swing = 0.0f;
+        return;
     }
+    
+    float avgOffBeat = std::accumulate(offBeatTimings.begin(), offBeatTimings.end(), 0.0f)
+                       / static_cast<float>(offBeatTimings.size());
+    
+    // Swing ratio: 0.5 = straight; >0.5 = delayed upbeat
+    float swing = (avgOffBeat - 0.5f) * 2.0f; // Map to -1 .. 1
+    analysis_.swing = std::clamp(swing, -1.0f, 1.0f);
 }
 
 } // namespace penta::groove

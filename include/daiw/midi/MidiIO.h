@@ -25,10 +25,11 @@ using MidiInputCallback = std::function<void(const MidiMessage&)>;
  * @brief Information about a MIDI device
  */
 struct MidiDeviceInfo {
+    int deviceId = -1;
     std::string name;
-    int deviceId;
-    bool isInput;
-    bool isOutput;
+    std::string identifier;
+    bool isInput = false;
+    bool isOutput = false;
 };
 
 /**

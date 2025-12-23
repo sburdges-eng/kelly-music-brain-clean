@@ -3,7 +3,7 @@
 **TL;DR (run from repo root):**
 
 ```bash
-cd "/Volumes/Extreme SSD/kelly-clean"  # repo root
+# Ensure you're in the repository root directory
 cat .agents/handoffs/CURRENT_STATE.md
 cat .agents/contexts/<your_agent>_context.md
 # do work...
@@ -15,7 +15,8 @@ cat .agents/contexts/<your_agent>_context.md
 ### Step 0: Go to repo root
 
 ```bash
-cd "/Volumes/Extreme SSD/kelly-clean"
+# Navigate to your local repository root directory
+# All commands in this guide should be run from the repo root
 ```
 
 ### Step 1: Choose Your Agent
@@ -81,7 +82,7 @@ Edit `.agents/handoffs/CURRENT_STATE.md` with:
 
 ```bash
 # START SESSION
-cd "/Volumes/Extreme SSD/kelly-clean"  # Workspace root (adjust if different)
+# From the repository root directory:
 cat .agents/handoffs/CURRENT_STATE.md
 cat .agents/contexts/musicbrain_context.md
 
