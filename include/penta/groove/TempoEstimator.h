@@ -48,7 +48,8 @@ public:
     
 private:
     void estimateTempo() noexcept;
-    float autocorrelate(const std::vector<float>& intervals) const noexcept;
+    float findBestInterval(const std::vector<float>& intervals) const noexcept;
+    float computeCorrelation(const std::vector<float>& intervals, float testInterval) const noexcept;
     
     Config config_;
     
