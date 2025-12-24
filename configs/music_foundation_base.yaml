@@ -13,8 +13,11 @@ seed: 42
 spending_limit_usd: 100.0
 use_streaming: true
 
+# Data Configuration
+# Override with KELLY_AUDIO_DATA_ROOT environment variable
+# See configs/storage_paths.yaml for path configuration
 data:
-  train_manifest: /Volumes/Extreme SSD/kelly-audio-data/manifests/full_unlabeled.jsonl
+  train_manifest: ${KELLY_AUDIO_DATA_ROOT:-/Volumes/Extreme SSD/kelly-audio-data}/manifests/full_unlabeled.jsonl
   sample_rate: 44100
   segment_seconds: 5.0
   manifest_audio_key: audio

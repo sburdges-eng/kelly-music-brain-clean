@@ -1,0 +1,70 @@
+# ============================================================================
+# Kelly Storage Paths Configuration
+# ============================================================================
+# This file defines storage paths for ML training data.
+# Override with environment variables or edit paths directly.
+#
+# Environment Variables:
+#   KELLY_AUDIO_DATA_ROOT: Override the base audio data path
+#   KELLY_SSD_PATH: Set external SSD mount point
+# ============================================================================
+
+# Base path for all audio data
+# Default: /Volumes/Extreme SSD/kelly-audio-data (macOS)
+#          /mnt/ssd/kelly-audio-data (Linux)
+#          D:\kelly-audio-data (Windows)
+audio_data_root: ${KELLY_AUDIO_DATA_ROOT:/Volumes/Extreme SSD/kelly-audio-data}
+
+# Directory structure under audio_data_root
+directories:
+  raw: raw                           # Original audio files
+  processed: processed               # Pre-processed features
+  downloads: downloads               # Downloaded datasets
+  cache: cache                       # Temporary cache
+  manifests: manifests               # Data manifest files
+
+# Dataset-specific paths (relative to audio_data_root)
+datasets:
+  emotions: raw/emotions
+  melodies: raw/melodies
+  chord_progressions: raw/chord_progressions
+  grooves: raw/grooves
+  expression: raw/expression
+  instruments: raw/instruments
+  emotion_thesaurus: raw/emotion_thesaurus
+  stems: raw/stems
+  onsets: raw/onsets
+  pitch: raw/pitch
+  keys: raw/keys
+  vad: raw/vad
+  timbres: raw/timbres
+  tempo: raw/tempo
+  audio_classification: raw/audio_classification
+  chords: raw/chords
+  beats: raw/beats
+
+# Manifest files
+manifests:
+  full_unlabeled: manifests/full_unlabeled.jsonl
+  train: manifests/train.jsonl
+  val: manifests/val.jsonl
+  test: manifests/test.jsonl
+  dry_run: manifests/dry_run.jsonl
+
+# Platform-specific SSD paths to search (if env vars not set)
+platform_defaults:
+  Darwin:  # macOS
+    - /Volumes/Extreme SSD
+    - /Volumes/External SSD
+    - /Volumes/Audio Data
+  Linux:
+    - /mnt/ssd
+    - /media/ssd
+    - /mnt/external
+  Windows:
+    - D:\
+    - E:\
+    - F:\
+
+# Fallback path if no external SSD found
+fallback: data/audio

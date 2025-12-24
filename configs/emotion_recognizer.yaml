@@ -33,7 +33,9 @@ cnn_config:
 
 # Data Configuration
 # Audio data stored on external SSD for performance
-data_path: /Volumes/Extreme SSD/kelly-audio-data/raw/emotions
+# Override with KELLY_AUDIO_DATA_ROOT environment variable
+# See configs/storage_paths.yaml for path configuration
+data_path: ${KELLY_AUDIO_DATA_ROOT:-/Volumes/Extreme SSD/kelly-audio-data}/raw/emotions
 data_version: v1
 sample_rate: 16000
 n_mels: 64

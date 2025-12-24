@@ -10,8 +10,9 @@ spending_limit_usd: 5.0 # Very low limit for dry run
 cost_per_step_sim: 0.01 # Higher simulated cost to trigger limit faster
 use_streaming: true
 
+# Override with KELLY_AUDIO_DATA_ROOT environment variable
 data:
-  train_manifest: /Volumes/Extreme SSD/kelly-audio-data/raw/emotions/cremad/manifest.jsonl
+  train_manifest: ${KELLY_AUDIO_DATA_ROOT:-/Volumes/Extreme SSD/kelly-audio-data}/raw/emotions/cremad/manifest.jsonl
   sample_rate: 16000 # CREMA-D native SR
   segment_seconds: 2.0
   manifest_audio_key: audio

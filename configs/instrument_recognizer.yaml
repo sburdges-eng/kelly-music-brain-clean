@@ -80,8 +80,9 @@ emotional_head:
 
 # =============================================================================
 # Data Configuration
+# Override with KELLY_AUDIO_DATA_ROOT environment variable
 # =============================================================================
-data_path: /Volumes/Extreme SSD/kelly-audio-data/raw/instruments
+data_path: ${KELLY_AUDIO_DATA_ROOT:-/Volumes/Extreme SSD/kelly-audio-data}/raw/instruments
 data_version: v1
 sample_rate: 22050
 n_mels: 128

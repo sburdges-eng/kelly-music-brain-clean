@@ -1,55 +1,115 @@
 """
 Kelly ML Datasets - Audio data management and downloading.
 
-All audio data is stored on external SSD at:
-    /Volumes/Extreme SSD/kelly-audio-data/
+Audio data storage is configured via environment variables:
+    KELLY_AUDIO_DATA_ROOT: Full path to audio data directory
+    KELLY_SSD_PATH: Path to external SSD mount point
 
-Directory structure:
-    /Volumes/Extreme SSD/kelly-audio-data/
+Default directory structure:
+    <audio_data_root>/
     ├── raw/           # Original audio files
     ├── processed/     # Pre-processed features (mel specs, etc.)
     ├── downloads/     # Downloaded datasets
-    └── cache/         # Temporary cache
+    ├── cache/         # Temporary cache
+    └── manifests/     # Data manifest files
 
 Usage:
     from python.penta_core.ml.datasets import get_audio_data_root, AudioDownloader
-    
+
     # Get the audio data root
     root = get_audio_data_root()
-    
+
     # Download datasets
     downloader = AudioDownloader()
     downloader.download_freesound_pack("emotion_sounds", output_dir=root / "raw" / "emotions")
+
+See configs/storage.py for full configuration options.
 """
 
 from pathlib import Path
 from typing import Optional
 import os
+import sys
 
-# Primary audio data location - external SSD
-AUDIO_DATA_ROOT = Path("/Volumes/Extreme SSD/kelly-audio-data")
+# Try to import centralized storage config
+try:
+    # Add configs to path if needed
+    _configs_path = Path(__file__).parent.parent.parent.parent.parent / "configs"
+    if _configs_path.exists() and str(_configs_path) not in sys.path:
+        sys.path.insert(0, str(_configs_path.parent))
 
-# Fallback location if SSD not mounted
-FALLBACK_AUDIO_ROOT = Path(__file__).parent.parent.parent.parent.parent / "data" / "audio"
+    from configs.storage import (
+        StorageConfig,
+        get_storage_config,
+        get_audio_data_root as _get_audio_root,
+        get_raw_audio_dir as _get_raw,
+        get_processed_dir as _get_processed,
+        get_downloads_dir as _get_downloads,
+        get_cache_dir as _get_cache,
+        get_manifests_dir as _get_manifests,
+        ensure_storage_directories as _ensure_dirs,
+    )
+    _HAS_STORAGE_CONFIG = True
+except ImportError:
+    _HAS_STORAGE_CONFIG = False
+
+# Fallback if storage config not available
+if not _HAS_STORAGE_CONFIG:
+    import platform
+
+    # Default paths based on platform
+    _DEFAULT_SSD_PATHS = {
+        "Darwin": "/Volumes/Extreme SSD",
+        "Linux": "/mnt/ssd",
+        "Windows": "D:\\",
+    }
+
+    def _find_audio_root() -> Path:
+        """Find audio data root from environment or defaults."""
+        # Check environment variable first
+        env_root = os.environ.get("KELLY_AUDIO_DATA_ROOT")
+        if env_root:
+            return Path(env_root)
+
+        # Check SSD path environment variable
+        env_ssd = os.environ.get("KELLY_SSD_PATH")
+        if env_ssd:
+            return Path(env_ssd) / "kelly-audio-data"
+
+        # Try platform default
+        system = platform.system()
+        default_ssd = _DEFAULT_SSD_PATHS.get(system)
+        if default_ssd and Path(default_ssd).exists():
+            return Path(default_ssd) / "kelly-audio-data"
+
+        # Fallback to project local
+        return Path(__file__).parent.parent.parent.parent.parent / "data" / "audio"
+
+# Legacy constant for backward compatibility
+AUDIO_DATA_ROOT = _get_audio_root() if _HAS_STORAGE_CONFIG else _find_audio_root()
 
 
 def get_audio_data_root() -> Path:
     """
     Get the root directory for audio data.
-    
-    Returns /Volumes/Extreme SSD/kelly-audio-data if available,
-    otherwise falls back to project data/audio directory.
+
+    Uses centralized storage config if available, otherwise
+    falls back to environment variables or platform defaults.
+
+    Configure via:
+        - KELLY_AUDIO_DATA_ROOT environment variable
+        - KELLY_SSD_PATH environment variable
+        - configs/storage.py settings
     """
-    if AUDIO_DATA_ROOT.exists():
-        return AUDIO_DATA_ROOT
-    
-    # Create fallback if needed
-    FALLBACK_AUDIO_ROOT.mkdir(parents=True, exist_ok=True)
-    return FALLBACK_AUDIO_ROOT
+    if _HAS_STORAGE_CONFIG:
+        return _get_audio_root()
+    return _find_audio_root()
 
 
 def get_raw_audio_dir() -> Path:
     """Get directory for raw audio files."""
+    if _HAS_STORAGE_CONFIG:
+        return _get_raw()
     path = get_audio_data_root() / "raw"
     path.mkdir(parents=True, exist_ok=True)
     return path
@@ -57,6 +117,8 @@ def get_raw_audio_dir() -> Path:
 
 def get_processed_dir() -> Path:
     """Get directory for processed features."""
+    if _HAS_STORAGE_CONFIG:
+        return _get_processed()
     path = get_audio_data_root() / "processed"
     path.mkdir(parents=True, exist_ok=True)
     return path
@@ -64,6 +126,8 @@ def get_processed_dir() -> Path:
 
 def get_downloads_dir() -> Path:
     """Get directory for downloaded datasets."""
+    if _HAS_STORAGE_CONFIG:
+        return _get_downloads()
     path = get_audio_data_root() / "downloads"
     path.mkdir(parents=True, exist_ok=True)
     return path
@@ -71,7 +135,18 @@ def get_downloads_dir() -> Path:
 
 def get_cache_dir() -> Path:
     """Get directory for temporary cache."""
+    if _HAS_STORAGE_CONFIG:
+        return _get_cache()
     path = get_audio_data_root() / "cache"
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def get_manifests_dir() -> Path:
+    """Get directory for data manifest files."""
+    if _HAS_STORAGE_CONFIG:
+        return _get_manifests()
+    path = get_audio_data_root() / "manifests"
     path.mkdir(parents=True, exist_ok=True)
     return path
 
@@ -79,15 +154,18 @@ def get_cache_dir() -> Path:
 def ensure_audio_directories() -> dict:
     """
     Ensure all audio data directories exist.
-    
+
     Returns dict with all directory paths.
     """
+    if _HAS_STORAGE_CONFIG:
+        return _ensure_dirs()
     return {
         "root": get_audio_data_root(),
         "raw": get_raw_audio_dir(),
         "processed": get_processed_dir(),
         "downloads": get_downloads_dir(),
         "cache": get_cache_dir(),
+        "manifests": get_manifests_dir(),
     }
 
 
@@ -134,6 +212,7 @@ __all__ = [
     "get_processed_dir",
     "get_downloads_dir",
     "get_cache_dir",
+    "get_manifests_dir",
     "ensure_audio_directories",
 ]
 

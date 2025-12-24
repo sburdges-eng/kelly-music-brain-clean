@@ -29,7 +29,8 @@ mlp_config:
 
 # Data Configuration
 # Data stored on external SSD for performance
-data_path: /Volumes/Extreme SSD/kelly-audio-data/raw/chord_progressions
+# Override with KELLY_AUDIO_DATA_ROOT environment variable
+data_path: ${KELLY_AUDIO_DATA_ROOT:-/Volumes/Extreme SSD/kelly-audio-data}/raw/chord_progressions
 data_version: v1
 
 # Chord representation
