@@ -10,23 +10,29 @@ Tests the efficiency improvements made to:
 import time
 
 
+def _bench(fn, repeats: int = 3):
+    """Run a small benchmark and return (result, best_time)."""
+    durations = []
+    result = None
+    for _ in range(repeats):
+        start = time.perf_counter()
+        result = fn()
+        durations.append(time.perf_counter() - start)
+    return result, min(durations)
+
+
 def test_enumerate_vs_range_len():
     """Test that enumerate is as fast or faster than range(len())."""
     data = list(range(10000))
     
-    # Old pattern: range(len())
-    start = time.time()
-    result_old = []
-    for i in range(len(data)):
-        result_old.append(data[i] * 2)
-    old_time = time.time() - start
+    def _range_len():
+        return [data[i] * 2 for i in range(len(data))]
     
-    # New pattern: enumerate
-    start = time.time()
-    result_new = []
-    for i, val in enumerate(data):
-        result_new.append(val * 2)
-    new_time = time.time() - start
+    def _enumerate():
+        return [val * 2 for i, val in enumerate(data)]
+    
+    result_old, old_time = _bench(_range_len)
+    result_new, new_time = _bench(_enumerate)
     
     # Results should be identical
     assert result_old == result_new
@@ -42,19 +48,14 @@ def test_dict_iteration_efficiency():
     """Test that dict iteration without .keys() is efficient."""
     data = {f"key{i}": i for i in range(10000)}
     
-    # Old pattern: for k in dict.keys()
-    start = time.time()
-    result_old = []
-    for k in data.keys():
-        result_old.append(data[k])
-    old_time = time.time() - start
+    def _keys_iteration():
+        return [data[k] for k in data.keys()]
     
-    # New pattern: for k in dict
-    start = time.time()
-    result_new = []
-    for k in data:
-        result_new.append(data[k])
-    new_time = time.time() - start
+    def _direct_iteration():
+        return [data[k] for k in data]
+    
+    result_old, old_time = _bench(_keys_iteration)
+    result_new, new_time = _bench(_direct_iteration)
     
     # Results should be identical
     assert result_old == result_new

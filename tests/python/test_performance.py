@@ -134,24 +134,25 @@ def test_sections_iteration_performance():
     """Test that enumerate + zip is efficient."""
     # Simulate section boundaries
     boundaries = list(range(0, 100, 4))  # 25 sections
+    pairwise_boundaries = tuple(zip(boundaries[:-1], boundaries[1:]))  # precompute slices
     
     # Old way with range(len())
-    start = time.time()
+    start = time.perf_counter()
     for _ in range(10000):  # More iterations for measurable difference
         sections_old = []
         for i in range(len(boundaries) - 1):
             start_bar = boundaries[i]
             end_bar = boundaries[i + 1]
             sections_old.append((start_bar, end_bar))
-    old_time = time.time() - start
+    old_time = time.perf_counter() - start
     
     # New way with zip
-    start = time.time()
+    start = time.perf_counter()
     for _ in range(10000):  # More iterations for measurable difference
         sections_new = []
-        for i, (start_bar, end_bar) in enumerate(zip(boundaries[:-1], boundaries[1:])):
+        for i, (start_bar, end_bar) in enumerate(pairwise_boundaries):
             sections_new.append((start_bar, end_bar))
-    new_time = time.time() - start
+    new_time = time.perf_counter() - start
     
     # New way should be comparable (within 50% due to measurement variance)
     # The main benefit is readability, not necessarily raw speed

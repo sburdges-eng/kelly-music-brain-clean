@@ -107,6 +107,12 @@ def _get_safe_fallback() -> Path:
     return Path(tempfile.gettempdir()) / "kelly-audio-data"
 
 
+def _ensure_dir_exists(path: Path) -> Path:
+    """Ensure a directory exists (with parents) and return it."""
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
 @dataclass
 class StorageConfig:
     """
@@ -342,28 +348,28 @@ def get_audio_data_root() -> Path:
 
 
 def get_raw_audio_dir() -> Path:
-    """Get directory for raw audio files."""
-    return get_storage_config().raw_audio_dir
+    """Get directory for raw audio files and ensure it exists."""
+    return _ensure_dir_exists(get_storage_config().raw_audio_dir)
 
 
 def get_processed_dir() -> Path:
-    """Get directory for processed features."""
-    return get_storage_config().processed_dir
+    """Get directory for processed features and ensure it exists."""
+    return _ensure_dir_exists(get_storage_config().processed_dir)
 
 
 def get_downloads_dir() -> Path:
-    """Get directory for downloaded datasets."""
-    return get_storage_config().downloads_dir
+    """Get directory for downloaded datasets and ensure it exists."""
+    return _ensure_dir_exists(get_storage_config().downloads_dir)
 
 
 def get_cache_dir() -> Path:
-    """Get directory for temporary cache."""
-    return get_storage_config().cache_dir
+    """Get directory for temporary cache and ensure it exists."""
+    return _ensure_dir_exists(get_storage_config().cache_dir)
 
 
 def get_manifests_dir() -> Path:
-    """Get directory for data manifests."""
-    return get_storage_config().manifests_dir
+    """Get directory for data manifests and ensure it exists."""
+    return _ensure_dir_exists(get_storage_config().manifests_dir)
 
 
 def ensure_storage_directories() -> dict:

@@ -78,14 +78,14 @@ class EmotionThesaurus:
             # Joy category
             (0, "euphoria", EmotionCategory.JOY, 1.0, 1.0, 1.0),
             (1, "contentment", EmotionCategory.JOY, 0.5, 0.7, 0.3),
-            (2, "cheerful", EmotionCategory.JOY, 0.6, 0.8, 0.6),
-            (3, "blissful", EmotionCategory.JOY, 0.9, 0.95, 0.8),
+            (2, "grief", EmotionCategory.SADNESS, 1.0, -0.9, 0.7),
+            (3, "cheerful", EmotionCategory.JOY, 0.6, 0.8, 0.6),
+            (4, "blissful", EmotionCategory.JOY, 0.9, 0.95, 0.8),
             
             # Sadness category
-            (10, "grief", EmotionCategory.SADNESS, 1.0, -0.9, 0.7),
-            (11, "melancholy", EmotionCategory.SADNESS, 0.6, -0.6, 0.3),
-            (12, "sorrow", EmotionCategory.SADNESS, 0.8, -0.8, 0.5),
-            (13, "despair", EmotionCategory.SADNESS, 0.95, -0.95, 0.6),
+            (10, "melancholy", EmotionCategory.SADNESS, 0.6, -0.6, 0.3),
+            (11, "sorrow", EmotionCategory.SADNESS, 0.8, -0.8, 0.5),
+            (12, "despair", EmotionCategory.SADNESS, 0.95, -0.95, 0.6),
             
             # Anger category
             (20, "rage", EmotionCategory.ANGER, 1.0, -0.8, 1.0),

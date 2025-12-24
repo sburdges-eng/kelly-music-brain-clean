@@ -139,10 +139,17 @@ def parse_chord(chord_str: str) -> Optional[ParsedChord]:
     
     # Parse quality and extensions
     quality = 'maj'  # Default
-    extensions = []
+    extensions: List[str] = []
     
-    # Check for minor variations
-    if remainder.startswith(('m', 'min', '-')):
+    # Major variants (handle maj7 before the generic "m" prefix)
+    if remainder.startswith(('maj7', 'M7')):
+        quality = 'maj7'
+        remainder = remainder[4:] if remainder.startswith('maj7') else remainder[2:]
+    elif remainder.startswith('maj'):
+        quality = 'maj'
+        remainder = remainder[3:]
+    # Check for minor variations (after maj to avoid misclassifying maj7)
+    elif remainder.startswith(('m', 'min', '-')):
         quality = 'min'
         remainder = re.sub(r'^(min|m|-)', '', remainder)
     elif remainder.startswith(('dim', '°', 'o')):
@@ -156,9 +163,6 @@ def parse_chord(chord_str: str) -> Optional[ParsedChord]:
         if sus_match:
             quality = f"sus{sus_match.group(1) or '4'}"
             remainder = remainder[len(sus_match.group(0)):]
-    elif remainder.startswith('maj'):
-        quality = 'maj'
-        remainder = remainder[3:]
     
     # Parse extensions (7, 9, 11, 13, add, etc.)
     ext_match = re.findall(r'(maj7|M7|7|9|11|13|add\d+|b\d+|#\d+)', remainder)
