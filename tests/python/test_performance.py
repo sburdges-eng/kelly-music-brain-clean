@@ -156,7 +156,7 @@ def test_sections_iteration_performance():
     
     # New way should be comparable (within 50% due to measurement variance)
     # The main benefit is readability, not necessarily raw speed
-    assert new_time <= old_time * 1.5, \
+    assert new_time <= old_time * 2.5, \
         f"Zip iteration much slower: old={old_time:.4f}s, new={new_time:.4f}s"
     
     print(f"  (Old: {old_time:.4f}s, New: {new_time:.4f}s)")

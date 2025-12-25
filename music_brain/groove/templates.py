@@ -14,6 +14,11 @@ from music_brain.groove.extractor import GrooveTemplate
 # Swing: 0.0=straight, 0.5=moderate swing, 0.67=triplet swing
 # Timing deviations: positive=late (laid back), negative=early (pushed)
 
+GENRE_ALIASES = {
+    "boom-bap": "boom_bap",
+    "boom bap": "boom_bap",
+}
+
 GENRE_TEMPLATES = {
     "funk": {
         "name": "Funk Pocket",
@@ -33,6 +38,26 @@ GENRE_TEMPLATES = {
             95, 55, 75, 50,   # Beat 2: snare accent
             85, 50, 70, 45,   # Beat 3
             100, 60, 80, 55,  # Beat 4: snare accent
+        ],
+    },
+
+    # Boom-bap aliases map to hiphop characteristics
+    "boom_bap": {
+        "name": "Boom-Bap Pocket",
+        "description": "Classic boom-bap feel (maps to hip-hop groove)",
+        "swing_factor": 0.25,
+        "tempo_range": (85, 100),
+        "timing_deviations": [
+            0, 15, 8, 18,
+            20, 12, 15, 20,
+            5, 18, 10, 22,
+            25, 15, 18, 25,
+        ],
+        "velocity_curve": [
+            120, 35, 45, 30,
+            60, 30, 40, 35,
+            100, 38, 48, 32,
+            55, 32, 42, 38,
         ],
     },
     
@@ -87,25 +112,6 @@ GENRE_TEMPLATES = {
         ],
         "velocity_curve": [
             120, 35, 45, 30,  # Strong kick, lots of ghosts
-            60, 30, 40, 35,
-            100, 38, 48, 32,
-            55, 32, 42, 38,
-        ],
-    },
-    # Boom-bap aliases map to hiphop characteristics
-    "boom_bap": {
-        "name": "Boom-Bap Pocket",
-        "description": "Classic boom-bap feel (maps to hip-hop groove)",
-        "swing_factor": 0.25,
-        "tempo_range": (85, 100),
-        "timing_deviations": [
-            0, 15, 8, 18,
-            20, 12, 15, 20,
-            5, 18, 10, 22,
-            25, 15, 18, 25,
-        ],
-        "velocity_curve": [
-            120, 35, 45, 30,
             60, 30, 40, 35,
             100, 38, 48, 32,
             55, 32, 42, 38,
@@ -190,24 +196,6 @@ GENRE_TEMPLATES = {
 }
 
 
-GENRE_ALIASES = {
-    "boom-bap": "boom_bap",
-    "boom bap": "boom_bap",
-}
-
-
-def list_genre_templates(include_aliases: bool = True):
-    """
-    List available genre templates.
-    Args:
-        include_aliases: include known alias keys (e.g., boom-bap)
-    """
-    genres = set(GENRE_TEMPLATES.keys())
-    if include_aliases:
-        genres.update(GENRE_ALIASES.keys())
-    return sorted(genres)
-
-
 def get_genre_template(genre: str) -> GrooveTemplate:
     """
     Get a pre-defined groove template for a genre.
@@ -261,6 +249,18 @@ def get_genre_info(genre: str) -> dict:
     if genre_lower not in GENRE_TEMPLATES:
         return None
     return GENRE_TEMPLATES[genre_lower]
+
+
+def list_genre_templates(include_aliases: bool = True):
+    """
+    List available genre templates.
+    Args:
+        include_aliases: include known alias keys (e.g., boom-bap)
+    """
+    genres = set(GENRE_TEMPLATES.keys())
+    if include_aliases:
+        genres.update(GENRE_ALIASES.keys())
+    return sorted(genres)
 
 
 __all__ = [

@@ -84,7 +84,7 @@ class ChordQuality(Enum):
 @dataclass
 class Chord:
     """Represents a single chord with root and quality."""
-    root: int  # MIDI note number (0-11)
+    root: int  # MIDI note number (0-11) or note name when created from string
     quality: str  # 'maj', 'min', 'dim', etc.
     bass: Optional[int] = None  # For slash chords
     extensions: List[str] = field(default_factory=list)  # '7', '9', etc.
@@ -93,11 +93,30 @@ class Chord:
     start_tick: int = 0
     duration_ticks: int = 0
     notes: List[int] = field(default_factory=list)  # MIDI pitches
+    root_num: int = 0  # Cached pitch class for convenience
+    
+    def __post_init__(self):
+        """
+        Normalize root to both string and numeric forms.
+        
+        When constructed with an integer (analysis paths), we keep the pitch class
+        and also expose the note name for human-friendly access. When constructed
+        from a chord string, ``root`` may already be a note name.
+        """
+        if isinstance(self.root, str):
+            try:
+                self.root_num = NOTE_NAMES.index(self.root)
+            except ValueError:
+                self.root_num = 0
+        else:
+            self.root_num = int(self.root) % 12 if self.root is not None else 0
+        # Normalize root representation to note name for consistency in tests
+        self.root = NOTE_NAMES[self.root_num]
     
     @property
     def name(self) -> str:
         """Get chord name (e.g., 'Am7', 'F#dim')."""
-        root_name = NOTE_NAMES[self.root % 12]
+        root_name = self.root if isinstance(self.root, str) else NOTE_NAMES[self.root % 12]
         
         quality_str = ""
         if self.quality == 'maj':
@@ -121,14 +140,126 @@ class Chord:
         
         chord_name = f"{root_name}{quality_str}{ext_str}"
         
-        if self.bass is not None and self.bass != self.root:
-            bass_name = NOTE_NAMES[self.bass % 12]
-            chord_name += f"/{bass_name}"
+        if self.bass is not None:
+            bass_pc = int(self.bass) % 12
+            if bass_pc != self.root_num:
+                bass_name = NOTE_NAMES[bass_pc]
+                chord_name += f"/{bass_name}"
         
         return chord_name
     
+    def get_voicing(self, octave: int = 4, voicing_type: str = "close") -> List[int]:
+        """
+        Build a simple chord voicing as MIDI note numbers.
+        
+        Keeps logic lightweight for tests/benchmarks rather than full arranging.
+        """
+        root_pc = self.root_num % 12 if self.root_num is not None else 0
+        base_midi = 12 * (octave + 1) + root_pc  # C4 == 60 when octave=4
+        
+        quality = (self.quality or "").lower()
+        intervals = [0, 4, 7]  # default major triad
+        if 'dim' in quality:
+            intervals = [0, 3, 6]
+        elif 'aug' in quality or quality == '+':
+            intervals = [0, 4, 8]
+        elif quality.startswith('min'):
+            intervals = [0, 3, 7]
+        elif quality.startswith('sus2'):
+            intervals = [0, 2, 7]
+        elif quality.startswith('sus4') or quality.startswith('sus'):
+            intervals = [0, 5, 7]
+        
+        # Seventh quality
+        if 'maj7' in quality:
+            intervals.append(11)
+        elif 'min7' in quality or quality.endswith('m7'):
+            intervals.append(10)
+        elif quality == '7':
+            intervals.append(10)
+        
+        # Basic handling for common extensions
+        for ext in self.extensions:
+            if ext in ('9', 'add9'):
+                intervals.append(14)
+            elif ext == '11':
+                intervals.append(17)
+            elif ext == '13':
+                intervals.append(21)
+        
+        notes = sorted(base_midi + i for i in intervals)
+        
+        if voicing_type == "open" and len(notes) >= 3:
+            # Spread the middle voice up an octave for a simple open voicing
+            notes[1] += 12
+            notes = sorted(notes)
+        
+        return notes
+    
     def __str__(self) -> str:
         return self.name
+
+    @classmethod
+    def from_string(cls, chord_str: str, key: str = "") -> "Chord":
+        """
+        Parse a chord string like \"Am7\" or \"Cmaj9\" into a Chord instance.
+        
+        Uses the lightweight parser in progression.py to avoid heavy MIDI deps.
+        """
+        from music_brain.structure.progression import parse_chord
+
+        parsed = parse_chord(chord_str)
+        if not parsed:
+            raise ValueError(f"Could not parse chord string: {chord_str}")
+
+        bass = None
+        if parsed.bass:
+            try:
+                bass = NOTE_NAMES.index(parsed.bass)
+            except ValueError:
+                bass = None
+
+        root_value = parsed.root
+        if not isinstance(root_value, str):
+            try:
+                root_value = NOTE_NAMES[int(root_value) % 12]
+            except Exception:
+                root_value = str(root_value)
+
+        return cls(
+            root=root_value,
+            quality=parsed.quality,
+            bass=bass,
+            extensions=parsed.extensions,
+            notes=[],
+        )
+
+    @classmethod
+    def from_pitch_classes(cls, pitch_classes: List[int]) -> "Chord":
+        """
+        Build a chord from pitch classes (0-11). Intended for quick benchmarks.
+        """
+        if not pitch_classes:
+            raise ValueError("pitch_classes must be non-empty")
+
+        root_pc = pitch_classes[0] % 12
+        quality = 'maj'
+        intervals = {(pc - root_pc) % 12 for pc in pitch_classes}
+        if 3 in intervals and 4 not in intervals:
+            quality = 'min'
+        elif 4 in intervals and 3 not in intervals:
+            quality = 'maj'
+        elif 3 in intervals and 4 in intervals:
+            quality = 'min7' if 10 in intervals else 'min'
+        elif 6 in intervals:
+            quality = 'dim'
+
+        return cls(
+            root=NOTE_NAMES[root_pc],
+            quality=quality,
+            extensions=[],
+            notes=list(pitch_classes),
+        )
 
 
 @dataclass
@@ -223,11 +354,21 @@ def detect_key(chords: List[Chord]) -> Tuple[str, str]:
     if not chords:
         return ("C", "major")
     
+    def _root_value(chord: Chord) -> int:
+        root_val = getattr(chord, "root_num", chord.root)
+        if isinstance(root_val, str):
+            try:
+                root_val = NOTE_NAMES.index(root_val)
+            except ValueError:
+                root_val = 0
+        return int(root_val) % 12
+    
     # Count chord roots weighted by position
     root_counts = {}
     for i, chord in enumerate(chords):
         weight = 1.5 if i in [0, len(chords) - 1] else 1.0  # First/last chords weighted more
-        root_counts[chord.root] = root_counts.get(chord.root, 0) + weight
+        root_val = _root_value(chord)
+        root_counts[root_val] = root_counts.get(root_val, 0) + weight
     
     # Try each potential key
     best_key = 0
@@ -238,7 +379,8 @@ def detect_key(chords: List[Chord]) -> Tuple[str, str]:
         # Test major
         major_score = 0
         for chord in chords:
-            interval = (chord.root - key) % 12
+            root_val = _root_value(chord)
+            interval = (root_val - key) % 12
             if interval in MAJOR_SCALE:
                 major_score += 1
                 # Bonus for tonic and dominant
@@ -255,7 +397,8 @@ def detect_key(chords: List[Chord]) -> Tuple[str, str]:
         # Test minor
         minor_score = 0
         for chord in chords:
-            interval = (chord.root - key) % 12
+            root_val = _root_value(chord)
+            interval = (root_val - key) % 12
             if interval in MINOR_SCALE:
                 minor_score += 1
                 if interval == 0:
@@ -273,7 +416,13 @@ def get_roman_numeral(chord: Chord, key: int, mode: str = "major") -> str:
     """
     Get Roman numeral representation of chord relative to key.
     """
-    interval = (chord.root - key) % 12
+    root_val = getattr(chord, "root_num", chord.root)
+    if isinstance(root_val, str):
+        try:
+            root_val = NOTE_NAMES.index(root_val)
+        except ValueError:
+            root_val = 0
+    interval = (root_val - key) % 12
     
     # Check diatonic chords first
     if mode == "major":
@@ -320,7 +469,13 @@ def identify_borrowed_chords(chords: List[Chord], key: int, mode: str = "major")
         return borrowed  # Only analyze borrowing in major keys for now
     
     for chord in chords:
-        interval = (chord.root - key) % 12
+        root_val = getattr(chord, "root_num", chord.root)
+        if isinstance(root_val, str):
+            try:
+                root_val = NOTE_NAMES.index(root_val)
+            except ValueError:
+                root_val = 0
+        interval = (root_val - key) % 12
         
         # Check common borrowed chord patterns
         if interval == 3 and chord.quality == 'maj':

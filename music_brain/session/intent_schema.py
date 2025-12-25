@@ -453,7 +453,7 @@ def validate_intent(intent: CompleteSongIntent) -> List[str]:
     
     Returns list of issues found (empty = valid).
     """
-    issues = []
+    issues: List[str] = []
     
     # Phase 0 checks
     if not intent.song_root.core_event:

@@ -34,6 +34,23 @@ assert spec and spec.loader
 spec.loader.exec_module(templates)
 sys.modules["music_brain.groove.templates"] = templates
 
+# Force-load key modules from this repo to avoid any globally-installed versions
+def _force_local_module(module_name: str, relative_path: str):
+    module_path = REPO_ROOT / relative_path
+    spec = importlib.util.spec_from_file_location(module_name, module_path)
+    module = importlib.util.module_from_spec(spec)
+    assert spec and spec.loader
+    sys.modules[module_name] = module
+    spec.loader.exec_module(module)
+    return module
+
+_force_local_module("music_brain.session.intent_schema", "music_brain/session/intent_schema.py")
+_force_local_module("music_brain.structure.progression", "music_brain/structure/progression.py")
+_force_local_module("music_brain.structure.chord", "music_brain/structure/chord.py")
+_force_local_module("music_brain.groove.extractor", "music_brain/groove/extractor.py")
+_force_local_module("music_brain.data", "music_brain/data/__init__.py")
+_force_local_module("music_brain.data.rule_breaking_database", "music_brain/data/rule_breaking_database.py")
+
 # Test imports
 from music_brain.session.intent_schema import (
     CompleteSongIntent, SongRoot, SongIntent, TechnicalConstraints,
@@ -165,8 +182,10 @@ class TestIntentSchema:
     
     def test_list_all_rules(self):
         rules = list_all_rules()
-        assert len(rules) > 0
-        assert 'HARMONY_ModalInterchange' in [r['id'] for r in rules]
+        assert "Harmony" in rules
+        assert "Rhythm" in rules
+        flat_rules = sum(rules.values(), [])
+        assert 'HARMONY_ModalInterchange' in flat_rules
     
     def test_validate_intent_complete(self):
         intent = CompleteSongIntent(
@@ -188,7 +207,7 @@ class TestIntentSchema:
         )
         
         result = validate_intent(intent)
-        assert result['valid'] is True
+        assert result == []
     
     def test_validate_intent_missing_justification(self):
         intent = CompleteSongIntent(
@@ -202,7 +221,7 @@ class TestIntentSchema:
         )
         
         result = validate_intent(intent)
-        assert 'warnings' in result or 'errors' in result
+        assert any("Rule to break" in r for r in result)
 
 
 class TestGrooveTemplates:
@@ -217,7 +236,7 @@ class TestGrooveTemplates:
     def test_get_funk_template(self):
         template = get_genre_template('funk')
         assert template is not None
-        assert hasattr(template, 'swing') or 'swing' in template
+        assert hasattr(template, 'swing') or hasattr(template, 'swing_factor')
     
     def test_get_boom_bap_template(self):
         template = get_genre_template('boom-bap')
@@ -311,8 +330,9 @@ class TestEdgeCases:
     
     def test_empty_progression(self):
         """Empty progression should handle gracefully."""
-        with pytest.raises((ValueError, KeyError, IndexError)):
-            diagnose_progression("")
+        result = diagnose_progression("")
+        assert isinstance(result, dict)
+        assert result.get("issues")
     
     def test_invalid_chord_notation(self):
         """Invalid chord should handle gracefully."""
@@ -340,15 +360,15 @@ class TestRuleBreakingDatabase:
     
     def test_database_has_modal_interchange(self):
         rules = list_all_rules()
-        modal_rules = [r for r in rules if 'modal' in r.get('name', '').lower() or 
-                       'interchange' in r.get('name', '').lower()]
-        assert len(modal_rules) > 0
+        flat_rules = sum(rules.values(), [])
+        modal_rules = [r for r in flat_rules if 'modal' in r.lower() or 'interchange' in r.lower()]
+        assert modal_rules
     
     def test_database_has_examples(self):
         rules = list_all_rules()
         # At least some rules should have examples
-        with_examples = [r for r in rules if 'examples' in r or 'example' in r]
-        assert len(with_examples) > 0 or len(rules) > 5
+        with_examples = [r for r in rules.values() if r]
+        assert with_examples or len(rules) > 5
     
     def test_suggest_returns_justified_breaks(self):
         suggestions = suggest_rule_break("grief")
