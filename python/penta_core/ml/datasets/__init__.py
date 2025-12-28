@@ -248,3 +248,57 @@ from .compressor import (  # noqa: E402
     DatasetCompressor,
     DatasetArchiveManifest,
 )
+
+# Unified dataset generator
+try:
+    from .unified_generator import (
+        UnifiedDatasetGenerator,
+        UnifiedDataset,
+        DataSample,
+        DatasetType,
+        StaticDataLoader,
+        DownloadedSamplesLoader,
+        OSCPatternLoader,
+    )
+    _HAS_UNIFIED = True
+except ImportError:
+    _HAS_UNIFIED = False
+
+# MIDI generator
+try:
+    from .midi_generator import (
+        MIDIGenerator,
+        MIDISequence,
+        MIDINote,
+        MIDIDatasetGenerator,
+        ChordParser,
+        EmotionProfile,
+        EmotionModulator,
+        GenerationConfig,
+    )
+    _HAS_MIDI_GEN = True
+except ImportError:
+    _HAS_MIDI_GEN = False
+
+if _HAS_UNIFIED:
+    __all__.extend([
+        "UnifiedDatasetGenerator",
+        "UnifiedDataset",
+        "DataSample",
+        "DatasetType",
+        "StaticDataLoader",
+        "DownloadedSamplesLoader",
+        "OSCPatternLoader",
+    ])
+
+if _HAS_MIDI_GEN:
+    __all__.extend([
+        "MIDIGenerator",
+        "MIDISequence",
+        "MIDINote",
+        "MIDIDatasetGenerator",
+        "ChordParser",
+        "EmotionProfile",
+        "EmotionModulator",
+        "GenerationConfig",
+    ])

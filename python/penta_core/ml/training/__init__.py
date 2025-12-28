@@ -102,3 +102,22 @@ __all__ = [
     "compute_confusion_matrix",
     "plot_confusion_matrix",
 ]
+
+# CUDA Trainer
+try:
+    from .cuda_trainer import (
+        CUDATrainer,
+        TrainingConfig,
+        TrainingResult,
+        ModelType,
+        train_all_models,
+    )
+    __all__.extend([
+        "CUDATrainer",
+        "TrainingConfig",
+        "TrainingResult",
+        "ModelType",
+        "train_all_models",
+    ])
+except ImportError:
+    pass
