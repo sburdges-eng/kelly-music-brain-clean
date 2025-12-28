@@ -237,7 +237,7 @@ Kelly is a therapeutic desktop application that transforms emotional intent into
   - [ ] Template library
 
 ##### M4.3: Universal VST3 Plugin
-- **Target Date:** October 31, 2027 (4 weeks)
+- **Target Date:** October 31, 2027 (8 weeks from Sep 30)
 - **Status:** Planned
 - **Deliverables:**
   - [ ] VST3 plugin (cross-platform)
@@ -360,7 +360,7 @@ M1.1 (Intent Schema) ──┬──> M1.2 (Harmony) ──┬──> M1.4 (CLI 
 - [ ] Troubleshooting guide
 - [ ] Community guidelines
 
-### Phase 4 Deliverables (Due: December 31, 2026)
+### Phase 4 Deliverables (Due: December 31, 2027)
 
 #### Plugin Deliverables
 - [ ] AU plugin for Logic Pro X
@@ -413,7 +413,7 @@ M1.1 (Intent Schema) ──┬──> M1.2 (Harmony) ──┬──> M1.4 (CLI 
 | **Aug 30** | Logic AU Plugin Complete | Major | High |
 | **Sep 30** | Ableton Integration Complete | Major | High |
 
-### Q4 2026 (October - December 2027)
+### Q4 2026 - Q4 2027 (October 2026 - December 2027)
 
 | Date | Milestone | Type | Priority |
 |------|-----------|------|----------|
@@ -519,7 +519,7 @@ M1.1 (Intent Schema) ──┬──> M1.2 (Harmony) ──┬──> M1.4 (CLI 
 
 **Sign-off Required:** Yes (Full Team)
 
-### Phase 4 Completion Checkpoint (December 31, 2026)
+### Phase 4 Completion Checkpoint (December 31, 2027)
 
 **Must Have:**
 - [ ] At least one DAW plugin working
@@ -613,9 +613,9 @@ M1.1 (Intent Schema) ──┬──> M1.2 (Harmony) ──┬──> M1.4 (CLI 
 ## Appendix
 
 ### Related Documents
-- [ROADMAP_Implementation.md](ROADMAP_Implementation.md) - Detailed technical roadmap
-- [docs/PROJECT_TIMELINE.md](docs/PROJECT_TIMELINE.md) - Comprehensive todo list
-- [docs/PROJECT_ROADMAP.md](docs/PROJECT_ROADMAP.md) - Full development roadmap
+- [ROADMAP_Implementation.md](ROADMAP_Implementation.md) - Detailed technical implementation roadmap (4-phase plan)
+- [docs/PROJECT_TIMELINE.md](docs/PROJECT_TIMELINE.md) - Comprehensive timelined todo list with detailed tasks
+- [docs/PROJECT_ROADMAP.md](docs/PROJECT_ROADMAP.md) - Full development roadmap with vision
 - [README.md](README.md) - Project overview and setup
 - [DESIGN_Integration_Architecture.md](DESIGN_Integration_Architecture.md) - System architecture
 
