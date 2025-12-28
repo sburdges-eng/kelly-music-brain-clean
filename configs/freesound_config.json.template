@@ -1,0 +1,7 @@
+{
+    "freesound_api_key": "YOUR_FREESOUND_API_KEY_HERE",
+    "download_directory": "~/.kelly/emotion_samples",
+    "max_size_per_combo_mb": 25,
+    "rate_limit_delay_seconds": 1.0,
+    "notes": "Get your API key at https://freesound.org/apiv2/apply/"
+}
