@@ -72,3 +72,31 @@ daiw intent process my_song_intent.json
 > "Interrogate Before Generate" - Emotional intent drives technical decisions, not the other way around.
 
 Every rule break requires emotional justification. The tool should make you braver, not finish art for you.
+
+## Machine Learning Usage
+
+Intent files can be used as **training targets** for ML models. See:
+
+- **[ML Training Examples](../../ml_training/)** - Complete guide to using intent schema for model training
+- **[Intent Dataset API](../../../python/penta_core/ml/datasets/intent_dataset.py)** - Dataset loader for PyTorch/TensorFlow
+
+The intent schema provides rich, structured targets for:
+- Emotion recognition (classification)
+- Tension prediction (regression)
+- Narrative arc modeling (classification)
+- Rule-breaking decisions (multi-label classification)
+- Intent-driven data augmentation
+
+```python
+from python.penta_core.ml.datasets.intent_dataset import IntentDataset
+
+# Load intents as training data
+dataset = IntentDataset(intent_dir="examples/music_brain/intents")
+print(f"Loaded {len(dataset)} training samples")
+
+# Get encoded targets
+sample = dataset[0]
+targets = sample["targets"]  # emotion_label, tension, rule_break_id, etc.
+```
+
+See **[examples/ml_training/README.md](../../ml_training/README.md)** for complete usage guide.

@@ -1,0 +1,35 @@
+{
+  "title": "Breaking Point",
+  "created": "2024-12-28",
+  "song_root": {
+    "core_event": "Realizing I've been carrying everyone else's weight for too long",
+    "core_resistance": "Fear of seeming selfish if I say no",
+    "core_longing": "To feel light again, to reclaim my boundaries",
+    "core_stakes": "Personal",
+    "core_transformation": "From exhausted caretaker to self-compassionate individual"
+  },
+  "song_intent": {
+    "mood_primary": "Anger",
+    "mood_secondary_tension": 0.9,
+    "imagery_texture": "Sharp edges, breaking glass, walls crumbling",
+    "vulnerability_scale": "Medium",
+    "narrative_arc": "Sudden Shift"
+  },
+  "technical_constraints": {
+    "technical_genre": "Alternative Rock / Post-Punk",
+    "technical_tempo_range": [
+      120,
+      140
+    ],
+    "technical_key": "E",
+    "technical_mode": "phrygian",
+    "technical_groove_feel": "Straight/Driving",
+    "technical_rule_to_break": "RHYTHM_ConstantDisplacement",
+    "rule_breaking_justification": "The constant displacement creates perpetual unease - representing the off-kilter feeling of finally saying 'enough.' Everything should feel slightly wrong until the moment of breaking."
+  },
+  "system_directive": {
+    "output_target": "Full arrangement with tension build",
+    "output_feedback_loop": "Rhythm, Dynamics"
+  },
+  "notes": "Fast tempo with phrygian mode for dark, urgent energy. Constant rhythmic displacement (all hits shifted 16th note late) to create anxiety. Build from controlled to explosive dynamics. Power chords with parallel motion for punk defiance."
+}
