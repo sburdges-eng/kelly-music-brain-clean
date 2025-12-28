@@ -249,10 +249,11 @@ class EmotionalAudioDataset(Dataset):
                 resampler = torchaudio.transforms.Resample(sample_rate, 44100)
                 waveform = resampler(waveform)
             return waveform
-        except Exception as e:
-            # Fallback: return random noise (for demonstration only)
+        except (FileNotFoundError, RuntimeError) as e:
+            # Handle missing files or loading errors
             import torch
-            return torch.randn(1, 44100 * 3)  # 3 seconds of noise
+            print(f"Warning: Could not load {path}: {e}")
+            return torch.randn(1, 44100 * 3)  # 3 seconds of noise as fallback
 
 # Usage
 emotion_to_idx = {"grief": 0, "joy": 1, "anger": 2, "anxiety": 3, "calm": 4}
@@ -347,9 +348,10 @@ def analyze_audio_emotion(audio_path):
     
     # Valence: Major chroma (C=0, E=4, G=7) → positive, minor (C=0, Eb=3, G=7) → negative
     # Note: Assumes 12-dimensional chroma (one per pitch class)
-    if chroma.shape[0] >= 8:  # Validate we have enough pitch classes
-        major_strength = chroma[[0, 4, 7], :].mean()
-        minor_strength = chroma[[0, 3, 7], :].mean()
+    # We only need indices 0-7 for major/minor chord detection (C through G)
+    if chroma.shape[0] >= 8:  # Validate we have at least 8 pitch classes
+        major_strength = chroma[[0, 4, 7], :].mean()  # C, E, G
+        minor_strength = chroma[[0, 3, 7], :].mean()  # C, Eb, G
         valence = (major_strength - minor_strength)
     else:
         valence = 0.0  # Fallback if chroma is unexpected shape
