@@ -90,6 +90,13 @@ from music_brain.daw.mixer_params import (
 # Samples
 from music_brain.samples import EmotionScaleSampler, FreesoundFetcher
 
+# Emotion-driven sampling (Freesound integration)
+from music_brain.emotion_sampler import (
+    EmotionSampler,
+    BASE_EMOTIONS,
+    INSTRUMENTS as SAMPLER_INSTRUMENTS,
+)
+
 # Learning Module - AI-powered instrument education
 from music_brain.learning import (
     AdaptiveTeacher,
@@ -164,6 +171,10 @@ __all__ = [
     # Samples
     "EmotionScaleSampler",
     "FreesoundFetcher",
+    # Emotion-driven sampling
+    "EmotionSampler",
+    "BASE_EMOTIONS",
+    "SAMPLER_INSTRUMENTS",
     # Learning Module
     "DifficultyLevel",
     "InstrumentFamily",
