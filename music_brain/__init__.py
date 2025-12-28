@@ -97,6 +97,17 @@ from music_brain.emotion_sampler import (
     INSTRUMENTS as SAMPLER_INSTRUMENTS,
 )
 
+# ML OSC Learning - pattern learning for OSC control
+from music_brain.ml_osc import (
+    OSCRecorder,
+    OSCSequence,
+    OSCDataset,
+    OSCMessageEncoder,
+    OSCPatternLearner,
+    OSCPredictor,
+    OSCSequenceGenerator,
+)
+
 # Learning Module - AI-powered instrument education
 from music_brain.learning import (
     AdaptiveTeacher,
@@ -175,6 +186,14 @@ __all__ = [
     "EmotionSampler",
     "BASE_EMOTIONS",
     "SAMPLER_INSTRUMENTS",
+    # ML OSC Learning
+    "OSCRecorder",
+    "OSCSequence",
+    "OSCDataset",
+    "OSCMessageEncoder",
+    "OSCPatternLearner",
+    "OSCPredictor",
+    "OSCSequenceGenerator",
     # Learning Module
     "DifficultyLevel",
     "InstrumentFamily",
