@@ -149,6 +149,8 @@ class IntentEncoder:
             raise ImportError("music_brain.session.intent_schema required")
         
         # Phase 1: Emotional Intent
+        # Note: Using .lower() for defensive programming - allows "Grief", "grief", "GRIEF"
+        # in user-created JSON files while maintaining consistent encoding
         emotion = intent.song_intent.mood_primary.lower()
         emotion_id = self.emotion_to_id.get(emotion, 0)
         emotion_onehot = self._to_onehot(emotion_id, len(self.config.emotion_labels))

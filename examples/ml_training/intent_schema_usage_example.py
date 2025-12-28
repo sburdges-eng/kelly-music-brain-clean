@@ -37,7 +37,10 @@ import json
 # Add music_brain to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-# Import directly from session module to avoid audio module import issues
+# Note: Direct module import is used here to avoid importing music_brain.audio module,
+# which has a pre-existing import issue (uses np.ndarray in signatures without
+# guaranteed numpy import). This workaround keeps the example script functional
+# without numpy/librosa dependencies.
 import importlib.util
 spec = importlib.util.spec_from_file_location(
     "intent_schema",
