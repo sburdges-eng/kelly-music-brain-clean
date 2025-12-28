@@ -169,6 +169,43 @@ MODEL_SPECS = {
         "input_size": 256, "output_size": 512,
         "arch": "DiffSinger", "params": "~10M"
     },
+    # Voice synthesis sub-models
+    ModelType.AUDIO_CLASSIFIER: {
+        "input_size": 128, "output_size": 10,
+        "arch": "CNN:64→128→256", "params": "~500K"
+    },
+    ModelType.BEAT_TRACKER: {
+        "input_size": 128, "output_size": 2,
+        "arch": "TCN:64→128→256", "params": "~300K"
+    },
+    ModelType.KEY_DETECTOR: {
+        "input_size": 12, "output_size": 24,
+        "arch": "CNN+LSTM", "params": "~200K"
+    },
+    ModelType.ONSET_DETECTOR: {
+        "input_size": 128, "output_size": 1,
+        "arch": "CNN:64→128", "params": "~150K"
+    },
+    ModelType.PITCH_TRACKER: {
+        "input_size": 128, "output_size": 360,
+        "arch": "CREPE-style", "params": "~800K"
+    },
+    ModelType.SOURCE_SEPARATOR: {
+        "input_size": 2048, "output_size": 2048,
+        "arch": "U-Net/Demucs", "params": "~50M"
+    },
+    ModelType.TEMPO_ESTIMATOR: {
+        "input_size": 128, "output_size": 300,
+        "arch": "CNN+Dense", "params": "~400K"
+    },
+    ModelType.TIMBRE_ENCODER: {
+        "input_size": 128, "output_size": 256,
+        "arch": "VAE encoder", "params": "~1M"
+    },
+    ModelType.VOICE_ACTIVITY_DETECTOR: {
+        "input_size": 64, "output_size": 1,
+        "arch": "RNN:128→64", "params": "~100K"
+    },
 }
 
 

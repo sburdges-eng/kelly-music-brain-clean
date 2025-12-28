@@ -127,3 +127,34 @@ try:
     ])
 except ImportError:
     pass
+
+# Voice Synthesis Training
+try:
+    from .voice_synthesis import (
+        VoiceSynthesisTrainer,
+        VoiceDataset,
+        VoiceDatasetDownloader,
+        VoiceFeatureExtractor,
+        VoiceFeatures,
+        VocoderConfig,
+        HiFiGANTrainer,
+        AcousticModelConfig,
+        AcousticModelTrainer,
+        MontrealForcedAligner,
+        DATASET_URLS,
+    )
+    __all__.extend([
+        "VoiceSynthesisTrainer",
+        "VoiceDataset",
+        "VoiceDatasetDownloader",
+        "VoiceFeatureExtractor",
+        "VoiceFeatures",
+        "VocoderConfig",
+        "HiFiGANTrainer",
+        "AcousticModelConfig",
+        "AcousticModelTrainer",
+        "MontrealForcedAligner",
+        "DATASET_URLS",
+    ])
+except ImportError:
+    pass
