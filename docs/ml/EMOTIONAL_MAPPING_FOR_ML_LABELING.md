@@ -233,8 +233,26 @@ class EmotionalAudioDataset(Dataset):
         }
     
     def _load_audio(self, path):
-        # Implement audio loading
-        pass
+        """Load and preprocess audio file.
+        
+        Note: This is a simplified example. Production code should handle
+        resampling, normalization, and error cases.
+        """
+        try:
+            import torchaudio
+            waveform, sample_rate = torchaudio.load(path)
+            # Convert to mono if stereo
+            if waveform.shape[0] > 1:
+                waveform = waveform.mean(dim=0, keepdim=True)
+            # Resample if needed
+            if sample_rate != 44100:
+                resampler = torchaudio.transforms.Resample(sample_rate, 44100)
+                waveform = resampler(waveform)
+            return waveform
+        except Exception as e:
+            # Fallback: return random noise (for demonstration only)
+            import torch
+            return torch.randn(1, 44100 * 3)  # 3 seconds of noise
 
 # Usage
 emotion_to_idx = {"grief": 0, "joy": 1, "anger": 2, "anxiety": 3, "calm": 4}
@@ -318,7 +336,7 @@ def analyze_audio_emotion(audio_path):
     
     # Extract features
     tempo, _ = librosa.beat.beat_track(y=y, sr=sr)
-    chroma = librosa.feature.chroma_stft(y=y, sr=sr)
+    chroma = librosa.feature.chroma_stft(y=y, sr=sr)  # Returns 12 x time (C, C#, D, ..., B)
     spectral_centroid = librosa.feature.spectral_centroid(y=y, sr=sr).mean()
     
     # Map to emotional dimensions
@@ -327,10 +345,14 @@ def analyze_audio_emotion(audio_path):
     # Arousal: Higher tempo + spectral brightness → higher arousal
     arousal = min(1.0, (tempo / 200.0) + (spectral_centroid / 5000.0))
     
-    # Valence: Major chroma (C, E, G) → positive, minor → negative
-    major_strength = chroma[[0, 4, 7], :].mean()
-    minor_strength = chroma[[0, 3, 7], :].mean()
-    valence = (major_strength - minor_strength)
+    # Valence: Major chroma (C=0, E=4, G=7) → positive, minor (C=0, Eb=3, G=7) → negative
+    # Note: Assumes 12-dimensional chroma (one per pitch class)
+    if chroma.shape[0] >= 8:  # Validate we have enough pitch classes
+        major_strength = chroma[[0, 4, 7], :].mean()
+        minor_strength = chroma[[0, 3, 7], :].mean()
+        valence = (major_strength - minor_strength)
+    else:
+        valence = 0.0  # Fallback if chroma is unexpected shape
     
     # Determine primary emotion
     if valence < -0.5 and arousal < 0.5:
