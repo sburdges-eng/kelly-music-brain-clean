@@ -262,6 +262,13 @@ package-lock.json
 *.pickle
 *.wavetable
 
+# ML training experiment artifacts
+logs/training/*.json
+checkpoints/*/
+!checkpoints/.gitkeep
+configs/experiments/*.json
+!configs/experiments/.gitkeep
+
 # Video files
 *.mp4
 *.mov

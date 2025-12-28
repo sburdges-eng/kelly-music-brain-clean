@@ -1,0 +1,23 @@
+{
+  "model_id": "variant_model",
+  "model_type": "RTNeural",
+  "task": "emotion_embedding",
+  "input_size": 128,
+  "output_size": 64,
+  "hidden_layers": [
+    512,
+    256,
+    128
+  ],
+  "activation": "relu",
+  "dropout": 0.3,
+  "architecture_type": "mlp",
+  "epochs": 100,
+  "batch_size": 32,
+  "learning_rate": 0.0002,
+  "optimizer": "adam",
+  "loss": "cross_entropy",
+  "author": "",
+  "notes": "Higher batch size, lower LR, more dropout",
+  "labels": []
+}

@@ -1,0 +1,23 @@
+{
+  "model_id": "baseline_model",
+  "model_type": "RTNeural",
+  "task": "emotion_embedding",
+  "input_size": 128,
+  "output_size": 64,
+  "hidden_layers": [
+    512,
+    256,
+    128
+  ],
+  "activation": "relu",
+  "dropout": 0.2,
+  "architecture_type": "mlp",
+  "epochs": 100,
+  "batch_size": 16,
+  "learning_rate": 0.001,
+  "optimizer": "adam",
+  "loss": "cross_entropy",
+  "author": "",
+  "notes": "Baseline configuration",
+  "labels": []
+}
