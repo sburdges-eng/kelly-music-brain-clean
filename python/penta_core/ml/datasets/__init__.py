@@ -302,3 +302,39 @@ if _HAS_MIDI_GEN:
         "EmotionModulator",
         "GenerationConfig",
     ])
+
+# Emotion-annotated datasets
+try:
+    from .emotion_datasets import (
+        EmotionDataset,
+        EmotionDatasetDownloader,
+        EmotionDatasetProcessor,
+        EmotionAnnotatedSample,
+        GEMSRating,
+        GEMSAnnotator,
+        BigFiveProfile,
+        PersonalityMapper,
+        TherapeuticGoal,
+        TherapeuticRecommender,
+        OpenSMILEExtractor,
+        DATASET_INFO,
+    )
+    _HAS_EMOTION = True
+except ImportError:
+    _HAS_EMOTION = False
+
+if _HAS_EMOTION:
+    __all__.extend([
+        "EmotionDataset",
+        "EmotionDatasetDownloader",
+        "EmotionDatasetProcessor",
+        "EmotionAnnotatedSample",
+        "GEMSRating",
+        "GEMSAnnotator",
+        "BigFiveProfile",
+        "PersonalityMapper",
+        "TherapeuticGoal",
+        "TherapeuticRecommender",
+        "OpenSMILEExtractor",
+        "DATASET_INFO",
+    ])
