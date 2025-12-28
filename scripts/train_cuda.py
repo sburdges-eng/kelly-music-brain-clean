@@ -284,12 +284,21 @@ Examples:
     parser.add_argument("--check-gpu", action="store_true",
                        help="Check GPU availability")
 
-    # Training options
+    # Training options - all models from registry + additional
+    ALL_MODELS = [
+        # Core 7 from registry
+        "emotion_recognizer", "melody_transformer", "harmony_predictor",
+        "dynamics_engine", "groove_predictor", "instrument_recognizer",
+        "emotion_node_classifier",
+        # Additional ML modules
+        "osc_pattern_learner", "style_transfer", "chord_predictor", "neural_voice",
+        # Audio analysis models
+        "audio_classifier", "beat_tracker", "key_detector", "onset_detector",
+        "pitch_tracker", "source_separator", "tempo_estimator",
+        "timbre_encoder", "voice_activity_detector",
+    ]
     parser.add_argument("--model", type=str, default=None,
-                       choices=["emotion_recognizer", "melody_transformer",
-                               "harmony_predictor", "dynamics_engine",
-                               "groove_predictor", "instrument_recognizer",
-                               "osc_pattern_learner"],
+                       choices=ALL_MODELS,
                        help="Train specific model (default: all)")
     parser.add_argument("--epochs", type=int, default=100,
                        help="Training epochs (default: 100)")

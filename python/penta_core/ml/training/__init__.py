@@ -110,6 +110,9 @@ try:
         TrainingConfig,
         TrainingResult,
         ModelType,
+        MODEL_SPECS,
+        SSD_PATHS,
+        get_ssd_data_path,
         train_all_models,
     )
     __all__.extend([
@@ -117,6 +120,9 @@ try:
         "TrainingConfig",
         "TrainingResult",
         "ModelType",
+        "MODEL_SPECS",
+        "SSD_PATHS",
+        "get_ssd_data_path",
         "train_all_models",
     ])
 except ImportError:

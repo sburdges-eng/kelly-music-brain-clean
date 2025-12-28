@@ -32,14 +32,56 @@ logger = logging.getLogger(__name__)
 
 
 class ModelType(Enum):
-    """Kelly ML model types."""
+    """Kelly ML model types - aligned with models/registry.json"""
+    # Core 7 models from registry
     EMOTION_RECOGNIZER = "emotion_recognizer"
     MELODY_TRANSFORMER = "melody_transformer"
     HARMONY_PREDICTOR = "harmony_predictor"
     DYNAMICS_ENGINE = "dynamics_engine"
     GROOVE_PREDICTOR = "groove_predictor"
     INSTRUMENT_RECOGNIZER = "instrument_recognizer"
+    EMOTION_NODE_CLASSIFIER = "emotion_node_classifier"
+
+    # Additional ML modules
     OSC_PATTERN_LEARNER = "osc_pattern_learner"
+    STYLE_TRANSFER = "style_transfer"
+    CHORD_PREDICTOR = "chord_predictor"
+    NEURAL_VOICE = "neural_voice"
+
+    # Audio analysis models
+    AUDIO_CLASSIFIER = "audio_classifier"
+    BEAT_TRACKER = "beat_tracker"
+    KEY_DETECTOR = "key_detector"
+    ONSET_DETECTOR = "onset_detector"
+    PITCH_TRACKER = "pitch_tracker"
+    SOURCE_SEPARATOR = "source_separator"
+    TEMPO_ESTIMATOR = "tempo_estimator"
+    TIMBRE_ENCODER = "timbre_encoder"
+    VOICE_ACTIVITY_DETECTOR = "voice_activity_detector"
+
+
+# SSD Storage paths
+SSD_PATHS = {
+    "darwin": "/Volumes/Extreme SSD/kelly-audio-data",
+    "linux": "/mnt/ssd/kelly-audio-data",
+    "windows": "D:\\kelly-audio-data",
+}
+
+
+def get_ssd_data_path() -> Optional[Path]:
+    """Get SSD data path if available."""
+    import platform
+    system = platform.system().lower()
+    ssd_path = Path(SSD_PATHS.get(system, SSD_PATHS["linux"]))
+
+    # Check environment override
+    env_path = os.environ.get("KELLY_SSD_PATH")
+    if env_path:
+        ssd_path = Path(env_path)
+
+    if ssd_path.exists():
+        return ssd_path
+    return None
 
 
 @dataclass
@@ -57,7 +99,8 @@ class TrainingConfig:
     mixed_precision: bool = True  # FP16 training
     gradient_accumulation_steps: int = 1
 
-    # Data
+    # Data paths
+    data_dir: Optional[Path] = None  # Auto-detect SSD if None
     train_split: float = 0.8
     val_split: float = 0.1
     test_split: float = 0.1
@@ -71,6 +114,62 @@ class TrainingConfig:
     log_every_n_steps: int = 100
     use_tensorboard: bool = True
     use_wandb: bool = False
+
+    # Model-specific architecture params (from registry)
+    arch_params: Dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self):
+        """Auto-detect SSD path if not specified."""
+        if self.data_dir is None:
+            ssd_path = get_ssd_data_path()
+            if ssd_path:
+                self.data_dir = ssd_path
+                logger.info(f"Using SSD data path: {ssd_path}")
+
+
+# Model architecture specifications from registry
+MODEL_SPECS = {
+    ModelType.EMOTION_RECOGNIZER: {
+        "input_size": 128, "output_size": 64,
+        "arch": "128→512→256→128→64", "params": "~500K"
+    },
+    ModelType.MELODY_TRANSFORMER: {
+        "input_size": 64, "output_size": 128,
+        "arch": "64→256→256→256→128", "params": "~400K"
+    },
+    ModelType.HARMONY_PREDICTOR: {
+        "input_size": 128, "output_size": 64,
+        "arch": "128→256→128→64", "params": "~100K"
+    },
+    ModelType.DYNAMICS_ENGINE: {
+        "input_size": 32, "output_size": 16,
+        "arch": "32→128→64→16", "params": "~20K"
+    },
+    ModelType.GROOVE_PREDICTOR: {
+        "input_size": 64, "output_size": 32,
+        "arch": "64→128→64→32", "params": "~25K"
+    },
+    ModelType.INSTRUMENT_RECOGNIZER: {
+        "input_size": 128, "output_size": 160,
+        "arch": "CNN:64→128→256→512", "params": "~2M"
+    },
+    ModelType.EMOTION_NODE_CLASSIFIER: {
+        "input_size": 128, "output_size": 258,
+        "arch": "CNN+Multi-head", "params": "~3M"
+    },
+    ModelType.STYLE_TRANSFER: {
+        "input_size": 64, "output_size": 64,
+        "arch": "VAE/CycleGAN", "params": "~1M"
+    },
+    ModelType.CHORD_PREDICTOR: {
+        "input_size": 128, "output_size": 128,
+        "arch": "LSTM:256→256→128", "params": "~800K"
+    },
+    ModelType.NEURAL_VOICE: {
+        "input_size": 256, "output_size": 512,
+        "arch": "DiffSinger", "params": "~10M"
+    },
+}
 
 
 @dataclass
