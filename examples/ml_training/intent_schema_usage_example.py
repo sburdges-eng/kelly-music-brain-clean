@@ -37,13 +37,20 @@ import json
 # Add music_brain to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from music_brain.session.intent_schema import (
-    CompleteSongIntent,
-    SongRoot,
-    SongIntent,
-    TechnicalConstraints,
-    validate_intent,
+# Import directly from session module to avoid audio module import issues
+import importlib.util
+spec = importlib.util.spec_from_file_location(
+    "intent_schema",
+    Path(__file__).parent.parent.parent / "music_brain" / "session" / "intent_schema.py"
 )
+intent_schema_module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(intent_schema_module)
+
+CompleteSongIntent = intent_schema_module.CompleteSongIntent
+SongRoot = intent_schema_module.SongRoot
+SongIntent = intent_schema_module.SongIntent
+TechnicalConstraints = intent_schema_module.TechnicalConstraints
+validate_intent = intent_schema_module.validate_intent
 
 from python.penta_core.ml.datasets.intent_dataset import (
     IntentDataset,
