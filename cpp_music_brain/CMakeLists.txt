@@ -53,15 +53,17 @@ endif()
 # CPM.cmake for package management
 include(cmake/CPM.cmake)
 
-# JUCE Framework
-CPMAddPackage(
-    NAME JUCE
-    GITHUB_REPOSITORY juce-framework/JUCE
-    GIT_TAG 7.0.12
-    OPTIONS
-        "JUCE_BUILD_EXAMPLES OFF"
-        "JUCE_BUILD_EXTRAS OFF"
-)
+# JUCE Framework (only when building plugin targets)
+if(DAIW_BUILD_VST3 OR DAIW_BUILD_AU)
+    CPMAddPackage(
+        NAME JUCE
+        GITHUB_REPOSITORY juce-framework/JUCE
+        GIT_TAG 7.0.12
+        OPTIONS
+            "JUCE_BUILD_EXAMPLES OFF"
+            "JUCE_BUILD_EXTRAS OFF"
+    )
+endif()
 
 # fmt for formatting
 CPMAddPackage(
@@ -190,7 +192,7 @@ set_target_warnings(daiw_harmony)
 # VST3 Plugin
 # =============================================================================
 
-if(DAIW_BUILD_VST3)
+if(DAIW_BUILD_VST3 OR DAIW_BUILD_AU)
     juce_add_plugin(DAiWPlugin
         COMPANY_NAME "DAiW"
         PLUGIN_MANUFACTURER_CODE Daiw
@@ -261,6 +263,10 @@ endif()
 if(DAIW_BUILD_TESTS)
     enable_testing()
 
+    # Catch2 provides CMake helpers in its extras directory
+    list(APPEND CMAKE_MODULE_PATH "${Catch2_SOURCE_DIR}/extras")
+    include(Catch)
+
     add_executable(daiw_tests
         tests/test_main.cpp
         tests/test_memory_pool.cpp
@@ -278,7 +284,6 @@ if(DAIW_BUILD_TESTS)
     )
 
     include(CTest)
-    include(Catch)
     catch_discover_tests(daiw_tests)
 endif()
 
