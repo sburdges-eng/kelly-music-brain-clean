@@ -158,6 +158,12 @@ class TrainingConfig:
 class AudioDataset(Dataset):
     """
     Audio dataset with lazy loading and augmentation.
+    
+    Supports rich metadata including:
+    - Emotional attributes (emotion, valence, arousal, intensity)
+    - Musical intent (key, tempo, mode, chord_progression)
+    - DAiW thesaurus integration (node_id for 216-class emotion hierarchy)
+    - Sample annotations (quality_score, rule_breaks, tags)
     """
     
     def __init__(
@@ -168,6 +174,7 @@ class AudioDataset(Dataset):
         max_duration: float = 5.0,
         augmentor: Optional[AudioAugmentor] = None,
         transform: Optional[Any] = None,
+        use_thesaurus: bool = False,
     ):
         self.data_dir = Path(data_dir)
         self.sample_rate = sample_rate
@@ -175,9 +182,23 @@ class AudioDataset(Dataset):
         self.max_duration = max_duration
         self.augmentor = augmentor
         self.transform = transform
+        self.use_thesaurus = use_thesaurus
         
         # Load metadata
         self.samples = self._load_samples()
+        
+        # Optionally load thesaurus for emotion node mapping
+        self.thesaurus_loader = None
+        if use_thesaurus:
+            try:
+                from python.penta_core.ml.datasets import ThesaurusLoader
+                thesaurus_path = self.data_dir / "emotion_thesaurus"
+                if thesaurus_path.exists():
+                    self.thesaurus_loader = ThesaurusLoader(thesaurus_path)
+                    self.thesaurus_loader.load()
+                    logger.info(f"Loaded thesaurus with {len(self.thesaurus_loader.nodes)} emotion nodes")
+            except ImportError:
+                logger.warning("ThesaurusLoader not available, skipping thesaurus loading")
         
         # Mel spectrogram transform
         if TORCHAUDIO_AVAILABLE:
@@ -190,7 +211,32 @@ class AudioDataset(Dataset):
             self.amplitude_to_db = torchaudio.transforms.AmplitudeToDB()
     
     def _load_samples(self) -> List[Dict[str, Any]]:
-        """Load sample metadata."""
+        """
+        Load sample metadata with support for emotional and intent metadata.
+        
+        Expected metadata.json schema:
+        {
+            "samples": [
+                {
+                    "file": "path/to/audio.wav",
+                    "emotion": "happy",
+                    "valence": 0.8,
+                    "arousal": 0.6,
+                    "intensity_tier": 3,
+                    "node_id": 42,
+                    "key": "C major",
+                    "tempo_bpm": 120.0,
+                    "mode": "major",
+                    "chord_progression": ["C", "Am", "F", "G"],
+                    "groove_type": "straight",
+                    "tags": ["uplifting", "energetic"]
+                }
+            ]
+        }
+        
+        Returns:
+            List of sample dictionaries with metadata
+        """
         samples = []
         
         # Check for metadata file
@@ -198,9 +244,17 @@ class AudioDataset(Dataset):
         if metadata_path.exists():
             with open(metadata_path) as f:
                 data = json.load(f)
-            return data.get("samples", [])
+            samples = data.get("samples", [])
+            
+            # Validate and enrich metadata
+            for sample in samples:
+                self._validate_sample_metadata(sample)
+            
+            logger.info(f"Loaded {len(samples)} samples from metadata.json")
+            return samples
         
         # Fallback: scan directories
+        logger.warning("No metadata.json found, scanning directories for basic metadata")
         processed_dir = self.data_dir / "processed"
         if processed_dir.exists():
             for emotion_dir in processed_dir.iterdir():
@@ -210,12 +264,131 @@ class AudioDataset(Dataset):
                         samples.append({
                             "file": str(audio_file),
                             "emotion": emotion,
+                            # Default values for missing metadata
+                            "valence": 0.0,
+                            "arousal": 0.0,
+                            "intensity_tier": 3,
                         })
         
         return samples
     
+    def _validate_sample_metadata(self, sample: Dict[str, Any]) -> None:
+        """
+        Validate and set defaults for sample metadata.
+        
+        Args:
+            sample: Sample dictionary to validate (modified in-place)
+        """
+        # Required fields
+        if "file" not in sample:
+            raise ValueError("Sample missing required 'file' field")
+        
+        # Set defaults for optional emotional metadata
+        sample.setdefault("emotion", "neutral")
+        sample.setdefault("valence", 0.0)
+        sample.setdefault("arousal", 0.0)
+        sample.setdefault("intensity_tier", 3)
+        
+        # Set defaults for optional intent metadata
+        sample.setdefault("key", "")
+        sample.setdefault("tempo_bpm", 0.0)
+        sample.setdefault("mode", "")
+        sample.setdefault("chord_progression", [])
+        sample.setdefault("groove_type", "straight")
+        
+        # Set defaults for optional annotation metadata
+        sample.setdefault("tags", [])
+        sample.setdefault("quality_score", 0.0)
+        sample.setdefault("rule_breaks", [])
+        
+        # Validate ranges
+        if not -1.0 <= sample["valence"] <= 1.0:
+            logger.warning(f"Valence {sample['valence']} out of range [-1, 1], clamping")
+            sample["valence"] = max(-1.0, min(1.0, sample["valence"]))
+        
+        if not 0.0 <= sample["arousal"] <= 1.0:
+            logger.warning(f"Arousal {sample['arousal']} out of range [0, 1], clamping")
+            sample["arousal"] = max(0.0, min(1.0, sample["arousal"]))
+        
+        if not 0 <= sample["intensity_tier"] <= 5:
+            logger.warning(f"Intensity tier {sample['intensity_tier']} out of range [0, 5], clamping")
+            sample["intensity_tier"] = max(0, min(5, sample["intensity_tier"]))
+    
     def __len__(self) -> int:
         return len(self.samples)
+    
+    def get_sample_metadata(self, idx: int) -> Dict[str, Any]:
+        """
+        Get the full metadata for a sample.
+        
+        Args:
+            idx: Sample index
+        
+        Returns:
+            Dictionary with all metadata fields including emotional and intent attributes
+        """
+        return self.samples[idx].copy()
+    
+    def get_emotion_labels(self, idx: int) -> Dict[str, Any]:
+        """
+        Extract emotion-related labels for a sample.
+        
+        Args:
+            idx: Sample index
+        
+        Returns:
+            Dictionary with emotion labels suitable for multi-head training:
+            - emotion: Basic emotion string
+            - valence: float [-1, 1]
+            - arousal: float [0, 1]
+            - intensity_tier: int [0, 5]
+            - node_id: int [0, 215] (if available from thesaurus)
+        """
+        sample = self.samples[idx]
+        
+        labels = {
+            "emotion": sample.get("emotion", "neutral"),
+            "valence": sample.get("valence", 0.0),
+            "arousal": sample.get("arousal", 0.0),
+            "intensity_tier": sample.get("intensity_tier", 3),
+        }
+        
+        # Add thesaurus node ID if available
+        if "node_id" in sample:
+            labels["node_id"] = sample["node_id"]
+        elif self.thesaurus_loader:
+            # Try to map emotion name to node
+            emotion_name = sample.get("emotion", "").lower()
+            node = self.thesaurus_loader.get_node_by_name(emotion_name)
+            if node:
+                labels["node_id"] = node.node_id
+        
+        return labels
+    
+    def get_musical_metadata(self, idx: int) -> Dict[str, Any]:
+        """
+        Extract musical intent metadata for a sample.
+        
+        Args:
+            idx: Sample index
+        
+        Returns:
+            Dictionary with musical metadata:
+            - key: Musical key (e.g., "C major")
+            - tempo_bpm: Tempo in BPM
+            - mode: Mode (major, minor, dorian, etc.)
+            - chord_progression: List of chords
+            - groove_type: Groove/feel type
+        """
+        sample = self.samples[idx]
+        
+        return {
+            "key": sample.get("key", ""),
+            "tempo_bpm": sample.get("tempo_bpm", 0.0),
+            "mode": sample.get("mode", ""),
+            "chord_progression": sample.get("chord_progression", []),
+            "groove_type": sample.get("groove_type", "straight"),
+        }
     
     def __getitem__(self, idx: int) -> Tuple[torch.Tensor, int]:
         sample = self.samples[idx]
