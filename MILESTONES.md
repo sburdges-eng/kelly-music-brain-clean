@@ -100,8 +100,10 @@ This document provides a high-level overview of major project milestones for the
 **Sub-Milestones:**
 - M4.1: Logic AU Plugin (Aug 30, 2026)
 - M4.2: Ableton Integration (Sep 30, 2026)
-- M4.3: VST3 Plugin (Oct 31, 2027) - Extended timeline for cross-platform development
+- M4.3: VST3 Plugin (Oct 31, 2027) - Extended timeline for cross-platform development and testing
 - M4.4: Commercial Launch (Dec 31, 2027)
+
+**Note:** VST3 development runs in parallel with Logic/Ableton work but requires extended timeline for cross-platform compatibility (Windows, macOS, Linux).
 
 ---
 

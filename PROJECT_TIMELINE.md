@@ -237,7 +237,7 @@ Kelly is a therapeutic desktop application that transforms emotional intent into
   - [ ] Template library
 
 ##### M4.3: Universal VST3 Plugin
-- **Target Date:** October 31, 2027 (8 weeks from Sep 30)
+- **Target Date:** October 31, 2027 (13 months from Sep 30, 2026)
 - **Status:** Planned
 - **Deliverables:**
   - [ ] VST3 plugin (cross-platform)
@@ -557,11 +557,11 @@ M1.1 (Intent Schema) ──┬──> M1.2 (Harmony) ──┬──> M1.4 (CLI 
 - **Testing:** 75% (90 hours)
 - **Documentation:** 50% (60 hours)
 
-#### Phase 4 (Aug 1 - Dec 31, 2026)
+#### Phase 4 (Aug 1, 2026 - Dec 31, 2027)
 - **Lead Developer:** 75% (90-120 hours)
-- **Plugin Developer:** 100% (120 hours)
-- **Testing:** 75% (90 hours)
-- **Marketing:** 50% (60 hours)
+- **Plugin Developer:** 100% (160 hours)
+- **Testing:** 75% (120 hours)
+- **Marketing:** 50% (80 hours)
 
 ---
 
