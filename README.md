@@ -93,3 +93,8 @@ Returns a JSON list/dictionary of available emotions.
 
 ## License
 MIT
+## Contributing
+
+Interested in contributing? Check out:
+- [TEAM_ROLES.md](TEAM_ROLES.md) - Team structure and role responsibilities
+- [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) - Development guidelines and setup

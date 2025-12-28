@@ -2,6 +2,10 @@
 
 Thank you for your interest in contributing to Kelly!
 
+## Team Roles & Responsibilities
+
+Before contributing, please review our [Team Roles document](../TEAM_ROLES.md) to understand the different roles and responsibilities within the project. This will help you identify where your skills and interests align with the project's needs.
+
 ## Development Setup
 
 ### Prerequisites
@@ -89,14 +93,37 @@ Add emotion mapping for surprise category
 
 ## Areas for Contribution
 
+See our [Team Roles document](../TEAM_ROLES.md) for detailed information about different contribution areas. Key areas include:
+
+### Music Theory & Composition
 - Expanding the emotion thesaurus to full 216 nodes
-- Adding more groove templates
-- Improving MIDI generation algorithms
-- Enhancing the GUI interface
-- Adding audio analysis features (librosa integration)
+- Adding more groove templates and genre-specific patterns
+- Validating emotional-to-musical mappings
+- Creating songwriting guides
+
+### Software Development
+- **Python Backend**: Improving MIDI generation algorithms, expanding the Music Brain API
+- **Frontend (React/TypeScript)**: Enhancing the GUI interface, improving UX
+- **Audio Engine (C++/JUCE)**: Adding audio analysis features, implementing real-time processing
+- **Desktop Integration (Rust/Tauri)**: Improving OS integrations, optimizing performance
+
+### Machine Learning
+- Developing emotion classification models
+- Implementing audio feature extraction
+- Training chord and tempo detection models
+
+### Documentation & Testing
 - Writing documentation and examples
-- Improving test coverage
+- Improving test coverage (target >80%)
+- Creating user guides and tutorials
+
+## Getting Started
+
+1. **Choose Your Role**: Review the [Team Roles document](../TEAM_ROLES.md) to find where you'd like to contribute
+2. **Start Small**: Look for issues tagged with `good-first-issue` to get familiar with the codebase
+3. **Understand the Philosophy**: Read the project README and `.github/copilot-instructions.md` to understand the "Interrogate Before Generate" philosophy
+4. **Join Discussions**: Participate in GitHub Discussions to connect with the community
 
 ## Questions?
 
-Feel free to open an issue for discussion before starting work on major changes.
+Feel free to open an issue or GitHub Discussion before starting work on major changes. For team-related questions, refer to the [Team Roles document](../TEAM_ROLES.md).
