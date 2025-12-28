@@ -1,0 +1,47 @@
+{
+  "run_id": "melody_transformer_demo_20251228_085538",
+  "config": {
+    "model_id": "melody_transformer_demo",
+    "model_type": "RTNeural",
+    "task": "emotion_embedding",
+    "input_size": 128,
+    "output_size": 64,
+    "hidden_layers": [
+      512,
+      256,
+      128
+    ],
+    "activation": "relu",
+    "dropout": 0.2,
+    "architecture_type": "mlp",
+    "epochs": 100,
+    "batch_size": 16,
+    "learning_rate": 0.001,
+    "optimizer": "adam",
+    "loss": "cross_entropy",
+    "author": "",
+    "notes": "",
+    "labels": []
+  },
+  "git_commit": "1542557cd781",
+  "hardware": "x86_64",
+  "start_time": "2025-12-28T08:55:38.740414",
+  "end_time": "",
+  "duration_seconds": 0.0,
+  "final_train_loss": 0.0,
+  "final_val_loss": 0.0,
+  "final_test_loss": 0.0,
+  "best_epoch": 0,
+  "best_val_loss": Infinity,
+  "output_files": [
+    "/home/runner/work/kelly-music-brain-clean/kelly-music-brain-clean/checkpoints/melody_transformer_demo/best.pt",
+    "/home/runner/work/kelly-music-brain-clean/kelly-music-brain-clean/checkpoints/melody_transformer_demo/epoch_5.pt",
+    "/home/runner/work/kelly-music-brain-clean/kelly-music-brain-clean/checkpoints/melody_transformer_demo/epoch_10.pt",
+    "/home/runner/work/kelly-music-brain-clean/kelly-music-brain-clean/checkpoints/melody_transformer_demo/final.pt",
+    "/home/runner/work/kelly-music-brain-clean/kelly-music-brain-clean/checkpoints/melody_transformer_demo/results.json",
+    "/home/runner/work/kelly-music-brain-clean/kelly-music-brain-clean/checkpoints/melody_transformer_demo/training_curves.png",
+    "/home/runner/work/kelly-music-brain-clean/kelly-music-brain-clean/checkpoints/melody_transformer_demo/confusion_matrix.png"
+  ],
+  "success": true,
+  "error": ""
+}
