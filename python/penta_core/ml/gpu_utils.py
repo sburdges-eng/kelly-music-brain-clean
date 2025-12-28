@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from typing import List, Optional, Dict, Any
 from enum import Enum
 import platform
+import importlib
 
 
 class DeviceType(Enum):
@@ -34,10 +35,15 @@ class GPUDevice:
     memory_total_mb: int = 0
     memory_free_mb: int = 0
     compute_capability: Optional[str] = None
+    cuda_driver_version: Optional[str] = None
+    cuda_runtime_version: Optional[str] = None
 
     # Performance info
     fp32_tflops: Optional[float] = None
     fp16_tflops: Optional[float] = None
+    bf16_supported: Optional[bool] = None
+    int8_supported: Optional[bool] = None
+    tensor_cores_available: Optional[bool] = None
 
     # Backend-specific
     backend_device_id: Optional[str] = None
@@ -81,16 +87,28 @@ def _detect_cuda_devices() -> List[GPUDevice]:
     """Detect NVIDIA CUDA devices."""
     devices = []
 
-    try:
+    if importlib.util.find_spec("torch"):
         import torch
         if torch.cuda.is_available():
+            cuda_info = get_cuda_runtime_info()
             for i in range(torch.cuda.device_count()):
                 props = torch.cuda.get_device_properties(i)
                 memory_total = props.total_memory // (1024 * 1024)
 
                 # Get free memory
                 torch.cuda.set_device(i)
-                memory_free = torch.cuda.memory_reserved(i) // (1024 * 1024)
+                try:
+                    free_bytes, total_bytes = torch.cuda.mem_get_info(i)
+                    memory_free = free_bytes // (1024 * 1024)
+                    memory_total = total_bytes // (1024 * 1024)
+                except AttributeError:
+                    memory_free = memory_total - (torch.cuda.memory_reserved(i) // (1024 * 1024))
+
+                capability = f"{props.major}.{props.minor}"
+                tensor_cores = _has_tensor_cores(props.major, props.minor)
+                bf16_supported = getattr(torch.cuda, "is_bf16_supported", None)
+                bf16_available = bf16_supported() if bf16_supported else None
+                int8_supported = _has_int8_support(props.major, props.minor)
 
                 devices.append(GPUDevice(
                     device_type=DeviceType.CUDA,
@@ -98,28 +116,37 @@ def _detect_cuda_devices() -> List[GPUDevice]:
                     index=i,
                     memory_total_mb=memory_total,
                     memory_free_mb=memory_total - memory_free,
-                    compute_capability=f"{props.major}.{props.minor}",
+                    compute_capability=capability,
+                    cuda_driver_version=cuda_info.get("driver"),
+                    cuda_runtime_version=cuda_info.get("runtime"),
+                    bf16_supported=bf16_available,
+                    int8_supported=int8_supported,
+                    tensor_cores_available=tensor_cores,
                     backend_device_id=f"cuda:{i}",
                 ))
 
-    except ImportError:
-        # Try pycuda
-        try:
-            import pycuda.driver as cuda
-            import pycuda.autoinit
+    if not devices and importlib.util.find_spec("pycuda"):
+        import pycuda.driver as cuda
+        import pycuda.autoinit
 
-            for i in range(cuda.Device.count()):
-                dev = cuda.Device(i)
-                devices.append(GPUDevice(
-                    device_type=DeviceType.CUDA,
-                    name=dev.name(),
-                    index=i,
-                    memory_total_mb=dev.total_memory() // (1024 * 1024),
-                    compute_capability=f"{dev.compute_capability()[0]}.{dev.compute_capability()[1]}",
-                    backend_device_id=f"cuda:{i}",
-                ))
-        except ImportError:
-            pass
+        cuda_info = get_cuda_runtime_info()
+        for i in range(cuda.Device.count()):
+            dev = cuda.Device(i)
+            major, minor = dev.compute_capability()
+            capability = f"{major}.{minor}"
+            devices.append(GPUDevice(
+                device_type=DeviceType.CUDA,
+                name=dev.name(),
+                index=i,
+                memory_total_mb=dev.total_memory() // (1024 * 1024),
+                compute_capability=capability,
+                cuda_driver_version=cuda_info.get("driver"),
+                cuda_runtime_version=cuda_info.get("runtime"),
+                bf16_supported=_has_bf16_support(major, minor),
+                int8_supported=_has_int8_support(major, minor),
+                tensor_cores_available=_has_tensor_cores(major, minor),
+                backend_device_id=f"cuda:{i}",
+            ))
 
     return devices
 
@@ -180,6 +207,65 @@ def _detect_rocm_devices() -> List[GPUDevice]:
         pass
 
     return devices
+
+
+def get_cuda_runtime_info() -> Dict[str, Optional[str]]:
+    """
+    Get CUDA runtime and driver versions (if available).
+
+    Returns:
+        Dict with keys: driver, runtime
+    """
+    info: Dict[str, Optional[str]] = {"driver": None, "runtime": None}
+    if importlib.util.find_spec("torch"):
+        import torch
+        info["runtime"] = torch.version.cuda
+        if hasattr(torch, "_C") and hasattr(torch._C, "_cuda_getDriverVersion"):
+            driver_version = torch._C._cuda_getDriverVersion()
+            if driver_version:
+                major = driver_version // 1000
+                minor = (driver_version % 1000) // 10
+                info["driver"] = f"{major}.{minor}"
+    return info
+
+
+def get_cuda_capability_map() -> Dict[str, Dict[str, Any]]:
+    """
+    Map CUDA device capabilities by index.
+
+    Returns:
+        Dict of device_index -> capability info
+    """
+    capability_map: Dict[str, Dict[str, Any]] = {}
+    devices = _detect_cuda_devices()
+    for device in devices:
+        capability_map[str(device.index)] = {
+            "name": device.name,
+            "compute_capability": device.compute_capability,
+            "memory_total_mb": device.memory_total_mb,
+            "memory_free_mb": device.memory_free_mb,
+            "tensor_cores_available": device.tensor_cores_available,
+            "bf16_supported": device.bf16_supported,
+            "int8_supported": device.int8_supported,
+            "cuda_driver_version": device.cuda_driver_version,
+            "cuda_runtime_version": device.cuda_runtime_version,
+        }
+    return capability_map
+
+
+def _has_tensor_cores(major: int, minor: int) -> bool:
+    """Determine Tensor Core availability from compute capability."""
+    return (major, minor) >= (7, 0)
+
+
+def _has_bf16_support(major: int, minor: int) -> bool:
+    """Determine BF16 support from compute capability."""
+    return (major, minor) >= (8, 0)
+
+
+def _has_int8_support(major: int, minor: int) -> bool:
+    """Determine INT8 support from compute capability."""
+    return (major, minor) >= (6, 1)
 
 
 def select_best_device(

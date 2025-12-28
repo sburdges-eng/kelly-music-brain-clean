@@ -215,6 +215,8 @@ __all__ = [
     "get_cache_dir",
     "get_manifests_dir",
     "ensure_audio_directories",
+    "DatasetCompressor",
+    "DatasetArchiveManifest",
 ]
 
 if _HAS_DOWNLOADER:
@@ -241,3 +243,8 @@ if _HAS_THESAURUS:
         "get_node_label_tensor",
         "validate_thesaurus_completeness",
     ])
+
+from .compressor import (  # noqa: E402
+    DatasetCompressor,
+    DatasetArchiveManifest,
+)

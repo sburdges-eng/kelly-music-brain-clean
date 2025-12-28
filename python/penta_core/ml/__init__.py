@@ -53,6 +53,14 @@ from python.penta_core.ml.gpu_utils import (
     select_best_device,
     GPUDevice,
     DeviceType,
+    get_cuda_runtime_info,
+    get_cuda_capability_map,
+)
+
+from python.penta_core.ml.knowledge_base import (
+    KnowledgeBase,
+    KnowledgeDocument,
+    connect_knowledge_base,
 )
 
 # Training and export utilities (optional imports)
@@ -106,6 +114,12 @@ __all__ = [
     "select_best_device",
     "GPUDevice",
     "DeviceType",
+    "get_cuda_runtime_info",
+    "get_cuda_capability_map",
+    # Knowledge base
+    "KnowledgeBase",
+    "KnowledgeDocument",
+    "connect_knowledge_base",
 ]
 
 # Add dataset exports if available
