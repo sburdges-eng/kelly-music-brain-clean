@@ -191,6 +191,54 @@ daiw intent validate my_song.yaml
 
 ---
 
+## Machine Learning Usage
+
+The intent schema is designed for **ML training** with rich, structured targets beyond simple emotion labels.
+
+### Training Data Format
+
+Intent files serve as training targets for:
+- **Emotion Recognition**: Multi-class classification (grief, joy, anger, etc.)
+- **Tension Prediction**: Regression (0.0-1.0 continuous values)
+- **Narrative Arc Modeling**: Structural arc classification
+- **Rule-Breaking Decisions**: Multi-label classification with justification
+
+### Quick Start
+
+```python
+from python.penta_core.ml.datasets.intent_dataset import IntentDataset
+
+# Load intent files as training data
+dataset = IntentDataset(intent_dir="examples/music_brain/intents")
+
+# Get encoded targets for ML models
+sample = dataset[0]
+targets = sample["targets"]
+# {
+#   "emotion_label": 0,           # Classification
+#   "tension": 0.8,               # Regression
+#   "rule_break_id": 5,           # Multi-label
+#   "has_justification": True,    # Binary
+# }
+
+# Compatible with PyTorch/TensorFlow
+from torch.utils.data import DataLoader
+loader = DataLoader(dataset, batch_size=32, shuffle=True)
+```
+
+### Complete ML Training Guide
+
+See **[examples/ml_training/README.md](../examples/ml_training/README.md)** for:
+- Complete training pipeline examples
+- Multi-task learning architectures
+- Intent-driven data augmentation strategies
+- Dataset validation utilities
+- PyTorch integration examples
+
+The intent schema enables **intent-driven ML** - models learn meaningful emotional relationships, not just patterns.
+
+---
+
 ## Connection to DAiW Modules
 
 | Intent Field | DAiW Module | Output |

@@ -1,0 +1,35 @@
+{
+  "title": "Golden Hour Memory",
+  "created": "2024-12-28",
+  "song_root": {
+    "core_event": "Remembering a perfect summer evening with someone who's no longer in my life",
+    "core_resistance": "Wanting to stay in the memory instead of moving forward",
+    "core_longing": "To hold onto the warmth without the pain of loss",
+    "core_stakes": "Relational",
+    "core_transformation": "From clinging to the past to cherishing it as it was"
+  },
+  "song_intent": {
+    "mood_primary": "Nostalgia",
+    "mood_secondary_tension": 0.4,
+    "imagery_texture": "Soft focus, warm light through leaves, faded photographs",
+    "vulnerability_scale": "Medium",
+    "narrative_arc": "Static Reflection"
+  },
+  "technical_constraints": {
+    "technical_genre": "Indie Folk / Dream Pop",
+    "technical_tempo_range": [
+      75,
+      90
+    ],
+    "technical_key": "D",
+    "technical_mode": "mixolydian",
+    "technical_groove_feel": "Laid Back",
+    "technical_rule_to_break": "PRODUCTION_RoomNoise",
+    "rule_breaking_justification": "Keeping the ambient room sound and natural noise creates authenticity - like you're actually in that summer evening moment. The imperfection makes it feel real, not polished away."
+  },
+  "system_directive": {
+    "output_target": "Acoustic arrangement with atmosphere",
+    "output_feedback_loop": "Production, Arrangement"
+  },
+  "notes": "Mixolydian mode gives bittersweet quality (major with flat 7). Laid-back groove, behind the beat for relaxed feel. Keep room noise and natural ambience. Fingerpicking guitar with open tunings. Minimal production for intimacy."
+}
