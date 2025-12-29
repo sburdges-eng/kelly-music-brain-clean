@@ -1,0 +1,76 @@
+{
+  "name": "RR CLI Plugin",
+  "version": "1.0.0",
+  "description": "Git + OpenAI integrated CLI tool for smart commits, code analysis, and learning",
+  "author": "Kelly Project",
+  "license": "MIT",
+  "repository": "file:///Volumes/Extreme SSD/kelly-project",
+  "commands": [
+    {
+      "name": "rr",
+      "description": "RR CLI: Git + OpenAI integration",
+      "script": "./commands/rr.sh",
+      "arguments": ["command", "subcommand"],
+      "help": "Run 'rr --help' for full command list"
+    },
+    {
+      "name": "rr-commit",
+      "description": "Generate AI-powered commit message from staged changes",
+      "script": "./commands/rr-commit.sh",
+      "arguments": ["style"],
+      "help": "Generate smart commit message and optionally commit"
+    },
+    {
+      "name": "rr-analyze",
+      "description": "Analyze code with AI",
+      "script": "./commands/rr-analyze.sh",
+      "arguments": ["file", "type"],
+      "help": "Analyze FILE with optional analysis TYPE (security/performance/architecture)"
+    },
+    {
+      "name": "rr-suggest",
+      "description": "Get AI suggestions for improving code",
+      "script": "./commands/rr-suggest.sh",
+      "arguments": ["file"],
+      "help": "Get improvement suggestions for FILE"
+    },
+    {
+      "name": "rr-explain",
+      "description": "Learn about programming concepts",
+      "script": "./commands/rr-explain.sh",
+      "arguments": ["topic"],
+      "help": "Explain TOPIC or concept"
+    },
+    {
+      "name": "rr-ask",
+      "description": "Ask questions about programming",
+      "script": "./commands/rr-ask.sh",
+      "arguments": ["question"],
+      "help": "Ask a QUESTION to the AI"
+    },
+    {
+      "name": "rr-status",
+      "description": "Check git repository status",
+      "script": "./commands/rr-status.sh",
+      "help": "Show git status"
+    },
+    {
+      "name": "rr-help",
+      "description": "Show RR CLI help and documentation",
+      "script": "./commands/rr-help.sh",
+      "help": "Display help for RR CLI"
+    }
+  ],
+  "dependencies": {
+    "rr-cli": ">=1.0.0",
+    "python": ">=3.8",
+    "git": ">=2.0"
+  },
+  "installation": {
+    "steps": [
+      "Install RR CLI: pip install -e /path/to/rr_cli",
+      "Set OpenAI API key: export OPENAI_API_KEY=sk-...",
+      "Verify: rr --help"
+    ]
+  }
+}
