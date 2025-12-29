@@ -1,0 +1,51 @@
+{
+  "folders": [
+    {
+      "name": "🧠 Brain (Python)",
+      "path": "brain-python"
+    },
+    {
+      "name": "🎵 Audio Engine (C++)",
+      "path": "audio-engine-cpp"
+    },
+    {
+      "name": "🔌 Plugin (JUCE)",
+      "path": "plugin-juce"
+    },
+    {
+      "name": "🖥️ Desktop App",
+      "path": "desktop-app"
+    },
+    {
+      "name": "📦 Shared Data",
+      "path": "shared-data"
+    },
+    {
+      "name": "📚 Docs",
+      "path": "docs"
+    },
+    {
+      "name": "🔗 Integration",
+      "path": "integration"
+    },
+    {
+      "name": "📁 Project Root",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.associations": {
+      "*.hpp": "cpp",
+      "*.h": "c"
+    },
+    "python.defaultInterpreterPath": "${workspaceFolder:🧠 Brain (Python)}/.venv/bin/python",
+    "files.exclude": {
+      "**/__pycache__": true,
+      "**/*.pyc": true,
+      "**/.pytest_cache": true,
+      "**/node_modules": true,
+      "**/build": false
+    }
+  }
+}
+
