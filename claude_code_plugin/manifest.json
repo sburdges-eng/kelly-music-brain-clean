@@ -42,6 +42,13 @@
       "help": "Explain TOPIC or concept"
     },
     {
+      "name": "rr-teach",
+      "description": "Detailed microscopic-level explanations",
+      "script": "./commands/rr-teach.sh",
+      "arguments": ["topic"],
+      "help": "Get detailed, microscopic-level explanation of TOPIC with code examples and deep dives"
+    },
+    {
       "name": "rr-ask",
       "description": "Ask questions about programming",
       "script": "./commands/rr-ask.sh",

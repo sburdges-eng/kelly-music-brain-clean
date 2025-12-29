@@ -11,6 +11,7 @@ This plugin provides seamless access to RR CLI commands within Claude Code sessi
 - `/rr-analyze` - Analyze code with AI
 - `/rr-suggest` - Get improvement suggestions
 - `/rr-explain` - Learn programming concepts
+- `/rr-teach` - Detailed microscopic-level explanations
 - `/rr-ask` - Ask questions
 - `/rr-status` - Check git status
 - `/rr-help` - Show help
@@ -110,13 +111,33 @@ Or use the quick command:
 /rr ai suggest file.py
 ```
 
-### Learn Concepts
+### Learn Concepts (Simple Explanation)
 
 ```bash
 /rr-explain "multi-task learning"
 # Or directly
 /rr ai explain "encoder generalization"
 ```
+
+### Detailed Teaching (Microscopic Level)
+
+For in-depth understanding with code examples, architecture details, and deep dives:
+
+```bash
+/rr-teach "encoder generalization"
+/rr-teach "multi-task learning"
+/rr-teach "task head independence"
+/rr-teach "loss balancing"
+```
+
+The teach command provides:
+- Step-by-step concept breakdown
+- Detailed code examples with comments
+- Architecture and system integration
+- Critical edge cases and pitfalls
+- Real-world applications
+- Mental models for understanding
+- Further learning resources
 
 ### Ask Questions
 
@@ -156,7 +177,8 @@ Runs any RR CLI command directly.
 | `/rr-commit` | Generate AI commit message | `/rr-commit [style]` |
 | `/rr-analyze` | Analyze code | `/rr-analyze FILE [type]` |
 | `/rr-suggest` | Get suggestions | `/rr-suggest FILE` |
-| `/rr-explain` | Learn concept | `/rr-explain TOPIC` |
+| `/rr-explain` | Learn concept (simple) | `/rr-explain TOPIC` |
+| `/rr-teach` | Learn concept (detailed) | `/rr-teach TOPIC` |
 | `/rr-ask` | Ask question | `/rr-ask QUESTION` |
 | `/rr-status` | Check git status | `/rr-status` |
 | `/rr-help` | Show help | `/rr-help` |
