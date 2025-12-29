@@ -1,0 +1,21 @@
+# ninja log v7
+1	16	1766747038880000000	readerwriterqueue-populate-prefix/src/readerwriterqueue-populate-stamp/readerwriterqueue-populate-mkdir	e98ebe278be6922f
+1	16	1766747038880000000	/Volumes/Extreme SSD/kelly-project/audio-engine-cpp/build-debug/_deps/readerwriterqueue-subbuild/readerwriterqueue-populate-prefix/src/readerwriterqueue-populate-stamp/readerwriterqueue-populate-mkdir	e98ebe278be6922f
+17	1253	1766747040120000000	readerwriterqueue-populate-prefix/src/readerwriterqueue-populate-stamp/readerwriterqueue-populate-download	68a88ebb572fabb0
+17	1253	1766747040120000000	/Volumes/Extreme SSD/kelly-project/audio-engine-cpp/build-debug/_deps/readerwriterqueue-subbuild/readerwriterqueue-populate-prefix/src/readerwriterqueue-populate-stamp/readerwriterqueue-populate-download	68a88ebb572fabb0
+1254	1294	1766747040120000000	readerwriterqueue-populate-prefix/src/readerwriterqueue-populate-stamp/readerwriterqueue-populate-update	eb2d69e6017666f9
+1254	1294	1766747040120000000	/Volumes/Extreme SSD/kelly-project/audio-engine-cpp/build-debug/_deps/readerwriterqueue-subbuild/readerwriterqueue-populate-prefix/src/readerwriterqueue-populate-stamp/readerwriterqueue-populate-update	eb2d69e6017666f9
+1294	1310	1766747040170000000	readerwriterqueue-populate-prefix/src/readerwriterqueue-populate-stamp/readerwriterqueue-populate-patch	667da3e949241713
+1294	1310	1766747040170000000	/Volumes/Extreme SSD/kelly-project/audio-engine-cpp/build-debug/_deps/readerwriterqueue-subbuild/readerwriterqueue-populate-prefix/src/readerwriterqueue-populate-stamp/readerwriterqueue-populate-patch	667da3e949241713
+1310	1324	1766747040190000000	readerwriterqueue-populate-prefix/src/readerwriterqueue-populate-stamp/readerwriterqueue-populate-configure	ce1f0bf09885af5c
+1310	1324	1766747040190000000	/Volumes/Extreme SSD/kelly-project/audio-engine-cpp/build-debug/_deps/readerwriterqueue-subbuild/readerwriterqueue-populate-prefix/src/readerwriterqueue-populate-stamp/readerwriterqueue-populate-configure	ce1f0bf09885af5c
+1324	1338	1766747040200000000	readerwriterqueue-populate-prefix/src/readerwriterqueue-populate-stamp/readerwriterqueue-populate-build	6f09705a7fd0bd5e
+1324	1338	1766747040200000000	/Volumes/Extreme SSD/kelly-project/audio-engine-cpp/build-debug/_deps/readerwriterqueue-subbuild/readerwriterqueue-populate-prefix/src/readerwriterqueue-populate-stamp/readerwriterqueue-populate-build	6f09705a7fd0bd5e
+1338	1353	1766747040220000000	readerwriterqueue-populate-prefix/src/readerwriterqueue-populate-stamp/readerwriterqueue-populate-install	1ca6209eac2025dc
+1338	1353	1766747040220000000	/Volumes/Extreme SSD/kelly-project/audio-engine-cpp/build-debug/_deps/readerwriterqueue-subbuild/readerwriterqueue-populate-prefix/src/readerwriterqueue-populate-stamp/readerwriterqueue-populate-install	1ca6209eac2025dc
+1353	1371	1766747040230000000	readerwriterqueue-populate-prefix/src/readerwriterqueue-populate-stamp/readerwriterqueue-populate-test	f6369bcd259f198
+1353	1371	1766747040230000000	/Volumes/Extreme SSD/kelly-project/audio-engine-cpp/build-debug/_deps/readerwriterqueue-subbuild/readerwriterqueue-populate-prefix/src/readerwriterqueue-populate-stamp/readerwriterqueue-populate-test	f6369bcd259f198
+1371	1395	1766747040260000000	CMakeFiles/readerwriterqueue-populate-complete	b4a094d33981d79a
+1371	1395	1766747040260000000	readerwriterqueue-populate-prefix/src/readerwriterqueue-populate-stamp/readerwriterqueue-populate-done	b4a094d33981d79a
+1371	1395	1766747040260000000	/Volumes/Extreme SSD/kelly-project/audio-engine-cpp/build-debug/_deps/readerwriterqueue-subbuild/CMakeFiles/readerwriterqueue-populate-complete	b4a094d33981d79a
+1371	1395	1766747040260000000	/Volumes/Extreme SSD/kelly-project/audio-engine-cpp/build-debug/_deps/readerwriterqueue-subbuild/readerwriterqueue-populate-prefix/src/readerwriterqueue-populate-stamp/readerwriterqueue-populate-done	b4a094d33981d79a

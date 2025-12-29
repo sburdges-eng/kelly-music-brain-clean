@@ -1,0 +1,5 @@
+if(EXISTS "/Volumes/Extreme SSD/kelly-project/audio-engine-cpp/build-debug/penta_tests-b12d07c_tests.cmake")
+  include("/Volumes/Extreme SSD/kelly-project/audio-engine-cpp/build-debug/penta_tests-b12d07c_tests.cmake")
+else()
+  add_test(penta_tests_NOT_BUILT-b12d07c penta_tests_NOT_BUILT-b12d07c)
+endif()
