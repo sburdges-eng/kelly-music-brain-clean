@@ -1,12 +1,15 @@
-# RR - Git + OpenAI CLI Tool
+# RR - Refactor-Review CLI Tool
 
-A powerful command-line tool that integrates Git and OpenAI to streamline your development workflow.
+A powerful command-line tool that integrates Git, Claude AI, and multi-version management for streamlined development workflow.
 
 ## Features
 
 - **Git Integration**: Check status, view logs, and manage commits
-- **AI-Powered Commits**: Automatically generate commit messages using AI
+- **AI-Powered Commits**: Automatically generate commit messages using Claude AI
 - **Code Analysis**: Analyze code with AI suggestions
+- **Multi-Version Management**: Register, compare, and manage multiple build versions
+- **Color-Coded Identification**: Visual identification of build types and comparison status
+- **Dual-Repo Synchronization**: Automatically sync versions between kelly-project and MidiKompanion
 - **Learning Tool**: Ask questions and get explanations on programming concepts
 - **Improvement Suggestions**: Get AI-powered suggestions to improve your code
 
@@ -15,7 +18,7 @@ A powerful command-line tool that integrates Git and OpenAI to streamline your d
 ### Prerequisites
 
 - Python 3.8 or higher
-- OpenAI API key (get one at https://platform.openai.com/api-keys)
+- Anthropic Claude API key (get one at https://console.anthropic.com/)
 - Git
 
 ### Setup
@@ -30,18 +33,16 @@ cd rr_cli
 pip install -e .
 ```
 
-3. Configure your OpenAI API key:
+3. Configure your Anthropic API key:
 ```bash
-# Create a .env file from the example
-cp .env.example .env
-
-# Edit .env and add your OpenAI API key
-# OPENAI_API_KEY=sk-...
+# Set the environment variable
+export ANTHROPIC_API_KEY="your-api-key-here"
 ```
 
-Alternatively, set the environment variable:
+Or create a `.env` file:
 ```bash
-export OPENAI_API_KEY=your_api_key_here
+cp .env.example .env
+# Edit .env and add your API key
 ```
 
 ## Usage
@@ -122,6 +123,47 @@ rr ai explain "what is a decorator in Python"
 rr ai ask "best practices for error handling"
 ```
 
+## Multi-Version Management (NEW!)
+
+Manage multiple versions of files across different builds with AI-powered comparison.
+
+```bash
+# Register a file version
+rr version register path/to/file.py --build-type release
+
+# Compare two versions
+rr version compare path/to/file.py --build-type-a release --build-type-b debug
+
+# View all registered versions
+rr version analyze
+
+# Generate comparison report
+rr version report
+```
+
+## Dual-Repository Synchronization (NEW!)
+
+Automatically sync files between kelly-project and MidiKompanion repositories.
+
+```bash
+# Analyze differences
+rr sync analyze-all --kelly /path/kelly --midikompanion /path/midi
+
+# Merge using AI selection
+rr sync merge-all --kelly /path/kelly --midikompanion /path/midi --use-ai
+
+# Commit to both repos
+rr sync commit-all --kelly /path/kelly --midikompanion /path/midi
+
+# View sync status
+rr sync status --kelly /path/kelly --midikompanion /path/midi
+
+# Generate report
+rr sync report --kelly /path/kelly --midikompanion /path/midi
+```
+
+**For detailed instructions, see:** `QUICK_START.md` and `MULTI_VERSION_GUIDE.md`
+
 ## Command Reference
 
 ### Git Group
@@ -136,6 +178,20 @@ rr ai ask "best practices for error handling"
 - `explain` - Explain a concept
 - `ask` - Ask a question
 
+### Version Group (NEW!)
+- `register` - Register a file version
+- `compare` - Compare two versions
+- `analyze` - View registered versions
+- `report` - Generate comparison report
+- `push-multi` - Push to multiple repos
+
+### Sync Group (NEW!)
+- `analyze-all` - Analyze files across repos
+- `merge-all` - Merge with AI selection
+- `commit-all` - Commit to both repos
+- `status` - Show sync status
+- `report` - Generate sync report
+
 ## Options
 
 ### Global Options
@@ -147,11 +203,11 @@ rr ai ask "best practices for error handling"
 
 ## Troubleshooting
 
-### "OPENAI_API_KEY environment variable not set"
+### "ANTHROPIC_API_KEY environment variable not set"
 Make sure your API key is configured. Either:
-1. Create a `.env` file with your API key
-2. Set the `OPENAI_API_KEY` environment variable
-3. Pass it as a parameter (check `--help`)
+1. Set the environment variable: `export ANTHROPIC_API_KEY="your-key-here"`
+2. Create a `.env` file with your API key
+3. Check the `MULTI_VERSION_GUIDE.md` for detailed setup
 
 ### "Invalid git repository"
 Make sure you're running the command in a git repository or specify the repository path:
@@ -159,14 +215,22 @@ Make sure you're running the command in a git repository or specify the reposito
 rr git status --repo /path/to/repo
 ```
 
+### "File not found" errors
+Use absolute paths for reliability:
+```bash
+rr version register /absolute/path/to/file.py --build-type release
+```
+
 ### API Rate Limits
-If you exceed OpenAI's rate limits, wait a moment and try again.
+If you exceed Anthropic's rate limits, wait a moment and try again.
+
+### Sync Issues
+Check `MULTI_VERSION_GUIDE.md` for comprehensive troubleshooting.
 
 ## Configuration
 
 ### Environment Variables
-- `OPENAI_API_KEY` - Your OpenAI API key (required)
-- `OPENAI_MODEL` - Model to use (optional, default: gpt-4)
+- `ANTHROPIC_API_KEY` - Your Anthropic Claude API key (required)
 
 ## License
 
