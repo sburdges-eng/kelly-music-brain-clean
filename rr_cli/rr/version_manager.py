@@ -144,11 +144,18 @@ class VersionManager:
         """Initialize version manager"""
         self.repo_path = repo_path
         self.git_handler = GitHandler(repo_path)
-        self.ai_handler = AIHandler()
+        self._ai_handler: Optional[AIHandler] = None
         self.versions: Dict[str, List[FileVersion]] = {}
         self.comparisons: Dict[str, VersionComparison] = {}
         self.version_dir = Path(repo_path) / ".versions"
         self.version_dir.mkdir(exist_ok=True)
+
+    @property
+    def ai_handler(self) -> AIHandler:
+        """Lazy-load AI handler (only when needed)"""
+        if self._ai_handler is None:
+            self._ai_handler = AIHandler()
+        return self._ai_handler
 
     def register_version(
         self,

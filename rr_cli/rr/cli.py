@@ -9,7 +9,7 @@ from .dual_repo_sync import DualRepoSync
 
 
 @click.group()
-@click.version_option()
+@click.version_option(version="1.0.0", prog_name="rr")
 def main():
     """RR - Refactor-Review CLI with Multi-Version Support"""
     pass
