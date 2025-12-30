@@ -15,7 +15,7 @@ venv/
 .env.*
 
 # Google services config (contains API keys)
-google-services.json
+**/google-services.json
 
 # CMake / build
 build/
