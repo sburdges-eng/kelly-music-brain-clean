@@ -1,0 +1,51 @@
+# Centralized Path Configuration for RR CLI
+# This file defines all file mappings between kelly-project and MidiKompanion
+
+# Project root paths (can be overridden by environment variables)
+roots:
+  kelly: "${KELLY_ROOT:}"
+  midikompanion: "${MIDI_ROOT:}"
+
+# File mappings between repositories
+# Priority: Higher values sync first
+mappings:
+  git_handler:
+    kelly_path: "rr_cli/rr/git_handler.py"
+    midikompanion_path: "mcp_web_parser/git_handler.py"
+    shared_identifier: "GitHandler"
+    priority: 5
+    description: "Git repository integration handler"
+
+  ai_handler:
+    kelly_path: "rr_cli/rr/ai_handler.py"
+    midikompanion_path: "mcp_web_parser/ai_handler.py"
+    shared_identifier: "AIHandler"
+    priority: 5
+    description: "Claude AI integration handler"
+
+  version_manager:
+    kelly_path: "rr_cli/rr/version_manager.py"
+    midikompanion_path: "version_management/version_manager.py"
+    shared_identifier: "VersionManager"
+    priority: 4
+    description: "Multi-version management system"
+
+  dual_repo_sync:
+    kelly_path: "rr_cli/rr/dual_repo_sync.py"
+    midikompanion_path: "version_management/dual_repo_sync.py"
+    shared_identifier: "DualRepoSync"
+    priority: 4
+    description: "Repository synchronization controller"
+
+# Exclude patterns (glob patterns to skip)
+exclude_patterns:
+  - "**/__pycache__/**"
+  - "**/.mypy_cache/**"
+  - "**/._*"
+  - "**/.git/**"
+
+# Optional: Additional configuration
+config:
+  case_sensitive: true
+  validate_exists: true
+  backup_before_sync: true
